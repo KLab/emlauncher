@@ -3,6 +3,7 @@
  * ServerEnv configuration
  */
 $serverenv_config = array(
+	'application_identifier' => 'ohoflight2-dev',
 
 	'local' => array(
 		'database' => array(
