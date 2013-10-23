@@ -11,8 +11,6 @@ $serverenv_config = array(
 			'default_master' => 'mysql:dbname=emlauncher;host=localhost',
 			),
 		'http_proxy' => array(
-			//'host' => '127.0.0.1',
-			//'port' => 8080,
 			),
 		'memcache' => array(
 			'host' => 'localhost',

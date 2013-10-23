@@ -1,0 +1,73 @@
+
+* {
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  color: #333333;
+  background-color: #eeeeee;
+}
+
+#navbar {
+  height: 2em;
+  padding: 0 1.5em;
+  color: #cccccc;
+  background-color: #555555;
+
+  -webkit-gradient(linear, left bottom, left top, color-stop(0, #444444), color-stop(1, #555555));
+
+}
+
+#navbar h1 {
+  padding: 0.5em 0em;
+  font-size: medium;
+}
+
+#navbar h1 .em {
+  background-color: inherit;
+}
+#navbar h1 .launcher {
+  color: #ffffff;
+  background-color: inherit;
+}
+
+#navbar #loginuser {
+  float: right;
+}
+
+#navbar #loginuser .address {
+  height: 2em;
+  padding: 0.5em 1em;
+  height: 1em;
+}
+
+#navbar #loginuser .address:after {
+  font-size: 0.5em;
+  content: "▼";
+}
+
+#navbar #loginuser .address:hover {
+  color: inherit;
+  background-color: #444444;
+}
+
+#navbar #usermenu {
+  color: inherit;
+  background-color: #555555;
+  list-style-type: none;
+  visibility: hidden;
+}
+
+#navbar #usermenu li {
+  padding: 0.4em 1.5em;
+  border-top: solid 1px #cccccc;
+}
+
+#navbar #usermenu li a {
+  color: inherit;
+  background-color: inherit;
+  text-decoration: none;
+}
+
+
