@@ -7,7 +7,7 @@
   </head>
   <body>
     <div id="navbar">
-      <div id="loginuser" <?=($this->login_user)?'':'style="visibility:hidden"'?>>
+      <div id="loginuser" <?=($this->login_user)?'':'style="visibility:visible"'?>>
         <div class="address">
           makiuchi-d@klab.com
         </div>
