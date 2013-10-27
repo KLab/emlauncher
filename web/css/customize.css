@@ -1,9 +1,16 @@
 
 
 body {
-	background-color: #eee;
 }
 
 .navbar {
 	border-radius: 0;
 }
+
+
+form+.google-login {
+padding: 1em;
+margin-top: 1em;
+border-top: 1px solid #ccc;
+}
+

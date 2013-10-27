@@ -7,13 +7,13 @@
     <?php if(mfwServerEnv::getEnv()==='local'): ?>
     <link href="/bootstrap/3.0.0/css/bootstrap.min.css" rel="stylesheet" media="screen">
     <?php else: ?>
-    <link href="//netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap.min.css" rel="stylesheet" media="screen">
+    <link href="//netdna.bootstrapcdn.com/bootswatch/3.0.0/flatly/bootstrap.min.css" rel="stylesheet" media="screen">
     <?php endif ?>
     <link rel="stylesheet" href="<?=url('/css/customize.css')?>" type="text/css">
   </head>
   <body>
 
-    <div class="navbar navbar-inverse" role="navigation">
+    <div class="navbar navbar-default" role="navigation">
       <div class="navbar-header">
         <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-ex1-collapse">
           <span class="sr-only">Toggle navigation</span>
@@ -33,7 +33,7 @@
             <ul class="dropdown-menu">
               <li><a href="<?=url('/mypage')?>">Mypage</a></li>
               <li><a href="<?=url('/project/create')?>">New project</a></li>
-              <li><a href="<?=url('/mypage/logout')?>">Logout</a></li>
+              <li><a href="<?=url('/logout')?>">Logout</a></li>
             </ul>
           </li>
         </ul>
