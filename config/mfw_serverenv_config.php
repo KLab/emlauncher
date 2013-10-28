@@ -19,3 +19,8 @@ $serverenv_config = array(
 		),
 
 	);
+
+$serverenv_config['aws'] = $serverenv_config['local'];
+$serverenv_config['aws']['database']['authfile'] = '/home/ohoflight2/dbauth/httpd';
+
+
