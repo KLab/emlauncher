@@ -7,7 +7,7 @@
 
     <div class="panel-body">
       <?php if($enable_password):?>
-      <form class="form-horizontal" method="post" action="#">
+      <form class="form-horizontal" method="post" action="<?=url('/login/password')?>">
 
         <div class="form-group">
           <label class="control-label col-sm-3" for="email">email</label>

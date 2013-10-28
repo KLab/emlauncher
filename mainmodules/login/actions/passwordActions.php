@@ -5,6 +5,19 @@ require_once APP_ROOT.'/model/UserPass.php';
 class passwordActions extends loginActions
 {
 
+	public function executePassword()
+	{
+		$mail = mfwRequest::param('email');
+		$pass = mfwRequest::param('password');
+
+		$user_pass = UserPassDb::selectByEmail($mail);
+		if(!$user_pass || !$user_pass->checkPassword($pass)){
+			return $this->buildErrorPage('invalid email or password');
+		}
+
+		return $this->redirect('/'); // todo: もともとアクセスしようとしていたぺーじへ
+	}
+
 	public function executePassword_reminder()
 	{
 		return $this->build();
@@ -55,6 +68,7 @@ class passwordActions extends loginActions
 		}
 
 		$user_pass->updatePasshash($pass);
+		mfwMemcache::delete($key);
 
 		return $this->build();
 	}

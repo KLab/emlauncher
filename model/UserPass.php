@@ -34,11 +34,48 @@ class UserPass extends mfwObject {
 		}
 	}
 
-	public function updateNewPasshash($password,$con=null)
+	protected function randomstring($length)
 	{
-		
+		$chars = '123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
+		$strlen = strlen($chars);
+		$str = '';
+		for($i=0;$i<$length;++$i){
+			$str .= $chars[mt_rand(0,$strlen-1)];
+		}
+		return $str;
+	}
+	protected function calchash($pass,$salt,$stretch)
+	{
+		$hash = sha1("{$pass}{$salt}");
+		for($i=0;$i<$stretch;++$i){
+			$hash = sha1($hash);
+		}
+		return $hash;
 	}
 
+	public function updatePasshash($password,$con=null)
+	{
+		$stretch = mt_rand(10,20);
+		$salt = $this->randomstring(16);
+		$hash = $this->calchash($password,$salt,$stretch);
+
+		$this->row['passhash'] = "{$stretch}:{$salt}:{$hash}";
+
+		error_log(json_encode($this->row));
+
+		$this->update($con);
+	}
+
+	public function checkPassword($password)
+	{
+		$passhash = $this->value('passhash');
+		if(!$password || !$passhash){
+			return false;
+		}
+		list($stretch,$salt,$hash) = explode(':',$passhash,3);
+		$calc = $this->calchash($password,$salt,$stretch);
+		return ($calc==$hash);
+	}
 }
 
 /**
