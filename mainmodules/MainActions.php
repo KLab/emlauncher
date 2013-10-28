@@ -15,9 +15,18 @@ class MainActions extends mfwActions
 
 //		$this->login_user = User::getLoginUser();
 		if(!$this->login_user && $this->getModule()!='login'){
-			mfwMemcache::storeUrl(mfwRequest::url());
 			return $this->redirect('/login');
 		}
+	}
+
+
+	protected function buildErrorPage($message)
+	{
+		$params = array(
+			'message' => $message,
+			);
+		$this->setTemplateName('_error');
+		return $this->build($params);
 	}
 
 }

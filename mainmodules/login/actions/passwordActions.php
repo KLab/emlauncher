@@ -1,6 +1,6 @@
 <?php
 require_once __DIR__.'/actions.php';
-
+require_once APP_ROOT.'/model/UserPass.php';
 
 class passwordActions extends loginActions
 {
@@ -10,28 +10,52 @@ class passwordActions extends loginActions
 		return $this->build();
 	}
 
-	public function executePassword_send()
-	{
-		return $this->redirect('/login/password_confirm');
-	}
-
 	public function executePassword_confirm()
 	{
-		return $this->build();
+		$params = array('error'=>0);
+
+		$mail = mfwRequest::param('email');
+		$user_pass = UserPassDb::selectByEmail($mail);
+		if($user_pass){
+			$user_pass->sendResetMail($this->config['reminder_address']);
+		}
+		else{
+			$params['error'] = 1;
+		}
+		return $this->build($params);
 	}
+
 
 	public function executePassword_reset()
 	{
-		return $this->build();
-	}
-
-	public function executePassword_apply()
-	{
-		return $this->redirect('/login/password_commit');
+		$key = mfwRequest::param('key');
+		$data = mfwMemcache::get($key);
+		if(!$data){
+			return $this->buildErrorPage('invalid key');
+		}
+		$params = array(
+			'key' => $key,
+			'data' => $data,
+			);
+		return $this->build($params);
 	}
 
 	public function executePassword_commit()
 	{
+		$key = mfwRequest::param('key');
+		$pass = mfwRequest::param('password');
+
+		$data = mfwMemcache::get($key);
+		$user_pass = null;
+		if(isset($data['mail'])){
+			$user_pass = UserPassDb::selectByEmail($data['mail']);
+		}
+		if(!$user_pass){
+			return $this->buildErrorPage('invalid key');
+		}
+
+		$user_pass->updatePasshash($pass);
+
 		return $this->build();
 	}
 

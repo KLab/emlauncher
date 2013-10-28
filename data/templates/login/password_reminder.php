@@ -6,7 +6,7 @@
     </div>
 
     <div class="panel-body">
-      <form class="form-horizontal" method="post" action="<?=url('/login/password_send')?>">
+      <form class="form-horizontal" method="post" action="<?=url('/login/password_confirm')?>">
 
         <div class="form-group">
           <label class="control-label col-sm-3" for="email">email</label>

@@ -12,6 +12,10 @@ $login_config = array(
 		 *  パスワードリセットの手順を踏むことでパスワードを登録する.
 		 */
 		'enable_password' => true,
+		/**
+		 * パスワードリマインダのメール送信用アドレス.
+		 */
+		'reminder_address' => 'no-reply@example.com',
 
 		/**
 		 * Googleアカウントでのログインを許可.
