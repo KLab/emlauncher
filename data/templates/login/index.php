@@ -10,9 +10,9 @@
       <form class="form-horizontal" method="post" action="#">
 
         <div class="form-group">
-          <label class="control-label col-sm-3" for="name">email</label>
+          <label class="control-label col-sm-3" for="email">email</label>
           <div class="col-sm-9">
-            <input class="form-control" type="text" id="name" name="name">
+            <input class="form-control" type="text" id="email" name="email">
           </div>
         </div>
         <div class="form-group">
@@ -23,7 +23,7 @@
         </div>
         <div class="col-sm-9 col-sm-offset-3">
           <input type="submit" class="btn btn-primary" value="login">
-          <a class="btn btn-link" href="">forget password</a>
+          <a class="btn btn-link" href="<?=url('/login/password_reminder')?>">forget password</a>
         </div>
       </form>
       <?php endif ?>
