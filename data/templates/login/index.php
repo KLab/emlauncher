@@ -1,6 +1,6 @@
 
 <div id="signin-dialog" class="col-sm-6 col-sm-offset-3">
-  <div class="panel panel-default">
+  <div class="panel panel-primary">
     <div class="panel-heading">
       <h2 class="panel-title">Login</h2>
     </div>

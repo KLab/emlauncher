@@ -7,6 +7,13 @@ body {
 	border-radius: 0;
 }
 
+.dropdown-menu {
+	background-color: #3e648d;
+}
+.dropdown-menu>li>a{
+	color: #fff;
+}
+
 
 form+.google-login {
 padding: 1em;
