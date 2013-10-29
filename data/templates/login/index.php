@@ -30,7 +30,7 @@
 
       <?php if($enable_google_auth): ?>
       <div class="google-login col-sm-10 col-sm-offset-1">
-        <a class="btn btn-primary col-xs-12">Login with google account</a>
+        <a class="btn btn-primary col-xs-12" href="<?=url('/login/google')?>">Login with google account</a>
       </div>
       <?php endif ?>
     </div>
