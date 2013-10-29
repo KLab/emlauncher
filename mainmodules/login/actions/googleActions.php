@@ -38,7 +38,7 @@ class googleActions extends loginActions
 
 		User::login($mail);
 
-		return $this->redirect('/'); // fixme: アクセスしていた場所へ
+		return $this->redirectUrlBeforeLogin();
 	}
 
 	public function executeGoogle_error()
@@ -80,7 +80,16 @@ class googleActions extends loginActions
 
 	protected function checkAccount($mail)
 	{
-		return false;
+		if(isset($this->config['allowed_mailaddr_pattern'])){
+			// パターンマッチしたらOK
+			if(preg_match($this->config['allowed_mailaddr_pattern'],$mail)){
+				return true;
+			}
+		}
+		// user_passテーブルに登録されていたらOK
+		$user = UserPassDb::selectByEmail($mail);
+
+		return ($user!=null);
 	}
 
 }

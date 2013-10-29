@@ -17,7 +17,7 @@ class passwordActions extends loginActions
 
 		User::login($mail);
 
-		return $this->redirect('/'); // fixme: もともとアクセスしようとしていたぺーじへ
+		return $this->redirectUrlBeforeLogin();
 	}
 
 	public function executePassword_reminder()

@@ -61,8 +61,6 @@ class UserPass extends mfwObject {
 
 		$this->row['passhash'] = "{$stretch}:{$salt}:{$hash}";
 
-		error_log(json_encode($this->row));
-
 		$this->update($con);
 	}
 

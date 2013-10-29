@@ -34,7 +34,7 @@
         </ul>
         <ul class="nav navbar-nav navbar-right">
           <li class="dropdown">
-            <a href="#" class="dropdown-toggle" data-toggle="dropdown">makiuchi-d@klab.com <b class="caret"></b></a>
+            <a href="#" class="dropdown-toggle" data-toggle="dropdown"><?=$login_user->getMail()?> <b class="caret"></b></a>
             <ul class="dropdown-menu">
               <li><a href="<?=url('/mypage')?>">Mypage</a></li>
               <li><a href="<?=url('/project/create')?>">New project</a></li>

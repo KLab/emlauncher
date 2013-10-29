@@ -32,9 +32,6 @@ class User
 			'mail' => $mail,
 			);
 		mfwSession::set(self::SESKEY,$data);
-
-		error_log("login: ".json_encode($data));
-
 		return new self($mail);
 	}
 
