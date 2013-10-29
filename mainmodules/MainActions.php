@@ -1,4 +1,5 @@
 <?php
+require_once APP_ROOT.'/model/User.php';
 
 class MainActions extends mfwActions
 {
@@ -13,10 +14,18 @@ class MainActions extends mfwActions
 			return $err;
 		}
 
-//		$this->login_user = User::getLoginUser();
+		$this->login_user = User::getLoginUser();
 		if(!$this->login_user && $this->getModule()!='login'){
 			return $this->redirect('/login');
 		}
+
+		return null;
+	}
+
+	protected function build($params)
+	{
+		$params['login_user'] = $this->login_user;
+		return parent::build($params);
 	}
 
 

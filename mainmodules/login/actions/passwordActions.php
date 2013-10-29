@@ -15,6 +15,8 @@ class passwordActions extends loginActions
 			return $this->buildErrorPage('invalid email or password');
 		}
 
+		User::login($mail);
+
 		return $this->redirect('/'); // todo: もともとアクセスしようとしていたぺーじへ
 	}
 

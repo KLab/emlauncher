@@ -6,8 +6,18 @@ class loginActions extends MainActions
 
 	public function initialize()
 	{
+		if(($err=parent::initialize())){
+			return $err;
+		}
+		if($this->login_user){
+			// ログイン済みならTOPに飛ばす
+			return $this->redirect('/');
+		}
+
 		include APP_ROOT.'/config/login_config.php';
 		$this->config = $login_config[mfwServerEnv::getEnv()];
+
+		return null;
 	}
 
 	protected function build($params=array())
