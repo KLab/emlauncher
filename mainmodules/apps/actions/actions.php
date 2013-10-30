@@ -16,4 +16,10 @@ class appsActions extends MainActions
 		return $this->build($params);
 	}
 
+	public function executeCreate()
+	{
+		var_dump($_POST);
+		var_dump($_FILES);
+	}
+
 }

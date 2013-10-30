@@ -22,7 +22,7 @@
               <div id="alert-noicon" class="alert alert-danger hidden">
                 アイコン画像が指定されていません
               </div>
-              <input type="file" id="icon" class="hidden">
+              <input type="file" id="icon" name="icon" class="hidden">
               <div class="input-group">
                 <input type="text" class="form-control" id="icon-text" disabled="disabled">
                 <a id="icon-browse" class="input-group-addon btn btn-default">Browse</a>
