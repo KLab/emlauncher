@@ -14,17 +14,17 @@
           </div>
         
           <div class="form-group">
-            <label for="icon" class="control-label col-md-2">Icon</label>
+            <label for="icon-text" class="control-label col-md-2">Icon</label>
             <input type="file" id="icon" class="hidden">
             <div class="input-group col-md-10">
-              <input type="text" class="form-control">
-              <a class="input-group-addon btn btn-default">Browse</a>
+              <input type="text" class="form-control" id="icon-text" disabled="disabled">
+              <a id="icon-browse" class="input-group-addon btn btn-default">Browse</a>
             </div>
           </div>
         </div>
       
-        <div class="col-md-2 col-sm-3 hidden-xs text-center">
-          <img class="img-thumbnail" style="width:96px;height:96px">
+        <div class="col-md-2 col-sm-3 hidden-xs">
+          <img id="icon-preview" class="img-thumbnail" style="width:96px;height:96px;">
         </div>
       </div>
       
@@ -54,3 +54,31 @@
 
 </div>
 
+<script type="text/javascript">
+
+$('#icon-browse').on('click',function(event){
+  $('#icon').click();
+  return false;
+});
+
+$('#icon-preview').on('click',function(event){
+  $('#icon').click();
+  return false;
+});
+
+$('#icon').on('change',function(event){
+  var file = event.target.files[0];
+  if(!file || !file.type.match('image.*')){
+    $(this).val(null);
+    return false;
+  }
+  var reader = new FileReader;
+  reader.onload = function(e){
+    $('#icon-preview').attr('src',e.target.result);
+  };
+  reader.readAsDataURL(file);
+  $('#icon-text').val(file.name);
+});
+
+
+</script>
