@@ -1,6 +1,6 @@
 
 <div class="well">
-  <form class="form-horizontal">
+  <form class="form-horizontal" method="post" action="<?=url('/apps/create')?>" enctype="multipart/form-data">
     <fieldset>
       <legend>New application</legend>
 
@@ -9,16 +9,24 @@
           <div class="form-group">
             <label for="title" class="control-label col-md-2">Title</label>
             <div class="col-md-10">
+              <div id="alert-notitle" class="alert alert-danger hidden">
+                タイトルが入力されていません
+              </div>
               <input class="form-control" type="text" id="title" name="title">
             </div>
           </div>
         
           <div class="form-group">
             <label for="icon-text" class="control-label col-md-2">Icon</label>
-            <input type="file" id="icon" class="hidden">
-            <div class="input-group col-md-10">
-              <input type="text" class="form-control" id="icon-text" disabled="disabled">
-              <a id="icon-browse" class="input-group-addon btn btn-default">Browse</a>
+            <div class="col-md-10">
+              <div id="alert-noicon" class="alert alert-danger hidden">
+                アイコン画像が指定されていません
+              </div>
+              <input type="file" id="icon" class="hidden">
+              <div class="input-group">
+                <input type="text" class="form-control" id="icon-text" disabled="disabled">
+                <a id="icon-browse" class="input-group-addon btn btn-default">Browse</a>
+              </div>
             </div>
           </div>
         </div>
@@ -70,6 +78,8 @@ $('#icon').on('change',function(event){
   var file = event.target.files[0];
   if(!file || !file.type.match('image.*')){
     $(this).val(null);
+    $('#icon-text').val(null);
+    $('#icon-preview').attr('src','data:image/gif;base64,R0lGODlhAQABAIABAP///wAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==');//透明gif
     return false;
   }
   var reader = new FileReader;
@@ -78,6 +88,20 @@ $('#icon').on('change',function(event){
   };
   reader.readAsDataURL(file);
   $('#icon-text').val(file.name);
+});
+
+$('form').submit(function(){
+  var valid = true;
+  $('.alert').addClass('hidden');
+  if($('#title').val()==''){
+    $('#alert-notitle').removeClass('hidden');
+    valid = false;
+  }
+  if(!$('#icon').val()){
+    $('#alert-noicon').removeClass('hidden');
+    valid = false;
+  }
+  return valid;
 });
 
 
