@@ -32,14 +32,13 @@
       <div class="collapse navbar-collapse navbar-ex1-collapse">
 <?php if($login_user): ?>
         <ul class="nav navbar-nav">
-          <li><a href="<?=url('/project')?>">Projects</a></li>
+          <li><a href="<?=url('/apps')?>">Apps</a></li>
+          <li><a href="<?=url('/mypage')?>">Mypage</a><li>
         </ul>
         <ul class="nav navbar-nav navbar-right">
           <li class="dropdown">
             <a href="#" class="dropdown-toggle" data-toggle="dropdown"><?=$login_user->getMail()?> <b class="caret"></b></a>
             <ul class="dropdown-menu">
-              <li><a href="<?=url('/mypage')?>">Mypage</a></li>
-              <li><a href="<?=url('/project/create')?>">New project</a></li>
               <li><a href="<?=url('/logout')?>">Logout</a></li>
             </ul>
           </li>
@@ -52,6 +51,8 @@
       </div>
     </div>
 
-    <?=$contents?>
+    <div class="container">
+      <?=$contents?>
+    </div>
   </body>
 </html>

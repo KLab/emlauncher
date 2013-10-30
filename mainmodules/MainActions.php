@@ -55,11 +55,15 @@ class MainActions extends mfwActions
 	protected function redirectUrlBeforeLogin()
 	{
 		$url = mfwSession::get(self::SESKEY_URL_BEFORE_LOGIN);
-		mfwSession::clear(self::SESKEY_URL_BEFORE_LOGIN);
 		if(!$url){
 			$url = '/';
 		}
 		return $this->redirect($url);
+	}
+
+	protected function clearUrlBeforelogin()
+	{
+		mfwSession::clear(self::SESKEY_URL_BEFORE_LOGIN);
 	}
 
 }

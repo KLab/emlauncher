@@ -30,3 +30,20 @@ form+.google-login {
 	text-shadow: 0 -1px 0 rgba(0,0,0,0.3);
 }
 
+.btn-default {
+	color: #666;
+	background-color: #dcdcdc;
+	border-color: #ccc;
+	background: linear-gradient(#fff,#e4e4e4);
+	background: -webkit-linear-gradient(top,#fff,#e4e4e4);
+	background: -moz-linear-gradient(center top, #fff 0%, #e4e4e4 100%);
+	background: -ms-linear-gradient(top, #fff, #e4e4e4);
+	background: -o-linear-gradient(top, #fff, #e4e4e4);
+}
+
+.btn-default:hover {
+	color: inherit;
+	background: inherit;
+	border-color: rgba(0,0,0,0.1);
+}
+
