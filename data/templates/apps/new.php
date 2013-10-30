@@ -17,22 +17,23 @@
           </div>
         
           <div class="form-group">
-            <label for="icon-text" class="control-label col-md-2">Icon</label>
+            <label for="icon-selector" class="control-label col-md-2">Icon</label>
             <div class="col-md-10">
               <div id="alert-noicon" class="alert alert-danger hidden">
                 アイコン画像が指定されていません
               </div>
-              <input type="file" id="icon" name="icon" class="hidden">
-              <div class="input-group">
-                <input type="text" class="form-control" id="icon-text" disabled="disabled">
+              <input type="hidden" id="icon-data" name="icon-data" value="">
+              <input type="file" id="icon-selector" class="hidden">
+              <div class="input-group"  id="input-group-icon">
+                <input type="text" class="form-control droparea" id="icon-text" readonly="readonly">
                 <a id="icon-browse" class="input-group-addon btn btn-default">Browse</a>
               </div>
             </div>
           </div>
         </div>
       
-        <div class="col-md-2 col-sm-3 hidden-xs">
-          <img id="icon-preview" class="img-thumbnail" style="width:96px;height:96px;">
+        <div class="col-md-2 col-sm-3 hidden-xs text-center">
+          <img id="icon-preview" class="img-thumbnail droparea" style="width:96px;height:96px;">
         </div>
       </div>
       
@@ -63,31 +64,53 @@
 </div>
 
 <script type="text/javascript">
+$(document).on('drop dragover',function(e){e.preventDefault()});
 
 $('#icon-browse').on('click',function(event){
-  $('#icon').click();
+  $('#icon-selector').click();
   return false;
 });
-
 $('#icon-preview').on('click',function(event){
-  $('#icon').click();
+  $('#icon-selector').click();
   return false;
 });
 
-$('#icon').on('change',function(event){
-  var file = event.target.files[0];
-  if(!file || !file.type.match('image.*')){
-    $(this).val(null);
+function setIconFile(file){
+  if(!file || !file.type.match('image/.*')){
+    $('#icon-data').val(null);
     $('#icon-text').val(null);
     $('#icon-preview').attr('src','data:image/gif;base64,R0lGODlhAQABAIABAP///wAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==');//透明gif
     return false;
   }
   var reader = new FileReader;
   reader.onload = function(e){
+    $('#icon-data').val(e.target.result);
     $('#icon-preview').attr('src',e.target.result);
   };
   reader.readAsDataURL(file);
   $('#icon-text').val(file.name);
+}
+
+$('#icon-preview').on('drop',function(event){
+  var file = event.originalEvent.dataTransfer.files[0];
+  $(this).removeClass('dragover');
+  return setIconFile(file);
+});
+$('#input-group-icon').on('drop',function(event){
+  var file = event.originalEvent.dataTransfer.files[0];
+  $(this).removeClass('dragover');
+  return setIconFile(file);
+});
+$('.droparea').on('dragenter',function(event){
+  $(this).addClass('dragover');
+});
+$('.droparea').on('dragleave',function(event){
+  $(this).removeClass('dragover');
+});
+
+$('#icon-selector').on('change',function(event){
+  var file = event.target.files[0];
+  return setIconFile(file);
 });
 
 $('form').submit(function(){
@@ -97,7 +120,7 @@ $('form').submit(function(){
     $('#alert-notitle').removeClass('hidden');
     valid = false;
   }
-  if(!$('#icon').val()){
+  if(!$('#icon-data').val()){
     $('#alert-noicon').removeClass('hidden');
     valid = false;
   }
