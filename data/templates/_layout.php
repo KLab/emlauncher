@@ -8,10 +8,12 @@
     <link href="/bootstrap/bootswatch/spacelab/bootstrap.min.css" rel="stylesheet" media="screen">
     <script src="/jquery/jquery.js"></script>
     <script src="/bootstrap/3.0.0/js/bootstrap.min.js"></script>
+    <link href="/font-awesome/4.0.1/css/font-awesome.min.css" rel="stylesheet">
 <?php else: ?>
     <link href="//netdna.bootstrapcdn.com/bootswatch/3.0.0/spacelab/bootstrap.min.css" rel="stylesheet" media="screen">
     <script src="//code.jquery.com/jquery.js"></script>
     <script src="//netdna.bootstrapcdn.com/bootstrap/3.0.0/js/bootstrap.min.js"></script>
+    <link href="//netdna.bootstrapcdn.com/font-awesome/4.0.1/css/font-awesome.min.css" rel="stylesheet">
 <?php endif ?>
     <link rel="stylesheet" href="<?=url('/css/customize.css')?>" type="text/css">
   </head>
