@@ -25,7 +25,7 @@ class S3 {
 		return static::$singleton;
 	}
 
-	public static function upload($key,$data,$type,$acl='private',$expires='')
+	public static function upload($key,$data,$type,$acl='private',$expires=null)
 	{
 		$s3 = static::singleton();
 		$r = $s3->client->putObject(
@@ -61,11 +61,11 @@ class S3 {
 				));
 	}
 
-	public static function url($key,$expire=null)
+	public static function url($key,$expires=null)
 	{
 		$s3 = static::singleton();
 		$bucket = $s3->config['bucket_name'];
-		return $s3->client->getObjectUrl($bucket,$key,$expire);
+		return $s3->client->getObjectUrl($bucket,$key,$expires);
 	}
 
 }

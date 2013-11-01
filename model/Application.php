@@ -52,7 +52,7 @@ class ApplicationDb extends mfwObjectDb {
 
 		S3::upload(
 			static::TEMP_ICON_DIR.$name,$im,
-			'image/png','private','+5 minits');
+			'image/png','private','+5 minutes');
 
 		return $name;
 	}
