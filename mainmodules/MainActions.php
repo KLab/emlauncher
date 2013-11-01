@@ -41,6 +41,11 @@ class MainActions extends mfwActions
 		return $this->build($params);
 	}
 
+	protected function response($status,$message=null)
+	{
+		return array(array($status),$message);
+	}
+
 	protected function saveUrlBeforeLogin()
 	{
 		if(mfwRequest::method()==='GET'){

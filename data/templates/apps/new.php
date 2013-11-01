@@ -76,7 +76,7 @@ $('#icon-preview').on('click',function(event){
 });
 
 function setIconFile(file){
-  if(!file || !file.type.match('image/.*')){
+  if(!file || !file.type.match('^image/(png|gif|jpeg)$')){
     $('#icon-data').val(null);
     $('#icon-text').val(null);
     $('#icon-preview').attr('src','data:image/gif;base64,R0lGODlhAQABAIABAP///wAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==');//透明gif
@@ -93,15 +93,16 @@ function setIconFile(file){
 
 $('#icon-preview').on('drop',function(event){
   var file = event.originalEvent.dataTransfer.files[0];
-  $(this).removeClass('dragover');
+  $('.droparea').removeClass('dragover');
   return setIconFile(file);
 });
 $('#input-group-icon').on('drop',function(event){
   var file = event.originalEvent.dataTransfer.files[0];
-  $(this).removeClass('dragover');
+  $('.droparea').removeClass('dragover');
   return setIconFile(file);
 });
 $('.droparea').on('dragenter',function(event){
+  $('.droparea').removeClass('dragover');
   $(this).addClass('dragover');
 });
 $('.droparea').on('dragleave',function(event){
@@ -120,7 +121,7 @@ $('form').submit(function(){
     $('#alert-notitle').removeClass('hidden');
     valid = false;
   }
-  if(!$('#icon-data').val()){
+  if(!$('#icon-text').val()){
     $('#alert-noicon').removeClass('hidden');
     valid = false;
   }

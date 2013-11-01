@@ -1,4 +1,5 @@
 <?php
+require_once APP_ROOT.'/model/Application.php';
 
 class appsActions extends MainActions
 {
@@ -18,13 +19,27 @@ class appsActions extends MainActions
 
 	public function executeCreate()
 	{
+		$title = mfwRequest::param('title');
 		$data = mfwRequest::param('icon-data');
-		preg_match('/^data:([^;]*);base64,(.*)$/',$data,$match);
-		$mime = $match[1];
-		$base64 = $match[2];
-		$png = base64_decode($base64);
-		header("Content-type: $mime");
-		echo $png;
+		$description = mfwRequest::param('description');
+		if(!$title || !preg_match('/^data:[^;]+;base64,(.+)$/',$data,$match)){
+			return $this->response(self::HTTP_400_BADREQUEST);
+		}
+		$image = base64_decode($match[1]);
+
+		$con = mfwDBConnection::getPDO();
+		$con->beginTransaction();
+		try{
+			$app = ApplicationDb::insertNewApp(
+				$this->login_user,$title,$image,$description);
+			$con->commit();
+		}
+		catch(Exception $e){
+			$con->rollback();
+			throw $e;
+		}
+
+		return $this->redirect("/apps/detail?id={$app->getId()}");
 	}
 
 }
