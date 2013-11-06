@@ -10,10 +10,13 @@ class Application extends mfwObject {
 	const DB_CLASS = 'ApplicationDb';
 	const SET_CLASS = 'ApplicationSet';
 
-	const S3_DIR_NAME = 'app-icons/';
-
 	public function getId(){
 		return $this->value('id');
+	}
+
+	public function getIconUrl()
+	{
+		return S3::url($this->value('icon_key'));
 	}
 
 }
@@ -39,22 +42,19 @@ class ApplicationDb extends mfwObjectDb {
 	const TABLE_NAME = 'application';
 	const SET_CLASS = 'ApplicationSet';
 
-	const TEMP_ICON_DIR = 'tmp-icons/';
-	const ICON_DIR = 'icons/';
+	const ICON_DIR = 'app-icons/';
 
-	protected static function uploadIconTemporary($image)
+	protected static function uploadIcon($image,$app_id)
 	{
 		$im = new Imagick();
 		$im->readImageBlob($image);
 		$im->scaleImage(144,144);
 		$im->setFormat('png');
-		$name = Random::string(8).'.png';
 
-		S3::upload(
-			static::TEMP_ICON_DIR.$name,$im,
-			'image/png','private','+5 minutes');
+		$key = static::ICON_DIR."$app_id/".Random::string(16).'.png';
+		S3::upload($key,$im,'image/png','public-read');
 
-		return $name;
+		return $key;
 	}
 
 	protected static function makeApiKey()
@@ -73,26 +73,22 @@ class ApplicationDb extends mfwObjectDb {
 
 	public static function insertNewApp($owner,$title,$image,$description)
 	{
-		$icon_name = static::uploadIconTemporary($image);
-		$api_key = static::makeApiKey();
-
 		// insert new application
 		$row = array(
 			'title' => $title,
-			'api_key' => $api_key,
+			'api_key' => static::makeApiKey(),
 			'description' => $description,
 			);
 		$app = new Application($row);
 		$app->insert();
 
-		// set icon image url
-		$icon_key = static::ICON_DIR."{$app->getId()}/$icon_name";
-		S3::rename(static::TEMP_ICON_DIR.$icon_name,$icon_key,'public-read');
-		$url = S3::url($icon_key);
+		// upload icon to S3
+		$icon_key = static::uploadIcon($image,$app->getId());
+
 		$table = static::TABLE_NAME;
 		mfwDBIBase::query(
-			"UPDATE $table SET icon_url = :url WHERE id= :id",
-			array(':id'=>$app->getId(),':url'=>$url));
+			"UPDATE $table SET icon_key = :icon_key WHERE id= :id",
+			array(':id'=>$app->getId(),':icon_key'=>$icon_key));
 
 		// insert owner
 		$row = array(

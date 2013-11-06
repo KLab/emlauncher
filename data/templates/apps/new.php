@@ -19,6 +19,9 @@
           <div class="form-group">
             <label for="icon-selector" class="control-label col-md-2">Icon</label>
             <div class="col-md-10">
+              <div id="alert-icon-size-limit" class="alert alert-danger hidden">
+                画像ファイルサイズが大きすぎます
+              </div>
               <div id="alert-noicon" class="alert alert-danger hidden">
                 アイコン画像が指定されていません
               </div>
@@ -76,12 +79,19 @@ $('#icon-preview').on('click',function(event){
 });
 
 function setIconFile(file){
+  $('#icon-data').val(null);
+  $('#icon-text').val(null);
+  $('#icon-preview').attr('src','data:image/gif;base64,R0lGODlhAQABAIABAP///wAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==');//透明gif
+  $('#alert-icon-size-limit').addClass('hidden');
+
   if(!file || !file.type.match('^image/(png|gif|jpeg)$')){
-    $('#icon-data').val(null);
-    $('#icon-text').val(null);
-    $('#icon-preview').attr('src','data:image/gif;base64,R0lGODlhAQABAIABAP///wAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==');//透明gif
     return false;
   }
+  if(file.size > 1000000){
+    $('#alert-icon-size-limit').removeClass('hidden');
+    return false;
+  }
+
   var reader = new FileReader;
   reader.onload = function(e){
     $('#icon-data').val(e.target.result);
