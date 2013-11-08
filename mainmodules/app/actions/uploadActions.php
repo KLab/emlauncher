@@ -28,5 +28,10 @@ class uploadActions extends appActions
 		return $this->build($params);
 	}
 
+	public function executeUpload_post()
+	{
+		var_dump($_REQUEST);
+	}
+
 }
 

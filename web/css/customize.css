@@ -69,7 +69,7 @@ h2.media-hedding {
 	}
 }
 
-.toggle-button.active {
+[data-toggle="button"].active {
   color: #ffffff;
   background-color: #385a7f;
   border-color: #315070;

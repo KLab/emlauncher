@@ -54,10 +54,17 @@
       <div class="form-group">
         <label class="control-label col-md-2">Tags</label>
         <div class="col-md-10">
-          <span>
-            <button class="btn btn-default toggle-button" data-toggle="button">ほげ</button>
-            <button class="btn btn-default toggle-button" data-toggle="button">ふが</button>
-          </span>
+
+          <input type="checkbox" class="hidden" name="tags[]" value="ほげ">
+          <button class="btn btn-default tags" data-toggle="button">ほげ</button>
+          <input type="checkbox" class="hidden" name="tags[]" value="ふが">
+          <button class="btn btn-default tags" data-toggle="button">ふが</button>
+
+          <div id="tag-template" class="hidden">
+            <input type="checkbox" class="hidden" name="tags[]" value="">
+            <button class="btn btn-default tags" data-toggle="button"></button>
+          </div>
+
           <div class="btn-group">
             <a class="btn btn-default dropdown-toggle" href="#" data-toggle="dropdown"><i class="fa fa-plus"></i></a>
             <div id="new-tag-form" class="dropdown-menu">
@@ -84,3 +91,53 @@
   <?=block('app_infopanel')?>
 </div>
 
+<script type="text/javascript">
+
+
+// initialize tags button state
+$('input[name="tags[]"]').each(function(i,val){
+  if($(val).prop('checked')){
+    $(val).next().addClass('active');
+  }
+});
+// toggle tags checkbox
+$('.btn.tags').on('click',function(event){
+  $(this).prev().prop('checked',!$(this).hasClass('active'));
+});
+
+// don't close dropdown
+$('#new-tag-form').click(function(event){
+  event.stopPropagation();
+});
+
+// click create button by enter key
+$('#new-tag-name').keydown(function(event){
+  if(event.keyCode==13){
+    $('#new-tag-create').click();
+    return false;
+  }
+  return true;
+});
+
+// create new tag button
+$('#new-tag-create').on('click',function(event){
+  var $tagname = $('#new-tag-name');
+  var tag = $tagname.val();
+  if(tag){
+    var $tmpl = $('#tag-template');
+    var $c = $tmpl.children().clone(true);
+
+    $($c[0]).attr('value',tag).prop('checked',true);
+    $($c[1]).text(tag).addClass('active')
+
+    $tmpl.before($c);
+    $tmpl.before(' ');
+
+    $tagname.val(null);
+  }
+  $('.dropdown-toggle').parent().removeClass('open');
+  return false;
+});
+
+
+</script>
