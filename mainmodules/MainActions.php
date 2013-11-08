@@ -25,20 +25,20 @@ class MainActions extends mfwActions
 		return null;
 	}
 
-	protected function build($params)
+	protected function build($params,$headers=array())
 	{
 		$params['login_user'] = $this->login_user;
-		return parent::build($params);
+		return parent::build($params,$headers);
 	}
 
 
-	protected function buildErrorPage($message)
+	protected function buildErrorPage($message,$headers=array())
 	{
 		$params = array(
 			'message' => $message,
 			);
 		$this->setTemplateName('_error');
-		return $this->build($params);
+		return $this->build($params,$headers);
 	}
 
 	protected function response($status,$message=null)

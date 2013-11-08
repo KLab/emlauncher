@@ -1,6 +1,6 @@
 
 <div class="well">
-  <form class="form-horizontal" method="post" action="<?=url('/apps/create')?>" enctype="multipart/form-data">
+  <form class="form-horizontal" method="post" action="<?=url('/app/create')?>" enctype="multipart/form-data">
     <fieldset>
       <legend>New application</legend>
 
@@ -34,18 +34,29 @@
             </div>
           </div>
         </div>
-      
+
         <div class="col-md-2 col-sm-3 hidden-xs text-center">
           <img id="icon-preview" class="img-thumbnail droparea" style="width:96px;height:96px;">
         </div>
       </div>
-      
+
       <div class="row">
         <div class="form-group">
           <div class="col-md-10">
             <label for="description" class="control-label col-md-2">Description</label>
             <div class="col-md-10">
               <textarea class="form-control" row="3" id="description" name="description"></textarea>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="form-group">
+          <div class="col-md-10">
+            <label for="repository" class="control-label col-md-2">Repository</label>
+            <div class="col-md-10">
+              <input type="text" class="form-control" id="repository" name="repository">
             </div>
           </div>
         </div>

@@ -21,12 +21,17 @@ class Application extends mfwObject {
 	public function getDescription(){
 		return $this->value('description');
 	}
+	public function getRepository(){
+		return $this->value('repository');
+	}
 	public function getIconUrl()
 	{
 		return S3::url($this->value('icon_key'));
 	}
-	public function getCreated()
-	{
+	public function getLastUpdated(){
+		return $this->value('last_updated');
+	}
+	public function getCreated(){
 		return $this->value('created');
 	}
 	public function getOwners()

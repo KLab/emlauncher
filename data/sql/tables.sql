@@ -14,6 +14,8 @@ create table `application` (
   `api_key` varchar(255) not null,
   `icon_key` varchar(255) default null,
   `description` varchar(1000) default null,
+  `repository` varchar(1000) default null,
+  `last_updated` datetime default null,
   `created` datetime not null,
   unique key `idx_api_key` (`api_key`),
   primary key (`id`)

@@ -1,7 +1,7 @@
 <?php
 require_once APP_ROOT.'/model/Application.php';
 
-class appsActions extends MainActions
+class appActions extends MainActions
 {
 	protected $app = null;
 
@@ -13,6 +13,9 @@ class appsActions extends MainActions
 		if(!in_array($this->getAction(),array('new','create'))){
 			$id = mfwRequest::param('id');
 			$this->app = ApplicationDb::retrieveByPK($id);
+			if(!$this->app){
+				return $this->buildErrorPage('Not Found',array(self::HTTP_404_NOTFOUND));
+			}
 		}
 	}
 
@@ -22,14 +25,6 @@ class appsActions extends MainActions
 			$params['app'] = $this->app;
 		}
 		return parent::build($params);
-	}
-
-
-	public function executeIndex()
-	{
-		//仮
-		$url = mfwRequest::makeUrl('/apps/new');
-		return array(array(),"<a href=\"$url\">new</a>");
 	}
 
 	public function executeNew()
@@ -61,19 +56,19 @@ class appsActions extends MainActions
 			throw $e;
 		}
 
-		return $this->redirect("/apps/detail?id={$app->getId()}");
+		return $this->redirect("/app?id={$app->getId()}");
 	}
 
-	public function executeDetail()
+	public function executeIndex()
 	{
 		$platform = mfwRequest::param('pf');
-
-		if(!$platform){
+		if(!in_array($platform,array('android','ios','all'))){
 			$platform = 'android';// fixme: UA見て変える
 		}
 
 		$owners = $this->app->getOwners();
 		$ownerid = $owners->searchPK('owner_mail',$this->login_user->getMail());
+
 		$params = array(
 			'pf' => $platform,
 			'is_owner' => ($ownerid!==null),
