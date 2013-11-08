@@ -10,13 +10,15 @@ class appActions extends MainActions
 		if(($err=parent::initialize())){
 			return $err;
 		}
-		if(!in_array($this->getAction(),array('new','create'))){
-			$id = mfwRequest::param('id');
-			$this->app = ApplicationDb::retrieveByPK($id);
-			if(!$this->app){
-				return $this->buildErrorPage('Not Found',array(self::HTTP_404_NOTFOUND));
-			}
+		if(in_array($this->getAction(),array('new','create'))){
+			return null;
 		}
+		$id = mfwRequest::param('id');
+		$this->app = ApplicationDb::retrieveByPK($id);
+		if(!$this->app){
+			return $this->buildErrorPage('Not Found',array(self::HTTP_404_NOTFOUND));
+		}
+		return null;
 	}
 
 	public function build($params)

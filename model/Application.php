@@ -41,6 +41,12 @@ class Application extends mfwObject {
 		}
 		return $this->owners;
 	}
+	public function isOwner(User $user)
+	{
+		$owners = $this->getOwners();
+		$k = $owners->searchPK('owner_mail',$user->getMail());
+		return $k!==null;
+	}
 }
 
 /**

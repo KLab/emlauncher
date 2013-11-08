@@ -2,8 +2,12 @@
 <?php if($is_owner): ?>
   <div class="list-group-item">
     <ul class="nav nav-pills nav-stacked">
-      <li><a href="<?=url("/app/upload?id={$app->getId()}")?>"><i class="fa fa-upload"></i> Upload</a></li>
-      <li><a href="<?=url("/app/preference?id={$app->getId()}")?>"><i class="fa fa-cog"></i> Preference</a></li>
+      <li<?=($act==='upload')?' class="active"':''?>>
+        <a href="<?=url("/app/upload?id={$app->getId()}")?>"><i class="fa fa-upload"></i> Upload</a>
+      </li>
+      <li<?=($act==='preference')?' class="active"':''?>>
+        <a href="<?=url("/app/preference?id={$app->getId()}")?>"><i class="fa fa-cog"></i> Preference</a>
+      </li>
     </ul>
   </div>
 <?endif?>

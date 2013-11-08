@@ -1,7 +1,9 @@
 
 <div class="media">
   <p class="pull-left">
-    <img class="app-icon media-object img-rounded" src="<?=$app->getIconUrl()?>">
+    <a href="<?=url("/app?id={$app->getId()}")?>">
+      <img class="app-icon media-object img-rounded" src="<?=$app->getIconUrl()?>">
+    </a>
   </p>
   <div class="media-body">
     <h2 class="media-hedding"><?=$app->getTitle()?></h2>

@@ -15,7 +15,7 @@
               <input class="form-control" type="text" id="title" name="title">
             </div>
           </div>
-        
+
           <div class="form-group">
             <label for="icon-selector" class="control-label col-md-2">Icon</label>
             <div class="col-md-10">

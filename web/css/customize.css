@@ -1,23 +1,17 @@
 
-
-body {
-}
-
 .navbar {
 	border-radius: 0;
 }
 
-.dropdown-menu {
+.navbar .dropdown-menu {
 	background-color: #3e648d;
 }
-.dropdown-menu>li>a{
+.navbar .dropdown-menu>li>a{
 	color: #ddd;
 }
-.dropdown-menu>li>a:hover{
+.navbar .dropdown-menu>li>a:hover{
 	color: #fff;
 }
-
-
 
 form+.google-login {
 	padding: 1em;
@@ -60,6 +54,10 @@ h2.media-hedding {
 	border-bottom: 1px solid #eee;
 }
 
+.progress {
+	margin-bottom: 0;
+}
+
 .app-icon {
 	width: 72px;
 	height: auto;
@@ -69,4 +67,14 @@ h2.media-hedding {
 	.app-icon {
 		width: 96px;
 	}
+}
+
+.toggle-button.active {
+  color: #ffffff;
+  background-color: #385a7f;
+  border-color: #315070;
+}
+
+#new-tag-create {
+	margin-top: 5px;
 }
