@@ -25,7 +25,7 @@ class S3 {
 		return static::$singleton;
 	}
 
-	public static function upload($key,$data,$type,$acl='private',$expires=null)
+	public static function upload($key,$data,$type,$acl='private')
 	{
 		$s3 = static::singleton();
 		$r = $s3->client->putObject(
@@ -35,7 +35,6 @@ class S3 {
 				'ACL' => $acl,
 				'ContentType' => $type,
 				'Body' => Guzzle\Http\EntityBody::factory($data),
-				'Expires' => $expires,
 				));
 		return $r;
 	}
@@ -66,7 +65,7 @@ class S3 {
 		$s3 = static::singleton();
 		$bucket = $s3->config['bucket_name'];
 		if($expires===null){
-			return "https://{$bucket}.s3.amazon.com/{$key}";
+			return "https://{$bucket}.s3.amazonaws.com/{$key}";
 		}
 		return $s3->client->getObjectUrl($bucket,$key,$expires);
 	}

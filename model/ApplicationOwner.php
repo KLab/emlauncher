@@ -6,6 +6,10 @@
 class ApplicationOwner extends mfwObject {
 	const DB_CLASS = 'ApplicationOwnerDb';
 	const SET_CLASS = 'ApplicationOwnerSet';
+
+	public function getOwnerMail(){
+		return $this->value('owner_mail');
+	}
 }
 
 /**
@@ -28,5 +32,11 @@ class ApplicationOwnerSet extends mfwObjectSet {
 class ApplicationOwnerDb extends mfwObjectDb {
 	const TABLE_NAME = 'application_owner';
 	const SET_CLASS = 'ApplicationOwnerSet';
+
+	public static function selectByAppId($app_id)
+	{
+		$query = "WHERE app_id = ?";
+		return static::selectSet($query,array($app_id));
+	}
 }
 

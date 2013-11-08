@@ -10,15 +10,32 @@ class Application extends mfwObject {
 	const DB_CLASS = 'ApplicationDb';
 	const SET_CLASS = 'ApplicationSet';
 
+	protected $owners = null;
+
 	public function getId(){
 		return $this->value('id');
 	}
-
+	public function getTitle(){
+		return $this->value('title');
+	}
+	public function getDescription(){
+		return $this->value('description');
+	}
 	public function getIconUrl()
 	{
 		return S3::url($this->value('icon_key'));
 	}
-
+	public function getCreated()
+	{
+		return $this->value('created');
+	}
+	public function getOwners()
+	{
+		if($this->owners===null){
+			$this->owners = ApplicationOwnerDb::selectByAppId($this->getId());
+		}
+		return $this->owners;
+	}
 }
 
 /**
@@ -78,6 +95,7 @@ class ApplicationDb extends mfwObjectDb {
 			'title' => $title,
 			'api_key' => static::makeApiKey(),
 			'description' => $description,
+			'created' => date('Y-m-d H:i:s'),
 			);
 		$app = new Application($row);
 		$app->insert();

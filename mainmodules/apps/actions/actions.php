@@ -3,6 +3,28 @@ require_once APP_ROOT.'/model/Application.php';
 
 class appsActions extends MainActions
 {
+	protected $app = null;
+
+	public function initialize()
+	{
+		if(($err=parent::initialize())){
+			return $err;
+		}
+		if(!in_array($this->getAction(),array('new','create'))){
+			$id = mfwRequest::param('id');
+			$this->app = ApplicationDb::retrieveByPK($id);
+		}
+	}
+
+	public function build($params)
+	{
+		if(!isset($params['app'])){
+			$params['app'] = $this->app;
+		}
+		return parent::build($params);
+	}
+
+
 	public function executeIndex()
 	{
 		//仮
@@ -40,6 +62,23 @@ class appsActions extends MainActions
 		}
 
 		return $this->redirect("/apps/detail?id={$app->getId()}");
+	}
+
+	public function executeDetail()
+	{
+		$platform = mfwRequest::param('pf');
+
+		if(!$platform){
+			$platform = 'android';// fixme: UA見て変える
+		}
+
+		$owners = $this->app->getOwners();
+		$ownerid = $owners->searchPK('owner_mail',$this->login_user->getMail());
+		$params = array(
+			'pf' => $platform,
+			'is_owner' => ($ownerid!==null),
+			);
+		return $this->build($params);
 	}
 
 }
