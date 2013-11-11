@@ -78,3 +78,10 @@ h2.media-hedding {
 #new-tag-create {
 	margin-top: 5px;
 }
+
+#file-name>i.fa.success {
+  color: green;
+}
+#file-name>i.fa.error {
+  color: red;
+}
