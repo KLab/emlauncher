@@ -1,4 +1,5 @@
 <?php
+require_once APP_ROOT.'/model/Tag.php';
 require_once APP_ROOT.'/model/Random.php';
 require_once APP_ROOT.'/model/S3.php';
 
@@ -14,6 +15,9 @@ class Package extends mfwObject {
 	const PF_UNKNOWN = 'unknown';
 	const MIME_ANDROID = 'application/vnd.android.package-archive';
 	const MIME_IOS = 'application/octet-stream';
+
+	const FILE_DIR = 'package/';
+	const TEMP_DIR = 'temp-data/';
 
 	protected $tags = null;
 
@@ -39,9 +43,29 @@ class Package extends mfwObject {
 	public function getTags()
 	{
 		if($this->tags===null){
-			$this->tags = TagsDb::selectByPackageId($this->getId());
+			$this->tags = TagDb::selectByPackageId($this->getId());
 		}
 		return $this->tags;
+	}
+	public function applyTags($tags,$con=null)
+	{
+		$this->tags = TagDb::updatePackageTags($this->getId(),$tags,$con);
+	}
+
+	protected function getFileKey()
+	{
+		$key = "{$this->getAppId()}/{$this->getId()}_{$this->value('file_name')}";
+		return static::FILE_DIR.$key;
+	}
+	public function renameTempFile()
+	{
+		$tempkey = static::TEMP_DIR.$this->value('file_name');
+		$newkey = $this->getFileKey();
+		S3::rename($tempkey,$newkey,'private');
+	}
+	public function getFileUrl($expire=null)
+	{
+		return S3::url($this->getFileKey(),$expire);
 	}
 
 }
@@ -67,32 +91,55 @@ class PackageDb extends mfwObjectDb {
 	const TABLE_NAME = 'package';
 	const SET_CLASS = 'PackageSet';
 
-	const TEMP_DIR = 'temp-data/';
+	public static function checkPlatform($name,$file)
+	{
+		$ext = pathinfo($name,PATHINFO_EXTENSION);
+		$is_zip = substr($file,0,4)==="PK\x03\x04";
+		if($is_zip && $ext==='apk'){
+			return Package::PF_ANDROID;
+		}
+		if($is_zip && $ext==='ipa'){
+			return Package::PF_IOS;
+		}
+		return Package::PF_UNKNOWN;
+	}
 
 	public static function uploadTemporary($name,$file,$mime)
 	{
-		$platform = Package::PF_UNKNOWN;
-		$ext = pathinfo($name,PATHINFO_EXTENSION);
+		$platform = static::checkPlatform($name,$file);
 
-		switch(strtolower($ext)){
-		case 'apk':
-			if(substr($file,0,4)==="PK\x03\x04"){
-				$mime = Package::MIME_ANDROID;
-				$platform = Package::PF_ANDROID;
-			}
+		switch($platform){
+		case Package::PF_ANDROID:
+			$mime = Package::MIME_ANDROID;
+			$ext = 'apk';
 			break;
-		case 'ipa':
-			if(substr($file,0,4)==="PK\x03\x04"){
-				$mime = Package::MIME_IOS;
-				$platform = Package::PF_IOS;
-			}
+		case Package::PF_IOS:
+			$mime = Package::MIME_IOS;
+			$ext = 'ipa';
 			break;
+		default:
+			$ext = pathinfo($name,PATHINFO_EXTENSION);
 		}
 
-		$temp_name = static::TEMP_DIR.Random::string(16).".$ext";
-		S3::upload($temp_name,$file,$mime,'private');
+		$temp_name = Random::string(16).".$ext";
+		S3::upload(Package::TEMP_DIR.$temp_name,$file,$mime,'private');
 
 		return array($temp_name,$platform);
+	}
+
+	public static function insertNewPackage($app_id,$platform,$file_name,$title,$description)
+	{
+		$row = array(
+			'app_id' => $app_id,
+			'platform' => $platform,
+			'file_name' => $file_name,
+			'title' => $title,
+			'description' => $description,
+			'created' => date('Y-m-d H:i:s'),
+			);
+		$pkg = new Package($row);
+		$pkg->insert();
+		return $pkg;
 	}
 }
 

@@ -1,5 +1,6 @@
 <?php
 require_once __DIR__.'/actions.php';
+require_once APP_ROOT.'/model/Package.php';
 
 class uploadActions extends appActions
 {
@@ -30,7 +31,41 @@ class uploadActions extends appActions
 
 	public function executeUpload_post()
 	{
-		var_dump($_REQUEST);
+		$temp_name = mfwRequest::param('temp_name');
+		$platform = mfwRequest::param('platform');
+		$title = mfwRequest::param('title');
+		$description = mfwRequest::param('description');
+		$tag_names = mfwRequest::param('tags');
+
+		if(!$temp_name || !$title){
+			error_log(__METHOD__.": bad request: $temp_name, $title");
+			return $this->response(self::HTTP_400_BADREQUEST);
+		}
+
+		$con = mfwDBConnection::getPDO();
+		$con->beginTransaction();
+		try{
+			$app = ApplicationDb::retrieveByPKForUpdate($this->app->getId(),$con);
+
+			$tags = $app->getTagsByName($tag_names);
+
+			$pkg = PackageDb::insertNewPackage(
+				$this->app->getId(),$platform,$temp_name,$title,$description);
+
+			$pkg->applyTags($tags,$con);
+
+			$pkg->renameTempFile();
+
+			$app->updateLastUpload($con);
+
+			$con->commit();
+		}
+		catch(Exception $e){
+			$con->rollback();
+			throw $e;
+		}
+
+		return $this->redirect("/package?id={$pkg->getId()}");
 	}
 
 }

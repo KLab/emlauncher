@@ -30,9 +30,20 @@ class Application extends mfwObject {
 	{
 		return S3::url($this->value('icon_key'));
 	}
-	public function getLastUpdated(){
-		return $this->value('last_updated');
+	public function getLastUpload(){
+		return $this->value('last_upload');
 	}
+	public function updateLastUpload($con=null)
+	{
+		$this->row['last_upload'] = date('Y-m-d H:i:s');
+		$sql = 'UPDATE application SET last_upload = :now WHERE id = :id';
+		$bind = array(
+			':id' => $this->getId(),
+			':now' => $this->getLastUpload(),
+			);
+		mfwDBIBase::query($sql,$bind,$con);
+	}
+
 	public function getCreated(){
 		return $this->value('created');
 	}
@@ -56,6 +67,36 @@ class Application extends mfwObject {
 		}
 		return $this->tags;
 	}
+
+	/**
+	 * タグ名からTagSetを取得.
+	 * 新しいtag_nameがあったら登録もする.
+	 */
+	public function getTagsByName(array $tag_names,PDO $con=null)
+	{
+		if(empty($tag_names)){
+			return new TagSet();
+		}
+		$this->tags = TagDb::selectByAppIdForUpdate($this->getId(),$con);
+		$tags = new TagSet();
+		// タグの数はたかが知れているので、愚直に一つずつ探す
+		foreach($tag_names as $name){
+			if(!$name){
+				continue;
+			}
+			$pk = $this->tags->searchPK('name',$name);
+			if($pk){
+				$tags[] = $this->tags[$pk];
+			}
+			else{
+				$tag = TagDb::insertNewTag($this->getId(),$name,$con);
+				$tags[] = $tag;
+				$this->tags[] = $tag;
+			}
+		}
+		return $tags;
+	}
+
 }
 
 /**

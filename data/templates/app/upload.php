@@ -19,6 +19,7 @@
     <form class="form-horizontal" method="post" action="<?=url("/app/upload_post?id={$app->getId()}")?>">
       <div class="form-group">
         <input type="file" class="hidden" id="file-selector">
+        <input type="hidden" id="platform" name="platform" value="">
         <input type="hidden" id="temp-name" name="temp_name" value="">
         <input type="hidden" id="file-name" name="file_name" value="">
         <div class="well well-lg droparea text-center hidden-xs">
@@ -107,6 +108,7 @@
       current_xhr.abort();
     }
     $('input[type="submit"]').attr('disabled','disabled');
+    $('#platform').val(null);
     $('#temp-name').val(null);
     $('#file-name').val(null);
     $('#file-name-display').html('<i class="fa fa-spinner fa-spin"></i> uploading...');
@@ -132,6 +134,7 @@
         return xhr;
       },
       success: function(data){
+        $('#platform').val(data.platform);
         $('#temp-name').val(data.temp_name);
         $('#file-name').val(file.name);
         $('#file-name-display').html('<i class="fa fa-check success"></i> '+file.name);
