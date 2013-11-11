@@ -36,8 +36,12 @@ class Package extends mfwObject {
 	public function getDescription(){
 		return $this->value('description');
 	}
-	public function getCreated(){
-		return $this->value('created');
+	public function getCreated($format=null){
+		$created = $this->value('created');
+		if($created && $format){
+			$created = date($format,strtotime($created));
+		}
+		return $created;
 	}
 
 	public function getTags()
@@ -140,6 +144,17 @@ class PackageDb extends mfwObjectDb {
 		$pkg = new Package($row);
 		$pkg->insert();
 		return $pkg;
+	}
+
+	public static function selectByAppId($app_id,$pf_filter=null)
+	{
+		$query = 'WHERE app_id = :app_id';
+		$bind = array(':app_id' => $app_id);
+		if($pf_filter){
+			$query .= ' AND platform = :platform';
+			$bind[':platform'] = $pf_filter;
+		}
+		return static::selectSet($query,$bind);
 	}
 }
 

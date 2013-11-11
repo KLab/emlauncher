@@ -51,27 +51,27 @@ form+.google-login {
 }
 
 h2.media-hedding {
-	border-bottom: 1px solid #eee;
+  border-bottom: 1px solid #eee;
 }
 
 label.required:after{
-	content: ' *';
-	color: red;
+  content: ' *';
+  color: red;
 }
 
 .progress {
-	margin-bottom: 0;
+  margin-bottom: 0;
 }
 
 .app-icon {
-	width: 72px;
-	height: auto;
+  width: 72px;
+  height: auto;
 }
 
 @media (min-width: 768px){
-	.app-icon {
-		width: 96px;
-	}
+  .app-icon {
+    width: 96px;
+  }
 }
 
 [data-toggle="button"].active {
@@ -81,7 +81,7 @@ label.required:after{
 }
 
 #new-tag-create {
-	margin-top: 5px;
+  margin-top: 5px;
 }
 
 #file-name>i.fa.success {
@@ -90,3 +90,28 @@ label.required:after{
 #file-name>i.fa.error {
   color: red;
 }
+
+#package-list {
+  margin-top: 1em;
+}
+
+#package-list td.text-center {
+  vertical-align: middle;
+}
+
+#package-list td .label {
+  line-height: 2;
+}
+
+#package-list td.logo {
+  font-size: 200%;
+}
+
+#package-list a.install-link {
+  width: 95%;
+}
+
+.fa-android {
+  color: #a4c639;
+}
+

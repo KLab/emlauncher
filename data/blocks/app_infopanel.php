@@ -26,5 +26,8 @@
       <dd><a href="mailto:<?=$owner->getOwnerMail()?>"><?=$owner->getOwnerMail()?></a></dd>
 <?php endforeach ?>
     </dl>
+    <div class="text-center">
+      <img src="http://chart.apis.google.com/chart?chs=150&cht=qr&chl=<?=urlencode(mfwRequest::url())?>">
+    </div>
   </div>
 </div>

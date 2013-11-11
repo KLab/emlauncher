@@ -29,13 +29,34 @@
       </li>
     </ul>
 
-    <ul>
-      <li><i class="fa fa-android"></i>binary informations</li>
-      <li><i class="fa fa-android"></i>binary informations</li>
-      <li><i class="fa fa-apple"></i>binary informations</li>
-      <li><i class="fa fa-android"></i>binary informations</li>
-      <li><i class="fa fa-apple"></i>binary informations</li>
-    </ul>
+    <table id="package-list" class="table table-striped">
+<?php foreach($packages as $pkg): ?>
+      <tr>
+        <td class="text-center logo">
+<?php if($pkg->getPlatform()==='Android'): ?>
+          <i class="fa fa-android"></i>
+<?php elseif($pkg->getPlatform()==='iOS'): ?>
+          <i class="fa fa-apple"></i>
+<?php else: ?>
+          <i class="fa fa-question"></i>
+<?php endif ?>
+        </td>
+        <td>
+          <a href="<?=url('/package?id='.$pkg->getId())?>"><?=$pkg->getTitle()?></a><br>
+          <?=$pkg->getCreated('Y-m-d H:i')?>
+        </td>
+        <td>
+<?php foreach($pkg->getTags() as $tag): ?>
+          <span class="label label-info"><?=$tag->getName()?></span>
+<?php endforeach ?>
+        </td>
+        <td class="text-center">
+          <a class="btn btn-primary install-link" href="<?=url('/package/install?id='.$pkg->getId())?>">Install</a>
+        </td>
+      </tr>
+<?php endforeach ?>
+    </table>
+
   </div>
 </div>
 

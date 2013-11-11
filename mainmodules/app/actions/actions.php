@@ -1,5 +1,6 @@
 <?php
 require_once APP_ROOT.'/model/Application.php';
+require_once APP_ROOT.'/model/Package.php';
 
 class appActions extends MainActions
 {
@@ -65,17 +66,31 @@ class appActions extends MainActions
 
 	public function executeIndex()
 	{
+		static $pf = array(
+			'android' => Package::PF_ANDROID,
+			'ios' => Package::PF_IOS,
+			'all' => null,
+			);
+
 		$platform = mfwRequest::param('pf');
 		if(!in_array($platform,array('android','ios','all'))){
-			$platform = 'android';// fixme: UA見て変える
+			$ua = mfwRequest::userAgent();
+			if($ua->isAndroid()){
+				$platform = 'android';
+			}
+			elseif($ua->isIOS()){
+				$platform = 'ios';
+			}
+			else{
+				$platform = 'all';
+			}
 		}
 
-		$owners = $this->app->getOwners();
-		$ownerid = $owners->searchPK('owner_mail',$this->login_user->getMail());
-
+		$pkgs = PackageDb::selectByAppId($this->app->getId(),$pf[$platform]);
 		$params = array(
 			'pf' => $platform,
-			'is_owner' => ($ownerid!==null),
+			'is_owner' => $this->app->isOwner($this->login_user),
+			'packages' => $pkgs,
 			);
 		return $this->build($params);
 	}

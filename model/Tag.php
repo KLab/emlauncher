@@ -49,10 +49,10 @@ class TagDb extends mfwObjectDb {
 		$query = 'WHERE app_id = ? FOR UPDATE';
 		return static::selectSet($query,array($app_id),$con);
 	}
-	public static function selectByPackage($pakcage_id)
+	public static function selectByPackageId($pakcage_id)
 	{
 		$sql = 'SELECT t.* FROM package_tag j LEFT JOIN tag t ON j.tag_id = t.id WHERE package_id = ?';
-		$rows = mfwDBI::getAll($sql,array($pakcage_id));
+		$rows = mfwDBIBase::getAll($sql,array($pakcage_id));
 		return new TagSet($rows);
 	}
 
