@@ -1,6 +1,6 @@
 <?php
 require_once __DIR__.'/actions.php';
-require_once APP_ROOT.'/model/S3.php';
+require_once APP_ROOT.'/model/Package.php';
 
 class upload_package_temporaryAction extends apiActions
 {
@@ -9,9 +9,8 @@ class upload_package_temporaryAction extends apiActions
 		try{
 			$file_name = mfwRequest::param('name');
 			$file = mfwRequest::body();
-			$temp_name = 'temp_name.apk';
-			$type = 'Android';
-			sleep(1);
+			$content_type = mfwRequest::header('Content-type');
+			list($temp_name,$platform) = PackageDb::uploadTemporary($file_name,$file,$content_type);
 		}
 		catch(Exception $e){
 			error_log(__METHOD__." {$e->getMessage()}");
@@ -24,7 +23,7 @@ class upload_package_temporaryAction extends apiActions
 			array(
 				'file_name' => $file_name,
 				'temp_name' => $temp_name,
-				'type' => $type,
+				'platform' => $platform,
 				));
 	}
 }

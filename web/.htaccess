@@ -8,3 +8,4 @@ RewriteRule ^(.+)$ main.php/$1 [QSA,L]
 SetEnvIf MFW_ENV ^$ MFW_ENV=local
 
 php_flag short_open_tag On
+php_value memory_limit "2G"

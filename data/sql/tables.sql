@@ -31,3 +31,32 @@ create table `application_owner` (
   primary key (`id`)
 )Engine=InnoDB default charset=utf8;
 
+drop table if exists `tag`;
+create table `tag` (
+  `id` integer not null auto_increment,
+  `app_id` integer not null,
+  `name` varchar(255) not null,
+  key `idx_app` (`api_id`),
+  primary key (`id`)
+)Engine=InnoDB default charset=utf8;
+
+drop table if exists `package`;
+create table `package` (
+  `id` integer not null auto_increment,
+  `app_id` integer not null,
+  `platform` varchar(31) not null,
+  `file_name` varchar(63) not null,
+  `title` varchar(255) not null,
+  `description` varchar(1000) default null,
+  `created` datetime not null,
+  key `idx_app` (`api_id`),
+  primary key (`id`)
+)Engine=InnoDB default charset=utf8;
+
+drop table if exists `package_tag`;
+create table `package_tag` (
+  `package_id` integer not null,
+  `tag_id` integer not null,
+  primary key (`package_id`,`tag_id`)
+)Engine=InnoDB default charset=utf8;
+

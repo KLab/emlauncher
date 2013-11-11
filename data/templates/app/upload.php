@@ -19,7 +19,8 @@
     <form class="form-horizontal" method="post" action="<?=url("/app/upload_post?id={$app->getId()}")?>">
       <div class="form-group">
         <input type="file" class="hidden" id="file-selector">
-        <input type="hidden" id="temp-file-name" name="temp_file_name" value="">
+        <input type="hidden" id="temp-name" name="temp_name" value="">
+        <input type="hidden" id="file-name" name="file_name" value="">
         <div class="well well-lg droparea text-center hidden-xs">
           Drop your apk/ipa file here.
         </div>
@@ -29,14 +30,14 @@
             ファイルがアップロードされていません
           </div>
           <div class="input-group"  id="input-group-icon">
-            <div class="form-control droparea" id="file-name" readonly="readonly"></div>
+            <div class="form-control droparea" id="file-name-display" readonly="readonly"></div>
             <a id="file-browse" class="input-group-addon btn btn-default">Browse</a>
           </div>
           <div class="help-block">
             <div class="progress progress-striped active">
               <div id="progress-bar" class="progress-bar" style="width:0%"></div>
             </div>
-            <span id="file-info">size: -; type: -</span>
+            <span id="file-info">-, size: -</span>
           </div>
         </div>
       </div>
@@ -107,12 +108,13 @@
       current_xhr.abort();
     }
     $('input[type="submit"]').attr('disabled','disabled');
-    $('#temp-file-name').val(null);
-    $('#file-name').html('<i class="fa fa-spinner fa-spin"></i> uploading...');
+    $('#temp-name').val(null);
+    $('#file-name').val(null);
+    $('#file-name-display').html('<i class="fa fa-spinner fa-spin"></i> uploading...');
     $('#progress-bar').css('width', '0%');
     $('#progress-bar').removeClass('progress-bar-success progress-bar-danger');
     $('#progress-bar').parent().addClass('progress-striped active');
-    $('#file-info').text('size: -; type: -');
+    $('#file-info').text('-, size: -');
 
     current_xhr = $.ajax({
       url: "<?=url('/api/upload_package_temporary?name=')?>"+file.name,
@@ -131,9 +133,10 @@
         return xhr;
       },
       success: function(data){
-        $('#temp-file-name').val(data.temp_name);
-        $('#file-name').html('<i class="fa fa-check success"></i> '+data.temp_name);
-        $('#file-info').text('size: '+file.size.toLocaleString()+' bytes; type: '+data.type);
+        $('#temp-name').val(data.temp_name);
+        $('#file-name').val(file.name);
+        $('#file-name-display').html('<i class="fa fa-check success"></i> '+file.name);
+        $('#file-info').text(data.platform+', size: '+file.size.toLocaleString()+' bytes');
         $('input[type="submit"]').removeAttr('disabled');
         $('#progress-bar').parent().removeClass('progress-striped active');
         $('#progress-bar').css('width','100%');
@@ -141,7 +144,7 @@
         current_xhr = null;
       },
       error: function(){
-        $('#file-name').html('<i class="fa fa-times error"></i> upload failed.');
+        $('#file-name-display').html('<i class="fa fa-times error"></i> upload failed.');
         $('#progress-bar').addClass('progress-bar-danger');
         current_xhr = null;
       },
@@ -235,7 +238,7 @@ $('#title').keydown(function(event){
 $('form').submit(function(){
   var valid = true;
   $('.alert').addClass('hidden');
-  if(!$('#temp-file-name').val()){
+  if(!$('#temp-name').val()){
     $('#alert-nofile').removeClass('hidden');
     valid = false;
   }
