@@ -15,6 +15,34 @@ class Package extends mfwObject {
 	const MIME_ANDROID = 'application/vnd.android.package-archive';
 	const MIME_IOS = 'application/octet-stream';
 
+	protected $tags = null;
+
+	public function getId(){
+		return $this->value('id');
+	}
+	public function getAppId(){
+		return $this->value('app_id');
+	}
+	public function getplatform(){
+		return $this->value('platform');
+	}
+	public function getTitle(){
+		return $this->value('title');
+	}
+	public function getDescription(){
+		return $this->value('description');
+	}
+	public function getCreated(){
+		return $this->value('created');
+	}
+
+	public function getTags()
+	{
+		if($this->tags===null){
+			$this->tags = TagsDb::selectByPackageId($this->getId());
+		}
+		return $this->tags;
+	}
 
 }
 

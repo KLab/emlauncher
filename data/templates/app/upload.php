@@ -62,11 +62,10 @@
       <div class="form-group">
         <label class="control-label col-md-2">Tags</label>
         <div class="col-md-10">
-
-          <input type="checkbox" class="hidden" name="tags[]" value="ほげ">
-          <button class="btn btn-default tags" data-toggle="button">ほげ</button>
-          <input type="checkbox" class="hidden" name="tags[]" value="ふが">
-          <button class="btn btn-default tags" data-toggle="button">ふが</button>
+<?php foreach($app->getTags() as $tag): ?>
+          <input type="checkbox" class="hidden" name="tags[]" value="<?=$tag->getName()?>">
+          <button class="btn btn-default tags" data-toggle="button"><?=$tag->getName()?></button>
+<?php endforeach ?>
 
           <div id="tag-template" class="hidden">
             <input type="checkbox" class="hidden" name="tags[]" value="">

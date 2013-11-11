@@ -36,7 +36,7 @@ create table `tag` (
   `id` integer not null auto_increment,
   `app_id` integer not null,
   `name` varchar(255) not null,
-  key `idx_app` (`api_id`),
+  key `idx_app` (`app_id`),
   primary key (`id`)
 )Engine=InnoDB default charset=utf8;
 
@@ -49,7 +49,7 @@ create table `package` (
   `title` varchar(255) not null,
   `description` varchar(1000) default null,
   `created` datetime not null,
-  key `idx_app` (`api_id`),
+  key `idx_app` (`app_id`),
   primary key (`id`)
 )Engine=InnoDB default charset=utf8;
 

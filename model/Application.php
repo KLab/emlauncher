@@ -1,5 +1,6 @@
 <?php
 require_once __DIR__.'/ApplicationOwner.php';
+require_once __DIR__.'/Tag.php';
 require_once __DIR__.'/S3.php';
 require_once __DIR__.'/Random.php';
 
@@ -11,6 +12,7 @@ class Application extends mfwObject {
 	const SET_CLASS = 'ApplicationSet';
 
 	protected $owners = null;
+	protected $tags = null;
 
 	public function getId(){
 		return $this->value('id');
@@ -46,6 +48,13 @@ class Application extends mfwObject {
 		$owners = $this->getOwners();
 		$k = $owners->searchPK('owner_mail',$user->getMail());
 		return $k!==null;
+	}
+	public function getTags()
+	{
+		if($this->tags===null){
+			$this->tags = TagDb::selectByAppId($this->getId());
+		}
+		return $this->tags;
 	}
 }
 
