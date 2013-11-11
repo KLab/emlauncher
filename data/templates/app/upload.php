@@ -25,7 +25,7 @@
         <div class="well well-lg droparea text-center hidden-xs">
           Drop your apk/ipa file here.
         </div>
-        <label class="control-label col-md-2">File</label>
+        <label class="control-label col-md-2 required">File</label>
         <div class="col-md-10">
           <div id="alert-nofile" class="alert alert-danger hidden">
             ファイルがアップロードされていません
@@ -44,7 +44,7 @@
       </div>
 
       <div class="form-group">
-        <label for="title" class="control-label col-md-2">Title</label>
+        <label for="title" class="control-label col-md-2 required">Title</label>
         <div class="col-md-10">
           <div id="alert-notitle" class="alert alert-danger hidden">
             タイトルが入力されていません

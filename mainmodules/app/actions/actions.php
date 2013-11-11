@@ -41,6 +41,7 @@ class appActions extends MainActions
 		$title = mfwRequest::param('title');
 		$data = mfwRequest::param('icon-data');
 		$description = mfwRequest::param('description');
+		$repository = mfwRequest::param('repository');
 		if(!$title || !preg_match('/^data:[^;]+;base64,(.+)$/',$data,$match)){
 			error_log(__METHOD__.": bad request: $title, ".substr($data,0,30));
 			return $this->response(self::HTTP_400_BADREQUEST);
@@ -51,7 +52,7 @@ class appActions extends MainActions
 		$con->beginTransaction();
 		try{
 			$app = ApplicationDb::insertNewApp(
-				$this->login_user,$title,$image,$description);
+				$this->login_user,$title,$image,$description,$repository);
 			$con->commit();
 		}
 		catch(Exception $e){

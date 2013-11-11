@@ -7,7 +7,7 @@
       <div class="row">
         <div class="col-md-10 col-sm-9">
           <div class="form-group">
-            <label for="title" class="control-label col-md-2">Title</label>
+	        <label for="title" class="control-label col-md-2 required">Title</label>
             <div class="col-md-10">
               <div id="alert-notitle" class="alert alert-danger hidden">
                 タイトルが入力されていません
@@ -17,7 +17,7 @@
           </div>
 
           <div class="form-group">
-            <label for="icon-selector" class="control-label col-md-2">Icon</label>
+            <label for="icon-selector" class="control-label col-md-2 required">Icon</label>
             <div class="col-md-10">
               <div id="alert-icon-size-limit" class="alert alert-danger hidden">
                 画像ファイルサイズが大きすぎます

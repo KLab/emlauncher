@@ -149,13 +149,14 @@ class ApplicationDb extends mfwObjectDb {
 		return static::selectOne($query,array($key));
 	}
 
-	public static function insertNewApp($owner,$title,$image,$description)
+	public static function insertNewApp($owner,$title,$image,$description,$repository)
 	{
 		// insert new application
 		$row = array(
 			'title' => $title,
 			'api_key' => static::makeApiKey(),
 			'description' => $description,
+			'repository' => $repository,
 			'created' => date('Y-m-d H:i:s'),
 			);
 		$app = new Application($row);

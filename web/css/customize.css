@@ -54,6 +54,11 @@ h2.media-hedding {
 	border-bottom: 1px solid #eee;
 }
 
+label.required:after{
+	content: ' *';
+	color: red;
+}
+
 .progress {
 	margin-bottom: 0;
 }
