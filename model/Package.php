@@ -1,4 +1,5 @@
 <?php
+require_once APP_ROOT.'/model/Application.php';
 require_once APP_ROOT.'/model/Tag.php';
 require_once APP_ROOT.'/model/Random.php';
 require_once APP_ROOT.'/model/S3.php';
@@ -19,6 +20,7 @@ class Package extends mfwObject {
 	const FILE_DIR = 'package/';
 	const TEMP_DIR = 'temp-data/';
 
+	protected $app = null;
 	protected $tags = null;
 
 	public function getId(){
@@ -26,6 +28,13 @@ class Package extends mfwObject {
 	}
 	public function getAppId(){
 		return $this->value('app_id');
+	}
+	public function getApplication()
+	{
+		if($this->app===null){
+			$this->app = ApplicationDb::retrieveByPK($this->getAppId());
+		}
+		return $this->app;
 	}
 	public function getplatform(){
 		return $this->value('platform');
@@ -70,6 +79,11 @@ class Package extends mfwObject {
 	public function getFileUrl($expire=null)
 	{
 		return S3::url($this->getFileKey(),$expire);
+	}
+
+	public function getInstallUrl()
+	{
+		return '#'; // stub
 	}
 
 }

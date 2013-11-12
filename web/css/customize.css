@@ -125,3 +125,20 @@ label.required:after{
   color: silver;
 }
 
+h3 {
+  margin-top: 2px;
+}
+
+@media (min-width: 768px) {
+  .dl-horizontal dt {
+    width: 100px;
+  }
+  .dl-horizontal dd {
+    margin-left: 120px;
+  }
+}
+
+#installed-date {
+  font-size: x-small;
+}
+

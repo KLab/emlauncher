@@ -6,8 +6,8 @@
     </a>
   </p>
   <div class="media-body">
-    <h2 class="media-hedding"><?=$app->getTitle()?></h2>
-    <p><?=$app->getDescription()?></p>
+    <h2 class="media-hedding"><?=htmlspecialchars($app->getTitle())?></h2>
+    <p><?=htmlspecialchars($app->getDescription())?></p>
   </div>
 </div>
 
@@ -54,7 +54,7 @@
         <td>
 	      <div class="row">
             <div class="col-xs-12 col-md-6">
-              <a class="title" href="<?=url('/package?id='.$pkg->getId())?>"><?=$pkg->getTitle()?></a>
+              <a class="title" href="<?=url('/package?id='.$pkg->getId())?>"><?=htmlspecialchars($pkg->getTitle())?></a>
               <span class="info hidden-xs hidden-sm"><?=$pkg->getCreated('Y-m-d H:i')?></span>
             </div>
             <div class="col-xs-12 col-md-6">
@@ -66,7 +66,7 @@
           <span class="info visible-xs visible-sm"><?=$pkg->getCreated('Y-m-d H:i')?></span>
         </td>
         <td class="text-center">
-          <a class="btn btn-primary install-link" href="<?=url('/package/install?id='.$pkg->getId())?>">Install</a>
+          <a class="btn btn-primary install-link col-xs-12" href="<?=$pkg->getInstallUrl()?>"><i class="fa fa-download"></i> Install</a>
         </td>
       </tr>
 <?php endforeach ?>

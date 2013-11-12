@@ -1,5 +1,5 @@
 <div class="list-group">
-<?php if($is_owner): ?>
+<?php if($app->isOwner($login_user)): ?>
   <div class="list-group-item">
     <ul class="nav nav-pills nav-stacked">
       <li<?=(isset($act)&&$act==='upload')?' class="active"':''?>>
@@ -21,7 +21,11 @@
       <dd><?=$app->getCreated()?></dd>
 <?php if($app->getRepository()): ?>
       <dt>repository</dt>
-      <dd><?=$app->getRepository()?></dd>
+<?php if(strpos($app->getRepository(),'http')===0): ?>
+      <dd><a href="<?=htmlspecialchars($app->getRepository())?>"><?=htmlspecialchars($app->getRepository())?></a></dd>
+<?php else: ?>
+      <dd><?=htmlspecialchars($app->getRepository())?></dd>
+<?php endif ?>
 <?php endif ?>
       <dt>owners</dt>
 <?php foreach($app->getOwners() as $owner):?>
@@ -31,6 +35,7 @@
   </div>
   <div class="list-group-item">
     <div class="text-center">
+      <p>link to this app</p>
       <img src="http://chart.apis.google.com/chart?chs=150&cht=qr&chl=<?=urlencode(url("/app?id={$app->getId()}"))?>">
     </div>
   </div>
