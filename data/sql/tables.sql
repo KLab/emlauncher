@@ -48,6 +48,7 @@ create table `package` (
   `file_name` varchar(63) not null,
   `title` varchar(255) not null,
   `description` varchar(1000) default null,
+  `ios_identifier` varchar(255) default null,
   `created` datetime not null,
   key `idx_app` (`app_id`),
   primary key (`id`)

@@ -36,6 +36,7 @@ class uploadActions extends appActions
 		$title = mfwRequest::param('title');
 		$description = mfwRequest::param('description');
 		$tag_names = mfwRequest::param('tags');
+		$ios_identifier = mfwRequest::param('ios_identifier');
 
 		if(!$temp_name || !$title){
 			error_log(__METHOD__.": bad request: $temp_name, $title");
@@ -50,7 +51,7 @@ class uploadActions extends appActions
 			$tags = $app->getTagsByName($tag_names);
 
 			$pkg = PackageDb::insertNewPackage(
-				$this->app->getId(),$platform,$temp_name,$title,$description);
+				$this->app->getId(),$platform,$temp_name,$title,$description,$ios_identifier);
 
 			$pkg->applyTags($tags,$con);
 

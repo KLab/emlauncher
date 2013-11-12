@@ -22,6 +22,7 @@
         <input type="hidden" id="platform" name="platform" value="">
         <input type="hidden" id="temp-name" name="temp_name" value="">
         <input type="hidden" id="file-name" name="file_name" value="">
+        <input type="hidden" id="ios-identifier" name="ios_identifier" value="">
         <div class="well well-lg droparea text-center hidden-xs">
           Drop your apk/ipa file here.
         </div>
@@ -117,11 +118,14 @@
     $('#progress-bar').parent().addClass('progress-striped active');
     $('#file-info').text('-, size: -');
 
+    var fd = new FormData();
+    fd.append('file',file);
+
     current_xhr = $.ajax({
       url: "<?=url('/api/upload_package_temporary?name=')?>"+file.name,
       type: "POST",
-      contentType: file.type,
-      data: file,
+      contentType: false,
+      data: fd,
       processData: false,
       xhr: function(){
         var xhr = $.ajaxSettings.xhr();
@@ -136,6 +140,7 @@
       success: function(data){
         $('#platform').val(data.platform);
         $('#temp-name').val(data.temp_name);
+        $('#ios-identifier').val(data.ios_identifier);
         $('#file-name').val(file.name);
         $('#file-name-display').html('<i class="fa fa-check success"></i> '+file.name);
         $('#file-info').text(data.platform+', size: '+file.size.toLocaleString()+' bytes');
