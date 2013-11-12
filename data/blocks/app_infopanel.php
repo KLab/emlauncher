@@ -13,8 +13,10 @@
 <?endif?>
   <div class="list-group-item">
     <dl>
-      <dt>last uploaded</dt>
-      <dd>fixme</dd>
+<?php if($app->getLastUpload()): ?>
+      <dt>last upload</dt>
+      <dd><?=$app->getLastUpload()?></dd>
+<?php endif ?>
       <dt>created</dt>
       <dd><?=$app->getCreated()?></dd>
 <?php if($app->getRepository()): ?>
@@ -26,6 +28,8 @@
       <dd><a href="mailto:<?=$owner->getOwnerMail()?>"><?=$owner->getOwnerMail()?></a></dd>
 <?php endforeach ?>
     </dl>
+  </div>
+  <div class="list-group-item">
     <div class="text-center">
       <img src="http://chart.apis.google.com/chart?chs=150&cht=qr&chl=<?=urlencode(mfwRequest::url())?>">
     </div>

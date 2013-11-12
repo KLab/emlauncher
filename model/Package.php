@@ -154,6 +154,7 @@ class PackageDb extends mfwObjectDb {
 			$query .= ' AND platform = :platform';
 			$bind[':platform'] = $pf_filter;
 		}
+		$query .= ' ORDER BY id DESC';
 		return static::selectSet($query,$bind);
 	}
 }

@@ -91,16 +91,23 @@ label.required:after{
   color: red;
 }
 
-#package-list {
-  margin-top: 1em;
+#tag-filter {
+  min-height: 2em;
+  padding: 5px;
+}
+
+#package-list .title {
+  font-weight: bolder;
+  font-size: medium;
+}
+#package-list .info {
+  font-size: xx-small;
+  display: inline-block;
+  padding-top: 2px;
 }
 
 #package-list td.text-center {
   vertical-align: middle;
-}
-
-#package-list td .label {
-  line-height: 2;
 }
 
 #package-list td.logo {
@@ -108,10 +115,13 @@ label.required:after{
 }
 
 #package-list a.install-link {
-  width: 95%;
+  width: 100%;
 }
 
 .fa-android {
   color: #a4c639;
+}
+.fa-apple {
+  color: silver;
 }
 
