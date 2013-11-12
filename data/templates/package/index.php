@@ -17,7 +17,7 @@
   <div class="col-xs-12 col-sm-8 col-md-9">
 
     <div class="row">
-      <div class="col-xs-8">
+      <div class="col-xs-7">
         <h3>
 <?php if($package->getPlatform()=='Android'): ?>
           <i class="fa fa-android"></i>
@@ -32,13 +32,13 @@
           <?=htmlspecialchars($package->getDescription())?>
         </p>
       </div>
-      <div class="col-xs-4">
+      <div class="col-xs-5">
 <!-- 
         <a href="<?=$package->getInstallUrl()?>" class="btn btn-primary col-xs-12"><i class="fa fa-download"></i> Install</a>
  -->
         <a href="<?=$package->getInstallUrl()?>" class="btn btn-success col-xs-12"><i class="fa fa-check"></i> Installed</a>
         <dl id="installed-date">
-          <dt>instaled at</dt>
+          <dt>Instaled at</dt>
           <dd>2013-12-15 13:12:05</dd>
         </dl>
       </div>
