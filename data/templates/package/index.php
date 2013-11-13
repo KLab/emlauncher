@@ -33,14 +33,15 @@
         </p>
       </div>
       <div class="col-xs-5">
-<!-- 
-        <a href="<?=$package->getInstallUrl()?>" class="btn btn-primary col-xs-12"><i class="fa fa-download"></i> Install</a>
- -->
+<?php if($login_user->getPackageInstalledDate($package)): ?>
         <a href="<?=$package->getInstallUrl()?>" class="btn btn-success col-xs-12"><i class="fa fa-check"></i> Installed</a>
         <dl id="installed-date">
           <dt>Instaled at</dt>
-          <dd>2013-12-15 13:12:05</dd>
+          <dd><?=$login_user->getPackageInstalledDate($package)?></dd>
         </dl>
+<?php else: ?>
+        <a href="<?=$package->getInstallUrl()?>" class="btn btn-primary col-xs-12"><i class="fa fa-download"></i> Install</a>
+<?php endif ?>
       </div>
     </div>
 
@@ -60,7 +61,7 @@
       <dd><i class="fa fa-question"></i> unknown</dd>
 <?php endif ?>
       <dt>Installed</dt>
-      <dd>12<!-- fixme --></dd>
+      <dd><?=$package->getInstallCount()?></dd>
       <dt>Uploaded</dt>
       <dd><?=$package->getCreated()?></dd>
       <dt>Owners</dt>

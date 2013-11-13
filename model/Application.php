@@ -1,6 +1,7 @@
 <?php
 require_once __DIR__.'/ApplicationOwner.php';
 require_once __DIR__.'/Tag.php';
+require_once __DIR__.'/InstallLog.php';
 require_once __DIR__.'/S3.php';
 require_once __DIR__.'/Random.php';
 
@@ -66,6 +67,11 @@ class Application extends mfwObject {
 			$this->tags = TagDb::selectByAppId($this->getId());
 		}
 		return $this->tags;
+	}
+
+	public function getInstallCount()
+	{
+		return InstallLog::getApplicationInstallCount($this);
 	}
 
 	/**

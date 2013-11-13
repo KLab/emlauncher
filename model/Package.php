@@ -88,6 +88,11 @@ class Package extends mfwObject {
 	{
 		return mfwRequest::makeUrl("/package/install?id={$this->getId()}");
 	}
+
+	public function getInstallCount()
+	{
+		return InstallLog::getPackageInstallCount($this);
+	}
 }
 
 /**

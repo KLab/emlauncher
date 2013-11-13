@@ -1,10 +1,12 @@
 <?php
+require_once APP_ROOT.'/model/InstallLog.php';
 
 class User
 {
 	const SESKEY = 'login_user';
 
 	protected $mail;
+	protected $pkg_install_dates = array();
 
 	public function __construct($mail)
 	{
@@ -38,6 +40,22 @@ class User
 	public static function logout()
 	{
 		mfwSession::clear(self::SESKEY);
+	}
+
+	public function getPackageInstalledDate(Package $pkg,$format=null)
+	{
+		$appid = $pkg->getAppId();
+		if(!isset($this->pkg_install_dates[$appid])){
+			$this->pkg_install_dates[$appid] = InstallLog::packageInstalledDates($this,$appid);
+		}
+		if(!isset($this->pkg_install_dates[$appid][$pkg->getId()])){
+			return null;
+		}
+		$date = $this->pkg_install_dates[$appid][$pkg->getId()];
+		if($format){
+			$date = date($format,strtotime($date));
+		}
+		return $date;
 	}
 
 }
