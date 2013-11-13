@@ -2,7 +2,7 @@
 <html lang="ja">
   <head>
     <meta charset="utf-8">
-    <title><?=(isset($page_title))?$title.' | ':''?>EM-Launcher</title>
+    <title><?=(isset($page_title))?htmlspecialchars($page_title).' | ':''?>EM-Launcher</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <?php if(mfwServerEnv::getEnv()==='local'): ?>
     <link href="/bootstrap/bootswatch/spacelab/bootstrap.min.css" rel="stylesheet" media="screen">
@@ -27,17 +27,16 @@
           <span class="icon-bar"></span>
           <span class="icon-bar"></span>
         </button>
-        <a href="<?=url('/mypage')?>" class="navbar-brand"><span>EM</span><span>Launcher</span></a>
+        <a href="<?=url('/')?>" class="navbar-brand"><span>EM</span><span>Launcher</span></a>
       </div>
       <div class="collapse navbar-collapse navbar-ex1-collapse">
 <?php if($login_user): ?>
         <ul class="nav navbar-nav">
-          <li><a href="<?=url('/apps')?>">Apps</a></li>
-          <li><a href="<?=url('/mypage')?>">Mypage</a><li>
+          <li><a href="<?=url('/')?>">App</a></li>
         </ul>
         <ul class="nav navbar-nav navbar-right">
           <li class="dropdown">
-            <a href="#" class="dropdown-toggle" data-toggle="dropdown"><?=$login_user->getMail()?> <b class="caret"></b></a>
+            <a href="#" class="dropdown-toggle" data-toggle="dropdown"><?=htmlspecialchars($login_user->getMail())?> <b class="caret"></b></a>
             <ul class="dropdown-menu">
               <li><a href="<?=url('/logout')?>">Logout</a></li>
             </ul>

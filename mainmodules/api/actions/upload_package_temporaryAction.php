@@ -20,7 +20,7 @@ class upload_package_temporaryAction extends apiActions
 
 			list($temp_name,$platform) = PackageDb::uploadTemporary($file_name,$file,$file_type);
 
-			$identifier = null;
+			$ios_identifier = null;
 			if($platform===Package::PF_IOS){
 				$plist = IPAFile::parseInfoPlist($file_path);
 				$ios_identifier = $plist['CFBundleIdentifier'];
