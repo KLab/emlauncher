@@ -66,6 +66,8 @@ class uploadActions extends appActions
 			throw $e;
 		}
 
+		// todo: notification
+
 		return $this->redirect("/package?id={$pkg->getId()}");
 	}
 

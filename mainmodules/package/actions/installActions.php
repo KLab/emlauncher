@@ -1,6 +1,6 @@
 <?php
 require_once __DIR__.'/actions.php';
-
+require_once APP_ROOT.'/model/InstallLog.php';
 
 class installActions extends packageActions
 {
@@ -8,8 +8,6 @@ class installActions extends packageActions
 	{
 		$pf = $this->package->getPlatform();
 		$ua = mfwRequest::userAgent();
-
-		// todo: インストールログの保存
 
 		if($pf===Package::PF_IOS && $ua->isIOS()){
 			// itms-service での接続はセッションを引き継げない
@@ -22,6 +20,19 @@ class installActions extends packageActions
 			// iPhone以外でのアクセスはパッケージを直接DL
 			$url = $this->package->getFileUrl('+5 min');
 		}
+
+		$con = mfwDBConnection::getPDO();
+		$con->beginTransaction();
+		try{
+			InstallLog::Logging($this->login_user,$this->package,$ua,$con);
+			$con->commit();
+		}
+		catch(Exception $e){
+			$con->rollback();
+			error_log(__METHOD__.': '.$e->getMessage());
+			throw $e;
+		}
+
 		return $this->redirect($url);
 	}
 
