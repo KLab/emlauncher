@@ -33,6 +33,8 @@ class MainActions extends mfwActions
 	protected function build($params,$headers=array())
 	{
 		$params['login_user'] = $this->login_user;
+		$params['module'] = $this->module;
+		$params['action'] = $this->action;
 		return parent::build($params,$headers);
 	}
 

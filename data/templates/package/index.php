@@ -19,13 +19,7 @@
     <div class="row">
       <div class="col-xs-7">
         <h3>
-<?php if($package->getPlatform()=='Android'): ?>
-          <i class="fa fa-android"></i>
-<?php elseif($package->getPlatform()=='iOS'): ?>
-          <i class="fa fa-apple"></i>
-<?php else: ?>
-          <i class="fa fa-question"></i>
-<?php endif ?>
+          <?=block('platform_icon')?>
           <?=htmlspecialchars($package->getTitle())?>
         </h3>
         <p>
@@ -53,13 +47,7 @@
 
     <dl class="dl-horizontal">
       <dt>Platform</dt>
-<?php if($package->getPlatform()=='Android'): ?>
-      <dd><i class="fa fa-android"></i> Android</dd>
-<?php elseif($package->getPlatform()=='iOS'): ?>
-      <dd><i class="fa fa-apple"></i> iOS</dd>
-<?php else: ?>
-      <dd><i class="fa fa-question"></i> unknown</dd>
-<?php endif ?>
+      <dd><?=block('platform_icon',array('with_name'=>true))?></dd>
       <dt>Installed</dt>
       <dd><?=$package->getInstallCount()?></dd>
       <dt>Uploaded</dt>

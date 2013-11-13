@@ -16,12 +16,6 @@ class uploadActions extends appActions
 		return null;
 	}
 
-	public function build($params,$headers=array())
-	{
-		$params['is_owner'] = true;
-		return parent::build($params,$headers);
-	}
-
 	public function executeUpload()
 	{
 		$params = array(

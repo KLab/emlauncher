@@ -43,13 +43,7 @@
 <?php foreach($packages as $pkg): ?>
       <tr>
         <td class="text-center logo">
-<?php if($pkg->getPlatform()==='Android'): ?>
-          <i class="fa fa-android"></i>
-<?php elseif($pkg->getPlatform()==='iOS'): ?>
-          <i class="fa fa-apple"></i>
-<?php else: ?>
-          <i class="fa fa-question"></i>
-<?php endif ?>
+          <?=block('platform_icon',array('package'=>$pkg))?>
         </td>
         <td>
 	      <div class="row">

@@ -12,7 +12,7 @@
 
 <div class="row">
   <div class="col-sm-4 col-md-3 hidden-xs">
-    <?=block('app_infopanel',array('act'=>'upload'))?>
+    <?=block('app_infopanel')?>
   </div>
 
   <div class="col-xs-12 col-sm-8 col-md-9">
@@ -97,7 +97,7 @@
 </div>
 
 <div class="visible-xs">
-  <?=block('app_infopanel',array('act'=>'upload'))?>
+  <?=block('app_infopanel')?>
 </div>
 
 <script type="text/javascript">

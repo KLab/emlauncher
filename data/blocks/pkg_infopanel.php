@@ -2,7 +2,7 @@
 <?php if($app->isOwner($login_user)): ?>
   <div class="list-group-item">
     <ul class="nav nav-pills nav-stacked">
-      <li<?=(isset($act)&&$act==='edit')?' class="active"':''?>>
+      <li<?=($action==='edit')?' class="active"':''?>>
         <a href="<?=url("/package/edit?id={$package->getId()}")?>"><i class="fa fa-pencil"></i> Edit</a>
       </li>
       <li>
