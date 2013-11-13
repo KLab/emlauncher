@@ -36,7 +36,7 @@ class Package extends mfwObject {
 		}
 		return $this->app;
 	}
-	public function getplatform(){
+	public function getPlatform(){
 		return $this->value('platform');
 	}
 	public function getTitle(){
@@ -44,6 +44,9 @@ class Package extends mfwObject {
 	}
 	public function getDescription(){
 		return $this->value('description');
+	}
+	public function getIOSIdentifier(){
+		return $this->value('ios_identifier');
 	}
 	public function getCreated($format=null){
 		$created = $this->value('created');
@@ -83,9 +86,8 @@ class Package extends mfwObject {
 
 	public function getInstallUrl()
 	{
-		return '#'; // stub
+		return mfwRequest::makeUrl("/package/install?id={$this->getId()}");
 	}
-
 }
 
 /**

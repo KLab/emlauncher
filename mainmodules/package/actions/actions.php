@@ -4,6 +4,7 @@ require_once APP_ROOT.'/model/Package.php';
 class packageActions extends MainActions
 {
 	protected $package = null;
+	protected $app = null;
 
 	public function initialize()
 	{
@@ -15,13 +16,14 @@ class packageActions extends MainActions
 		if(!$this->package){
 			return $this->buildErrorPage('Not Found',array(self::HTTP_404_NOTFOUND));
 		}
+		$this->app = $this->package->getApplication();
 		return null;
 	}
 
 	public function build($params)
 	{
 		$params['package'] = $this->package;
-		$params['app'] = $this->package->getApplication();
+		$params['app'] = $this->app;
 		return parent::build($params);
 	}
 
@@ -32,4 +34,5 @@ class packageActions extends MainActions
 			);
 		return $this->build($params);
 	}
+
 }
