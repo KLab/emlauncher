@@ -16,8 +16,8 @@ class MainActions extends mfwActions
 			return $err;
 		}
 
-		// package/install_plist はセッションが使えないためシグネチャで認証する.
-		if($this->getModule()==='package' && $this->getAction()==='install_plist'){
+		// package/install_plist はセッションが使えないため別途認証する.
+		if($this->module==='package' && $this->action==='install_plist'){
 			return null;
 		}
 
