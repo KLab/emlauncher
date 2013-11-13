@@ -13,7 +13,7 @@ echo '<?xml version="1.0" encoding="UTF-8"?>',"\n";
             <key>kind</key>
             <string>software-package</string>
             <key>url</key>
-            <string><?=$ipa_url?></string>
+            <string><?=htmlspecialchars($ipa_url)?></string>
           </dict>
           <dict>
             <key>kind</key>
@@ -21,7 +21,7 @@ echo '<?xml version="1.0" encoding="UTF-8"?>',"\n";
             <key>needs-shine</key>
             <true/>
             <key>url</key>
-            <string><?=$image_url?></string>
+            <string><?=htmlspecialchars($image_url)?></string>
           </dict>
           <dict>
             <key>kind</key>
@@ -29,21 +29,21 @@ echo '<?xml version="1.0" encoding="UTF-8"?>',"\n";
             <key>needs-shine</key>
             <true/>
             <key>url</key>
-            <string><?=$image_url?></string>
+            <string><?=htmlspecialchars($image_url)?></string>
           </dict>
         </array>
         <key>metadata</key>
         <dict>
           <key>bundle-identifier</key>
-          <string><?=$bundle_identifier?></string>
+          <string><?=htmlspecialchars($bundle_identifier)?></string>
           <key>bundle-version</key>
           <string>1.0</string>
           <key>kind</key>
           <string>software</string>
           <key>subtitle</key>
-          <string><?=$pkg_title?></string>
+          <string><?=htmlspecialchars($pkg_title)?></string>
           <key>title</key>
-          <string><?=$app_title?></string>
+          <string><?=htmlspecialchars($app_title)?></string>
         </dict>
       </dict>
     </array>
