@@ -11,11 +11,11 @@ drop table if exists `application`;
 create table `application` (
   `id` integer not null auto_increment,
   `title` varchar(255) not null,
-  `api_key` varchar(255) not null,
-  `icon_key` varchar(255) default null,
+  `api_key` varchar(255) not null comment 'Upload APIアクセス用のキー',
+  `icon_key` varchar(255) default null comment 'S3のアイコンファイルのキー',
   `description` varchar(1000) default null,
-  `repository` varchar(1000) default null,
-  `last_upload` datetime default null,
+  `repository` varchar(1000) default null comment 'リポジトリURLなど',
+  `last_upload` datetime default null comment 'パッケージの最終アップロード時刻',
   `created` datetime not null,
   unique key `idx_api_key` (`api_key`),
   primary key (`id`)
@@ -44,20 +44,41 @@ drop table if exists `package`;
 create table `package` (
   `id` integer not null auto_increment,
   `app_id` integer not null,
-  `platform` varchar(31) not null,
-  `file_name` varchar(63) not null,
+  `platform` varchar(31) not null comment '"Android","iOS","unknown"',
+  `file_name` varchar(63) not null comment 'ベースファイル名. app_idやidを加えてS3のキーを作る.',
   `title` varchar(255) not null,
   `description` varchar(1000) default null,
-  `ios_identifier` varchar(255) default null,
+  `ios_identifier` varchar(255) default null comment 'ipaのCFBundleIdentifier',
   `created` datetime not null,
   key `idx_app` (`app_id`),
   primary key (`id`)
-)Engine=InnoDB default charset=utf8;
+)Engine=InnoDB default charset=utf8 comment 'インストールパッケージ';
 
 drop table if exists `package_tag`;
 create table `package_tag` (
   `package_id` integer not null,
   `tag_id` integer not null,
   primary key (`package_id`,`tag_id`)
+)Engine=InnoDB default charset=utf8 comment 'packageとtagのjunction';
+
+drop table if exists `install_log`;
+create table install_log (
+  `id` integer not null auto_increment,
+  `app_id` integer not null,
+  `package_id` integer not null,
+  `mail` varchar(255) not null,
+  `user_agent` varchar(1000) not null,
+  `installed` datetime not null comment 'インストール日時',
+  key idx_mail_app (`mail`,`app_id`),
+  key idx_package_mail (`package_id`,`mail`),
+  primary key (`id`)
+)Engine=InnoDB default charset=utf8;
+
+drop table if exists `app_install_user`;
+create table app_install_user (
+  `app_id` integer not null,
+  `mail` varchar(255) not null,
+  `get_notifications` tinyint default 1 comment '更新通知設定. 0:受け取らない; 1:受け取る',
+  primary key (`app_id`,`mail`)
 )Engine=InnoDB default charset=utf8;
 
