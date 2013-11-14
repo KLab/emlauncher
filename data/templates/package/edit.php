@@ -73,8 +73,8 @@ foreach($app->getTags() as $tag):
 
       <div class="form-group">
         <div class="col-md-10 col-md-offset-2">
-          <input type="submit" class="btn btn-primary" value="Save">
-          <input type="submit" class="btn btn-default" name="cancel" value="Cancel">
+          <button class="btn btn-primary"><i class="fa fa-save"></i> Save</button>
+          <button class="btn btn-default" name="cancel"><i class="fa fa-times"></i> Cancel</button>
         </div>
       </div>
 
@@ -143,7 +143,7 @@ $('#title').keydown(function(event){
   return true;
 });
 
-$('input[name="cancel"]').on('click',function(event){
+$('button[name="cancel"]').on('click',function(event){
   location.href = '<?=url("/package?id={$package->getId()}")?>'
   return false;
 });
