@@ -31,12 +31,30 @@ class editActions extends packageActions
 			return $this->redirect("/package?id={$this->package->getId()}");
 		}
 
-		var_dump($_POST);
-		return;
-
 		$title = mfwRequest::param('title');
 		$description = mfwRequest::param('description');
 		$tag_names = mfwRequest::param('tags');
+
+		if(!$title){
+			error_log(__METHOD__.": bad request: $temp_name, $title");
+			return $this->response(self::HTTP_400_BADREQUEST);
+		}
+
+		$con = mfwDBConnection::getPDO();
+		$con->beginTransaction();
+		try{
+			$app = ApplicationDb::retrieveByPKForUpdate($this->app->getId(),$con);
+			$tags = $app->getTagsByName($tag_names,$con);
+
+			$pkg = PackageDb::retrieveByPKForUpdate($this->package->getId(),$con);
+			$pkg->updateInfo($title,$description,$tags);
+
+			$con->commit();
+		}
+		catch(Exception $e){
+			$con->rollback();
+			throw $e;
+		}
 
 		return $this->redirect("/package?id={$this->package->getId()}");
 	}

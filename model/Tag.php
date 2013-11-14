@@ -67,7 +67,7 @@ class TagDb extends mfwObjectDb {
 		return $tag;
 	}
 
-	public static function updatePackageTags($package_id,$tags,$con=null)
+	public static function updatePackageTags($package_id,TagSet $tags,$con=null)
 	{
 		$sql = 'DELETE FROM package_tag WHERE package_id = :package_id';
 		$bind = array(

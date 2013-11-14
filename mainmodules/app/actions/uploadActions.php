@@ -42,12 +42,10 @@ class uploadActions extends appActions
 		try{
 			$app = ApplicationDb::retrieveByPKForUpdate($this->app->getId(),$con);
 
-			$tags = $app->getTagsByName($tag_names);
+			$tags = $app->getTagsByName($tag_names,$con);
 
 			$pkg = PackageDb::insertNewPackage(
-				$this->app->getId(),$platform,$temp_name,$title,$description,$ios_identifier);
-
-			$pkg->applyTags($tags,$con);
+				$this->app->getId(),$platform,$temp_name,$title,$description,$ios_identifier,$tags,$con);
 
 			$pkg->renameTempFile();
 

@@ -63,7 +63,7 @@ class Package extends mfwObject {
 		}
 		return $this->tags;
 	}
-	public function applyTags($tags,$con=null)
+	public function applyTags(TagSet $tags,$con=null)
 	{
 		$this->tags = TagDb::updatePackageTags($this->getId(),$tags,$con);
 	}
@@ -92,6 +92,14 @@ class Package extends mfwObject {
 	public function getInstallCount()
 	{
 		return InstallLog::getPackageInstallCount($this);
+	}
+
+	public function updateInfo($title,$description,TagSet $tags,$con=null)
+	{
+		$this->row['title'] = $title;
+		$this->row['description'] = $description;
+		$this->update($con);
+		$this->applyTags($tags,$con);
 	}
 }
 
@@ -152,7 +160,7 @@ class PackageDb extends mfwObjectDb {
 		return array($temp_name,$platform);
 	}
 
-	public static function insertNewPackage($app_id,$platform,$file_name,$title,$description,$ios_identifier)
+	public static function insertNewPackage($app_id,$platform,$file_name,$title,$description,$ios_identifier,TagSet $tags,$con)
 	{
 		$row = array(
 			'app_id' => $app_id,
@@ -164,7 +172,8 @@ class PackageDb extends mfwObjectDb {
 			'created' => date('Y-m-d H:i:s'),
 			);
 		$pkg = new Package($row);
-		$pkg->insert();
+		$pkg->insert($con);
+		$pkg->applyTags($tags,$con);
 		return $pkg;
 	}
 
