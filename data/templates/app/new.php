@@ -66,7 +66,7 @@
         <div class="form-group">
           <div class="col-md-10">
             <div class="col-md-10 col-md-offset-2">
-              <input type="submit" class="btn btn-primary" value="Create">
+              <button class="btn btn-primary"><i class="fa fa-save"></i> Create</button>
             </div>
           </div>
         </div>
