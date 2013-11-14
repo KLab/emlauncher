@@ -88,7 +88,7 @@
 
       <div class="form-group">
         <div class="col-md-10 col-md-offset-2">
-          <input type="submit" class="btn btn-primary" disabled="disabled" value="Upload">
+          <button id="submit" class="btn btn-primary" disabled="disabled"><i class="fa fa-upload"></i> Upload</button>
         </div>
       </div>
 
@@ -108,7 +108,7 @@
     if(current_xhr){
       current_xhr.abort();
     }
-    $('input[type="submit"]').attr('disabled','disabled');
+    $('#submit').attr('disabled','disabled');
     $('#platform').val(null);
     $('#temp-name').val(null);
     $('#file-name').val(null);
@@ -144,7 +144,7 @@
         $('#file-name').val(file.name);
         $('#file-name-display').html('<i class="fa fa-check success"></i> '+file.name);
         $('#file-info').text(data.platform+', size: '+file.size.toLocaleString()+' bytes');
-        $('input[type="submit"]').removeAttr('disabled');
+        $('#submit').removeAttr('disabled');
         $('#progress-bar').parent().removeClass('progress-striped active');
         $('#progress-bar').css('width','100%');
         $('#progress-bar').addClass('progress-bar-success');
