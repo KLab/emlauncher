@@ -18,7 +18,7 @@
   <div class="col-xs-12 col-sm-8 col-md-9">
 
     <div class="well">
-      <form id="refresh-apikey" class="form-inline" method="post" action="<?=url('/app/preference_refresh_apikey')?>">
+      <form id="refresh-apikey" class="form-inline" method="post" action="<?=url('/app/preferences_refresh_apikey')?>">
         <legend>API Key</legend>
         <input type="hidden" name="id" value="<?=$app->getId()?>">
         <div class="form-group">
@@ -34,7 +34,7 @@
     </div>
 
     <div class="well">
-      <form id="edit-info" class="form-horizontal" method="post" action="<?=url('/app/preference_update')?>" enctype="multipart/form-data">
+      <form id="edit-info" class="form-horizontal" method="post" action="<?=url('/app/preferences_update')?>" enctype="multipart/form-data">
         <input type="hidden" name="id" value="<?=$app->getId()?>">
         <legend>Edit Informations</legend>
 

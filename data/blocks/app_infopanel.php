@@ -5,8 +5,8 @@
       <li<?=($action==='upload')?' class="active"':''?>>
         <a href="<?=url("/app/upload?id={$app->getId()}")?>"><i class="fa fa-upload"></i> Upload</a>
       </li>
-      <li<?=($action==='preference')?' class="active"':''?>>
-        <a href="<?=url("/app/preference?id={$app->getId()}")?>"><i class="fa fa-wrench"></i> Preference</a>
+      <li<?=($action==='preferences')?' class="active"':''?>>
+        <a href="<?=url("/app/preferences?id={$app->getId()}")?>"><i class="fa fa-wrench"></i> Preferences</a>
       </li>
     </ul>
   </div>

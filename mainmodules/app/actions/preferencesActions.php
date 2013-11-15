@@ -1,7 +1,7 @@
 <?php
 require_once __DIR__.'/actions.php';
 
-class preferenceActions extends appActions
+class preferencesActions extends appActions
 {
 	public function initialize()
 	{
@@ -15,14 +15,14 @@ class preferenceActions extends appActions
 		return null;
 	}
 
-	public function executePreference()
+	public function executePreferences()
 	{
 		$params = array(
 			);
 		return $this->build($params);
 	}
 
-	public function executePreference_refresh_apikey()
+	public function executePreferences_refresh_apikey()
 	{
 		$oldkey = mfwRequest::param('api-key','POST');
 		$con = mfwDBConnection::getPDO();
@@ -39,10 +39,10 @@ class preferenceActions extends appActions
 			error_log(__METHOD__.": {$e->getMessage()}");
 			throw $e;
 		}
-		return $this->redirect("/app/preference?id={$this->app->getId()}");
+		return $this->redirect("/app/preferences?id={$this->app->getId()}");
 	}
 
-	public function executePreference_update()
+	public function executePreferences_update()
 	{
 		var_dump($_POST);
 		exit;
