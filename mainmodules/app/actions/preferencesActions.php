@@ -44,8 +44,34 @@ class preferencesActions extends appActions
 
 	public function executePreferences_update()
 	{
-		var_dump($_POST);
-		exit;
+		$title = mfwRequest::param('title');
+		$data = mfwRequest::param('icon-data');
+		$description = mfwRequest::param('description');
+		$repository = mfwRequest::param('repository');
+		$image = null;
+
+		if(!$title || ($data&&!preg_match('/^data:[^;]+;base64,(.+)$/',$data,$match))){
+			error_log(__METHOD__.": bad request: $title, ".substr($data,0,30));
+			return $this->response(self::HTTP_400_BADREQUEST);
+		}
+		if($data){
+			$image = base64_decode($match[1]);
+		}
+
+		$con = mfwDBConnection::getPDO();
+		$con->beginTransaction();
+		try{
+			$this->app = ApplicationDb::retrieveByPkForUpdate($this->app->getId());
+			$this->app->updateInfo($title,$image,$description,$repository,$con);
+
+			$con->commit();
+		}
+		catch(Exception $e){
+			error_log(__METHOD__.": {$e->getMessage()}");
+			$con->rollback();
+			throw $e;
+		}
+		return $this->redirect("/app?id={$this->app->getId()}");
 	}
 
 

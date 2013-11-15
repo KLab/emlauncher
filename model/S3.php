@@ -60,6 +60,17 @@ class S3 {
 				));
 	}
 
+	public static function delete($key)
+	{
+		$s3 = static::singleton();
+		$bucket = $s3->config['bucket_name'];
+		$s3->client->deleteObject(
+			array(
+				'Bucket' => $bucket,
+				'Key' => $key,
+				));
+	}
+
 	public static function url($key,$expires=null)
 	{
 		$s3 = static::singleton();

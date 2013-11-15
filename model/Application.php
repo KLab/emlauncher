@@ -117,6 +117,30 @@ class Application extends mfwObject {
 		return $tags;
 	}
 
+	public function updateInfo($title,$image,$description,$repository,$con=null)
+	{
+		$this->row['title'] = $title;
+		$this->row['description'] = $description;
+		$this->row['repository'] = $repository;
+
+		$old_icon_key = null;
+		if($image){
+			$old_icon_key = $this->value('icon_key');
+			$this->row['icon_key'] = ApplicationDb::uploadIcon($image,$this->getId());
+		}
+		$this->update($con);
+
+		if($old_icon_key){
+			try{
+				S3::delete($old_icon_key);
+			}
+			catch(Exception $e){
+				error_log(__METHOD__.": {$e->getMessage()}");
+				// 画像削除は失敗しても気にしない
+			}
+		}
+	}
+
 }
 
 /**
@@ -142,7 +166,7 @@ class ApplicationDb extends mfwObjectDb {
 
 	const ICON_DIR = 'app-icons/';
 
-	protected static function uploadIcon($image,$app_id)
+	public static function uploadIcon($image,$app_id)
 	{
 		$im = new Imagick();
 		$im->readImageBlob($image);

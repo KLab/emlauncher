@@ -87,7 +87,7 @@
             <div class="form-group">
               <label for="repository" class="control-label col-md-3">Repository</label>
               <div class="col-md-9">
-                <input type="text" class="form-control" id="repository" name="repository">
+                <input type="text" class="form-control" id="repository" name="repository" value="<?=htmlspecialchars($app->getRepository())?>">
               </div>
             </div>
           </div>

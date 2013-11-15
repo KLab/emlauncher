@@ -57,6 +57,7 @@ class appActions extends MainActions
 			$con->commit();
 		}
 		catch(Exception $e){
+			error_log(__METHOD__.": {$e->getMessage()}");
 			$con->rollback();
 			throw $e;
 		}
