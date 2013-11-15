@@ -106,7 +106,8 @@
     </div>
 
     <div class="well">
-      <form id="edit-tags" class="form-horizontal">
+      <form id="delete-tags" class="form-horizontal" method="post" action="<?=url('/app/preferences_delete_tags')?>">
+        <input type="hidden" name="id" value="<?=$app->getId()?>">
         <legend>Delete Tags</legend>
 
         <div class="form-group">
@@ -126,6 +127,15 @@
 
       </form>
     </div>
+
+    <div class="well">
+      <form id="owners" class="form-horizontal">
+        <input type="hidden" name="id" value="<?=$app->getId()?>">
+        <legend>Owners</legend>
+
+      </form>
+    </div>
+
   </div>
 </div>
 
@@ -208,6 +218,16 @@ $('#edit-info').submit(function(){
   return valid;
 });
 
+// initialize tags button state
+$('input[name="tags[]"]').each(function(i,val){
+  if($(val).prop('checked')){
+    $(val).next().addClass('active');
+  }
+});
+// toggle tags checkbox
+$('.btn.delete-tags').on('click',function(event){
+  $(this).prev().prop('checked',!$(this).hasClass('active'));
+});
 
 
 

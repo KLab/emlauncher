@@ -86,5 +86,17 @@ class TagDb extends mfwObjectDb {
 		return $tags;
 	}
 
+	public static function deleteByIds($ids,$con=null)
+	{
+		$bind = array();
+		$ph = static::makeInPlaceholder($ids,$bind,'id');
+
+		$sql = "DELETE FROM package_tag WHERE tag_id IN ($ph)";
+		mfwDBIBase::query($sql,$bind,$con);
+
+		$sql = "DELETE FROM tag WHERE id IN ($ph)";
+		mfwDBIBase::query($sql,$bind,$con);
+	}
+
 }
 

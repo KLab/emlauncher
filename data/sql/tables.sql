@@ -58,6 +58,7 @@ drop table if exists `package_tag`;
 create table `package_tag` (
   `package_id` integer not null,
   `tag_id` integer not null,
+  key `idx_tag` (`tag_id`),
   primary key (`package_id`,`tag_id`)
 )Engine=InnoDB default charset=utf8 comment 'packageとtagのjunction';
 

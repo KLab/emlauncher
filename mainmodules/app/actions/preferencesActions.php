@@ -39,7 +39,7 @@ class preferencesActions extends appActions
 			error_log(__METHOD__.": {$e->getMessage()}");
 			throw $e;
 		}
-		return $this->redirect("/app/preferences?id={$this->app->getId()}");
+		return $this->redirect("/app/preferences?id={$this->app->getId()}#refresh-apikey");
 	}
 
 	public function executePreferences_update()
@@ -71,7 +71,29 @@ class preferencesActions extends appActions
 			$con->rollback();
 			throw $e;
 		}
-		return $this->redirect("/app?id={$this->app->getId()}");
+		return $this->redirect("/app/preferences?id={$this->app->getId()}#edit-info");
+	}
+
+	public function executePreferences_delete_tags()
+	{
+		$tag_names = mfwRequest::param('tags');
+		if(!empty($tag_names)){
+			$con = mfwDBConnection::getPDO();
+			$con->beginTransaction();
+			try{
+				$this->app = ApplicationDb::retrieveByPkForUpdate($this->app->getId());
+
+				$this->app->deleteTags($tag_names,$con);
+
+				$con->commit();
+			}
+			catch(Exception $e){
+				error_log(__METHOD__.": {$e->getMessage()}");
+				$con->rollback();
+				throw $e;
+			}
+		}
+		return $this->redirect("/app/preferences?id={$this->app->getId()}#delete-tags");
 	}
 
 

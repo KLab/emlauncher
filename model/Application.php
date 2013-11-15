@@ -117,6 +117,22 @@ class Application extends mfwObject {
 		return $tags;
 	}
 
+	public function deleteTags($tag_names,PDO $con=null)
+	{
+		$tags = TagDb::selectByAppIdForUpdate($this->getId(),$con);
+		$delete_ids = array();
+		$this->tags = new TagSet();
+		foreach($tags as $tag){
+			if(in_array($tag->getName(),$tag_names)){
+				$delete_ids[] = $tag->getId();
+			}
+			else{
+				$this->tags[] = $tag;
+			}
+		}
+		TagDb::deleteByIds($delete_ids,$con);
+	}
+
 	public function updateInfo($title,$image,$description,$repository,$con=null)
 	{
 		$this->row['title'] = $title;
