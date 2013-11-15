@@ -23,7 +23,7 @@
         <input type="hidden" name="id" value="<?=$app->getId()?>">
         <div class="form-group">
           <label class="sr-only" for="api-key">API Key</label>
-          <input type="text" id="api-key" name="api_key" class="form-control" readonly="readonly" value="<?=htmlspecialchars($app->getAPIKey())?>">
+          <input type="text" id="api-key" name="api-key" class="form-control" readonly="readonly" value="<?=htmlspecialchars($app->getAPIKey())?>">
         </div>
         <button id="submit-refresh-apikey" type="submit" class="btn btn-warning"><i class="fa fa-refresh"></i> Refresh</button>
         <div class="help-block">
@@ -35,13 +35,14 @@
 
     <div class="well">
       <form id="edit-info" class="form-horizontal" method="post" action="<?=url('/app/preference_update')?>" enctype="multipart/form-data">
+        <input type="hidden" name="id" value="<?=$app->getId()?>">
         <legend>Edit Informations</legend>
 
         <div class="row">
           <div class="col-md-9 col-xs-12">
             <div class="form-group">
-	          <label for="title" class="control-label col-md-2 required">Title</label>
-              <div class="col-md-10">
+	          <label for="title" class="control-label col-md-3 required">Title</label>
+              <div class="col-md-9">
                 <div id="alert-notitle" class="alert alert-danger hidden">
                   タイトルが入力されていません
                 </div>
@@ -50,8 +51,8 @@
             </div>
 
             <div class="form-group">
-              <label for="icon-selector" class="control-label col-md-2 required">Icon</label>
-              <div class="col-md-10">
+              <label for="icon-selector" class="control-label col-md-3">Icon</label>
+              <div class="col-md-9">
                 <div id="alert-icon-size-limit" class="alert alert-danger hidden">
                   画像ファイルサイズが大きすぎます
                 </div>
@@ -73,8 +74,8 @@
         <div class="row">
           <div class="col-md-9 col-xs-12">
             <div class="form-group">
-              <label for="description" class="control-label col-md-2">Description</label>
-              <div class="col-md-10">
+              <label for="description" class="control-label col-md-3">Description</label>
+              <div class="col-md-9">
                 <textarea class="form-control" row="3" id="description" name="description"><?=htmlspecialchars($app->getDescription())?></textarea>
               </div>
             </div>
@@ -84,8 +85,8 @@
         <div class="row">
           <div class="col-md-9 col-xs-12">
             <div class="form-group">
-              <label for="repository" class="control-label col-md-2">Repository</label>
-              <div class="col-md-10">
+              <label for="repository" class="control-label col-md-3">Repository</label>
+              <div class="col-md-9">
                 <input type="text" class="form-control" id="repository" name="repository">
               </div>
             </div>
@@ -95,7 +96,7 @@
         <div class="row">
           <div class="col-md-9 col-xs-12">
             <div class="form-group">
-              <div class="col-md-10 col-md-offset-2">
+              <div class="col-md-9 col-md-offset-3">
                 <button class="btn btn-primary"><i class="fa fa-save"></i> Update</button>
               </div>
             </div>
@@ -134,8 +135,80 @@
 
 <script type="text/javascript">
 
+// API Key
 $('#submit-refresh-apikey').on('click',function(){
   return confirm('現在のAPI Keyは使用できなくなります。\nよろしいですか？');
 });
+
+// Edit Information
+$(document).on('drop dragover',function(e){e.preventDefault()});
+
+$('#icon-browse').on('click',function(event){
+  $('#icon-selector').click();
+  return false;
+});
+$('#icon-preview').on('click',function(event){
+  $('#icon-selector').click();
+  return false;
+});
+
+function setIconFile(file){
+  $('#icon-data').val(null);
+  $('#icon-text').val(null);
+  $('#icon-preview').attr('src','<?=$app->getIconUrl()?>');
+  $('#alert-icon-size-limit').addClass('hidden');
+
+  if(!file || !file.type.match('^image/(png|gif|jpeg)$')){
+    return false;
+  }
+  if(file.size > 1000000){
+    $('#alert-icon-size-limit').removeClass('hidden');
+    return false;
+  }
+
+  var reader = new FileReader;
+  reader.onload = function(e){
+    $('#icon-data').val(e.target.result);
+    $('#icon-preview').attr('src',e.target.result);
+  };
+  reader.readAsDataURL(file);
+  $('#icon-text').val(file.name);
+}
+
+$('#icon-preview').on('drop',function(event){
+  var file = event.originalEvent.dataTransfer.files[0];
+  $('.droparea').removeClass('dragover');
+  return setIconFile(file);
+});
+$('#input-group-icon').on('drop',function(event){
+  var file = event.originalEvent.dataTransfer.files[0];
+  $('.droparea').removeClass('dragover');
+  return setIconFile(file);
+});
+$('.droparea').on('dragenter',function(event){
+  $('.droparea').removeClass('dragover');
+  $(this).addClass('dragover');
+});
+$('.droparea').on('dragleave',function(event){
+  $(this).removeClass('dragover');
+});
+
+$('#icon-selector').on('change',function(event){
+  var file = event.target.files[0];
+  return setIconFile(file);
+});
+
+$('#edit-info').submit(function(){
+  var valid = true;
+  $('.alert').addClass('hidden');
+  if($('#title').val()==''){
+    $('#alert-notitle').removeClass('hidden');
+    valid = false;
+  }
+  return valid;
+});
+
+
+
 
 </script>

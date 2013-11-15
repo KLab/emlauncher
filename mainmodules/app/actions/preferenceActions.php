@@ -24,7 +24,7 @@ class preferenceActions extends appActions
 
 	public function executePreference_refresh_apikey()
 	{
-		$oldkey = mfwRequest::param('api_key','POST');
+		$oldkey = mfwRequest::param('api-key','POST');
 		$con = mfwDBConnection::getPDO();
 		$con->beginTransaction();
 		try{
@@ -40,6 +40,12 @@ class preferenceActions extends appActions
 			throw $e;
 		}
 		return $this->redirect("/app/preference?id={$this->app->getId()}");
+	}
+
+	public function executePreference_update()
+	{
+		var_dump($_POST);
+		exit;
 	}
 
 
