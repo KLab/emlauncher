@@ -25,7 +25,7 @@
           <label class="sr-only" for="api-key">API Key</label>
           <input type="text" id="api-key" name="api_key" class="form-control" readonly="readonly" value="<?=htmlspecialchars($app->getAPIKey())?>">
         </div>
-        <button type="submit" class="btn btn-warning"><i class="fa fa-refresh"></i> Refresh</button>
+        <button id="submit-refresh-apikey" type="submit" class="btn btn-warning"><i class="fa fa-refresh"></i> Refresh</button>
         <div class="help-block">
           Upload APIを利用するために必要なキーです.
           詳細は<a href="#">APIドキュメント</a>を参照してください.
@@ -133,5 +133,9 @@
 </div>
 
 <script type="text/javascript">
+
+$('#submit-refresh-apikey').on('click',function(){
+  return confirm('現在のAPI Keyは使用できなくなります。\nよろしいですか？');
+});
 
 </script>

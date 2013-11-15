@@ -48,6 +48,16 @@ class Application extends mfwObject {
 	{
 		return $this->value('api_key');
 	}
+	public function refreshApiKey($con=null)
+	{
+		$this->row['api_key'] = ApplicationDb::makeApiKey();
+		$sql = 'UPDATE application SET api_key = :api_key WHERE id = :id';
+		$bind = array(
+			':id' => $this->getId(),
+			':api_key' => $this->getApiKey(),
+			);
+		mfwDBIBase::query($sql,$bind,$con);
+	}
 
 	public function getCreated(){
 		return $this->value('created');
@@ -145,7 +155,7 @@ class ApplicationDb extends mfwObjectDb {
 		return $key;
 	}
 
-	protected static function makeApiKey()
+	public static function makeApiKey()
 	{
 		do{
 			$api_key = Random::string();
