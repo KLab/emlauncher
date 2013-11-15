@@ -44,6 +44,10 @@ class Application extends mfwObject {
 			);
 		mfwDBIBase::query($sql,$bind,$con);
 	}
+	public function getAPIKey()
+	{
+		return $this->value('api_key');
+	}
 
 	public function getCreated(){
 		return $this->value('created');

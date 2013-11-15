@@ -35,7 +35,9 @@ form+.google-login {
 	background: -o-linear-gradient(top, #fff, #e4e4e4);
 }
 
-.btn-default:hover {
+.btn-default:hover,
+.btn-default:focus,
+.btn-default:active {
 	color: inherit;
 	background: inherit;
 	border-color: rgba(0,0,0,0.1);
@@ -140,5 +142,11 @@ h3 {
 
 #installed-date {
   font-size: x-small;
+}
+
+.delete-tags.active {
+  color: #ffffff;
+  background-color: #d2322d;
+  border: 1px solid #9a0200;
 }
 

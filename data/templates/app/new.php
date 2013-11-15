@@ -41,8 +41,8 @@
       </div>
 
       <div class="row">
-        <div class="form-group">
-          <div class="col-md-10">
+        <div class="col-md-10">
+          <div class="form-group">
             <label for="description" class="control-label col-md-2">Description</label>
             <div class="col-md-10">
               <textarea class="form-control" row="3" id="description" name="description"></textarea>
@@ -52,8 +52,8 @@
       </div>
 
       <div class="row">
-        <div class="form-group">
-          <div class="col-md-10">
+        <div class="col-md-10">
+          <div class="form-group">
             <label for="repository" class="control-label col-md-2">Repository</label>
             <div class="col-md-10">
               <input type="text" class="form-control" id="repository" name="repository">
@@ -63,8 +63,8 @@
       </div>
 
       <div class="row">
-        <div class="form-group">
-          <div class="col-md-10">
+        <div class="col-md-10">
+          <div class="form-group">
             <div class="col-md-10 col-md-offset-2">
               <button class="btn btn-primary"><i class="fa fa-save"></i> Create</button>
             </div>
