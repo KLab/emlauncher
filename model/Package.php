@@ -3,6 +3,7 @@ require_once APP_ROOT.'/model/Application.php';
 require_once APP_ROOT.'/model/Tag.php';
 require_once APP_ROOT.'/model/Random.php';
 require_once APP_ROOT.'/model/S3.php';
+require_once APP_ROOT.'/model/IPAFile.php';
 
 /**
  * Row object for 'package' table.
@@ -68,7 +69,7 @@ class Package extends mfwObject {
 		$this->tags = TagDb::updatePackageTags($this->getId(),$tags,$con);
 	}
 
-	protected function getFileKey()
+	public function getFileKey()
 	{
 		$key = "{$this->getAppId()}/{$this->getId()}_{$this->value('file_name')}";
 		return static::FILE_DIR.$key;
@@ -124,35 +125,25 @@ class PackageDb extends mfwObjectDb {
 	const TABLE_NAME = 'package';
 	const SET_CLASS = 'PackageSet';
 
-	public static function checkPlatform($name,$file)
+	public static function getPackageInfo($name,$file,$mime)
 	{
+		$platform = Package::PF_UNKNOWN;
 		$ext = pathinfo($name,PATHINFO_EXTENSION);
 		$is_zip = substr($file,0,4)==="PK\x03\x04";
 		if($is_zip && $ext==='apk'){
-			return Package::PF_ANDROID;
+			$platform = Package::PF_ANDROID;
+			$mime = Package::MIME_ANDROID;
 		}
 		if($is_zip && $ext==='ipa'){
-			return Package::PF_IOS;
+			$platform = Package::PF_IOS;
+			$mime = Package::MIME_IOS;
 		}
-		return Package::PF_UNKNOWN;
+		return array($platform,$ext,$mime);
 	}
 
 	public static function uploadTemporary($name,$file,$mime)
 	{
-		$platform = static::checkPlatform($name,$file);
-
-		switch($platform){
-		case Package::PF_ANDROID:
-			$mime = Package::MIME_ANDROID;
-			$ext = 'apk';
-			break;
-		case Package::PF_IOS:
-			$mime = Package::MIME_IOS;
-			$ext = 'ipa';
-			break;
-		default:
-			$ext = pathinfo($name,PATHINFO_EXTENSION);
-		}
+		list($platform,$ext,$mime) = static::getPackageInfo($name,$file,$mime);
 
 		$temp_name = Random::string(16).".$ext";
 		S3::upload(Package::TEMP_DIR.$temp_name,$file,$mime,'private');
@@ -174,6 +165,36 @@ class PackageDb extends mfwObjectDb {
 		$pkg = new Package($row);
 		$pkg->insert($con);
 		$pkg->applyTags($tags,$con);
+		return $pkg;
+	}
+
+	public static function uploadAndInsertNewPackage($app_id,$filename,$file_path,$mime,$title,$description,TagSet $tags,$con)
+	{
+		$file = file_get_contents($file_path);
+
+		list($platform,$ext,$mime) = static::getPackageInfo($filename,$file,$mime);
+		$ios_identifier = null;
+		if($platform===Package::PF_IOS){
+			$plist = IPAFile::parseInfoPlist($file_path);
+			$ios_identifier = $plist['CFBundleIdentifier'];
+		}
+
+		$row = array(
+			'app_id' => $app_id,
+			'platform' => $platform,
+			'file_name' => Random::string(16).".$ext",
+			'title' => $title,
+			'description' => $description,
+			'ios_identifier' => $ios_identifier,
+			'created' => date('Y-m-d H:i:s'),
+			);
+		$pkg = new Package($row);
+		$pkg->insert($con);
+		$pkg->applyTags($tags,$con);
+
+		$file_key = $pkg->getFileKey();
+		S3::upload($file_key,$file,$mime,'private');
+
 		return $pkg;
 	}
 

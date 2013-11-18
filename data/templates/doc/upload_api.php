@@ -17,7 +17,7 @@
         <dt>Fiels:</dt>
         <dd>
           <ul>
-            <li><code>api_key</code> - Required (See application preference)</li>
+            <li><code>api_key</code> - Required (See the application preferences)</li>
             <li><code>file</code> - Required, package file data</li>
             <li><code>title</code> - Required, title of the package</li>
             <li><code>description</code> - Optional, description of the package</li>
@@ -50,7 +50,7 @@ bbbbbb,
   <div>
     <h3>Sample Curl</h3>
     <div class="container">
-      <pre><code>curl <?=url('/api/upload')?>
+      <pre><code>curl <?=url('/api/upload')."\n"?>
   -F api_key='application_api_key'
   -F file=@emlauncher.pkg
   -F title='test upload'

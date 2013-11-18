@@ -30,7 +30,7 @@ class upload_package_temporaryAction extends apiActions
 			error_log(__METHOD__.": {$e->getMessage()}");
 			return $this->jsonResponse(
 				self::HTTP_500_INTERNALSERVERERROR,
-				array('message'=>$e->getMessage()));
+				array('error'=>$e->getMessage()));
 		}
 		return $this->jsonResponse(
 			self::HTTP_200_OK,

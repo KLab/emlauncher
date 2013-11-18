@@ -16,6 +16,11 @@ class MainActions extends mfwActions
 			return $err;
 		}
 
+		// upload apiはAPI Key認証なのでログイン不要
+		if($this->module==='api' && $this->action==='upload'){
+			return null;
+		}
+
 		// package/install_plist はセッションが使えないため別途認証する.
 		if($this->module==='package' && $this->action==='install_plist'){
 			return null;
