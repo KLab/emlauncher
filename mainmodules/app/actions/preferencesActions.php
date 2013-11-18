@@ -96,5 +96,31 @@ class preferencesActions extends appActions
 		return $this->redirect("/app/preferences?id={$this->app->getId()}#delete-tags");
 	}
 
+	public function executePreferences_update_owners()
+	{
+		$owners = mfwRequest::param('owners');
+		$owners = array_filter($owners,'strlen');
+
+		// 自分自身は除外させない
+		$owners[] = $this->login_user->getMail();
+		$owners = array_unique($owners);
+
+		$con = mfwDBConnection::getPDO();
+		$con->beginTransaction();
+		try{
+			$this->app = ApplicationDb::retrieveByPkForUpdate($this->app->getId(),$con);
+
+			$this->app->setOwners($owners,$con);
+
+			$con->commit();
+		}
+		catch(Exception $e){
+			error_log(__METHOD__.": {$e->getMessage()}");
+			$con->rollback();
+			throw $e;
+		}
+
+		return $this->redirect("/app/preferences?id={$this->app->getId()}#owners");
+	}
 
 }

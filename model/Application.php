@@ -75,6 +75,22 @@ class Application extends mfwObject {
 		$k = $owners->searchPK('owner_mail',$user->getMail());
 		return $k!==null;
 	}
+	public function setOwners(array $owner_mails,$con=null)
+	{
+		$cur_mails = $this->getOwners()->getMailArray();
+
+		$delete = array_diff($cur_mails,$owner_mails);
+		$add = array_diff($owner_mails,$cur_mails);
+
+		if(!empty($delete)){
+			ApplicationOwnerDb::deleteOwner($this->getId(),$delete,$con);
+		}
+		if(!empty($add)){
+			ApplicationOwnerDb::addOwner($this->getId(),$add,$con);
+		}
+		$this->owners = null;
+	}
+
 	public function getTags()
 	{
 		if($this->tags===null){

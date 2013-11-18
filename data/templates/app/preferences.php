@@ -159,7 +159,7 @@
             <div class="form-control" readonly="readonly">
               <button type="button" class="close pull-left"><i class="fa"></i></button>
               <span></span>
-              <input type="hidden" name="owners[]">
+              <input type="hidden">
             </div>
           </div>
         </div>
@@ -167,7 +167,7 @@
         <div id="add-owner" class="form-group">
           <div class="col-xs-12">
             <button class="close"><i class="fa fa-plus"></i></button>
-            <input type="text" class="form-control">
+            <input type="text" class="form-control" name="owners[]">
           </div>
         </div>
 
@@ -281,13 +281,18 @@ $('.edit-owner button').on('click',function(event){
   }
   else if($parent.hasClass('delete')){
     $parent.removeClass('delete');
-    $('input',$parent).val($('span',$parent).text());
+    $('input',$parent).attr('name','owners[]');
   }
   else{
     $parent.addClass('delete')
-    $('input',$parent).val(null);
+    $('input',$parent).removeAttr('name');
   }
   return false;
+});
+
+// initialize form
+$('.edit-owner').each(function(i,val){
+  $('input',val).val($('span',val).text());
 });
 
 $('#add-owner button').on('click',function(event){
@@ -295,6 +300,7 @@ $('#add-owner button').on('click',function(event){
   var $clone = $template.clone(true);
   var new_owner = $(this).next().val();
   $('span',$clone).text(new_owner);
+  $('input',$clone).attr('name','owners[]');
   $('input',$clone).val(new_owner);
   $clone.removeClass('hidden');
   $clone.removeAttr('id');
