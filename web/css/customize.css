@@ -183,3 +183,22 @@ h3 {
   padding-left: 38px;
 }
 
+#documentation h3 {
+  padding: 8px 15px;
+  background-color: #f5f5f5;
+  border-radius: 4px;
+  color: #999999;
+}
+
+#documentation dl.dl-horizontal dt {
+	width: 10em;
+	margin-right: 1em;
+}
+
+#documentation dl.dl-horizontal dd ul,
+#documentation dl.dl-horizontal dd pre {
+	clear: left;
+}
+#documentation dl.dl-horizontal dd ul li {
+	margin-bottom: 5px;
+}
