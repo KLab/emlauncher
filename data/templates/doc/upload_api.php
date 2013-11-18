@@ -38,8 +38,10 @@
         <dt>Sample response:</dt>
         <dd>
           <pre><code>{
-aaaaaaaa,
-bbbbbb,
+  "package_url": "<?=url('/package?id=3')?>",
+  "application_url": "<?=url('/app?id=1')?>",
+  "platform": "Android",
+  "created": "2013-11-19 02:03:04"
 }</code></pre>
         </dd>
       </dl>

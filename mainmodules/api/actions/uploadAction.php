@@ -71,6 +71,7 @@ class uploadAction extends apiActions
 				'package_url' => mfwRequest::makeUrl("/package?id={$pkg->getId()}"),
 				'application_url' => mfwRequest::makeUrl('/app?id={$app->getId()}'),
 				'platform' => $platform,
+				'created' => $pkg->getCreated(),
 				));
 	}
 
