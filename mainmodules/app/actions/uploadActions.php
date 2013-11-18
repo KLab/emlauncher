@@ -36,6 +36,7 @@ class uploadActions extends appActions
 			error_log(__METHOD__.": bad request: $temp_name, $title");
 			return $this->response(self::HTTP_400_BADREQUEST);
 		}
+		$ext = pathinfo($temp_name,PATHINFO_EXTENSION);
 
 		$con = mfwDBConnection::getPDO();
 		$con->beginTransaction();
@@ -45,9 +46,9 @@ class uploadActions extends appActions
 			$tags = $app->getTagsByName($tag_names,$con);
 
 			$pkg = PackageDb::insertNewPackage(
-				$this->app->getId(),$platform,$temp_name,$title,$description,$ios_identifier,$tags,$con);
+				$this->app->getId(),$platform,$ext,$title,$description,$ios_identifier,$tags,$con);
 
-			$pkg->renameTempFile();
+			$pkg->renameTempFile($temp_name);
 
 			$app->updateLastUpload($con);
 

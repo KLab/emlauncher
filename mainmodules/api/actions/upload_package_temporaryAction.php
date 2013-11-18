@@ -10,7 +10,10 @@ class upload_package_temporaryAction extends apiActions
 		try{
 			$file_info = mfwRequest::param('file');
 			if(!$file_info || $file_info['error']!=UPLOAD_ERR_OK){
-				throw new InvalidArgumentException("upload files error: {$file_info['error']}");
+				error_log(__METHOD__.": upload files error: {$file_info['error']}");
+				return $this->jsonResponse(
+					self::HTTP_400_BADREQUEST,
+					array('error'=>"upload files error: {$file_info['error']}"));
 			}
 			$file_name = $file_info['name'];
 			$file_path = $file_info['tmp_name'];
@@ -18,7 +21,9 @@ class upload_package_temporaryAction extends apiActions
 
 			$file = file_get_contents($file_path);
 
-			list($temp_name,$platform) = PackageDb::uploadTemporary($file_name,$file,$file_type);
+			list($platform,$ext,$mime) = PackageDb::getPackageInfo($file_name,$file,$file_type);
+
+			$temp_name = Package::uploadTempFile($file,$ext,$mime);
 
 			$ios_identifier = null;
 			if($platform===Package::PF_IOS){

@@ -118,6 +118,10 @@
     $('#progress-bar').parent().addClass('progress-striped active');
     $('#file-info').text('-, size: -');
 
+    if(!file){
+      return false;
+    }
+
     var fd = new FormData();
     fd.append('file',file);
 

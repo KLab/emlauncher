@@ -3,7 +3,6 @@ require_once APP_ROOT.'/model/Application.php';
 require_once APP_ROOT.'/model/Tag.php';
 require_once APP_ROOT.'/model/Random.php';
 require_once APP_ROOT.'/model/S3.php';
-require_once APP_ROOT.'/model/IPAFile.php';
 
 /**
  * Row object for 'package' table.
@@ -69,14 +68,25 @@ class Package extends mfwObject {
 		$this->tags = TagDb::updatePackageTags($this->getId(),$tags,$con);
 	}
 
-	public function getFileKey()
+	protected function getFileKey()
 	{
 		$key = "{$this->getAppId()}/{$this->getId()}_{$this->value('file_name')}";
 		return static::FILE_DIR.$key;
 	}
-	public function renameTempFile()
+	public function uploadFile($file_content,$mime)
 	{
-		$tempkey = static::TEMP_DIR.$this->value('file_name');
+		$key = $this->getFileKey();
+		S3::upload($key,$file_content,$mime,'private');
+	}
+	public static function uploadTempFile($file_content,$ext,$mime)
+	{
+		$tmp_name = Random::string(16).".$ext";
+		S3::upload(static::TEMP_DIR.$tmp_name,$file_content,$mime,'private');
+		return $tmp_name;
+	}
+	public function renameTempFile($temp_name)
+	{
+		$tempkey = static::TEMP_DIR.$temp_name;
 		$newkey = $this->getFileKey();
 		S3::rename($tempkey,$newkey,'private');
 	}
@@ -141,44 +151,8 @@ class PackageDb extends mfwObjectDb {
 		return array($platform,$ext,$mime);
 	}
 
-	public static function uploadTemporary($name,$file,$mime)
+	public static function insertNewPackage($app_id,$platform,$ext,$title,$description,$ios_identifier,TagSet $tags,$con)
 	{
-		list($platform,$ext,$mime) = static::getPackageInfo($name,$file,$mime);
-
-		$temp_name = Random::string(16).".$ext";
-		S3::upload(Package::TEMP_DIR.$temp_name,$file,$mime,'private');
-
-		return array($temp_name,$platform);
-	}
-
-	public static function insertNewPackage($app_id,$platform,$file_name,$title,$description,$ios_identifier,TagSet $tags,$con)
-	{
-		$row = array(
-			'app_id' => $app_id,
-			'platform' => $platform,
-			'file_name' => $file_name,
-			'title' => $title,
-			'description' => $description,
-			'ios_identifier' => $ios_identifier,
-			'created' => date('Y-m-d H:i:s'),
-			);
-		$pkg = new Package($row);
-		$pkg->insert($con);
-		$pkg->applyTags($tags,$con);
-		return $pkg;
-	}
-
-	public static function uploadAndInsertNewPackage($app_id,$filename,$file_path,$mime,$title,$description,TagSet $tags,$con)
-	{
-		$file = file_get_contents($file_path);
-
-		list($platform,$ext,$mime) = static::getPackageInfo($filename,$file,$mime);
-		$ios_identifier = null;
-		if($platform===Package::PF_IOS){
-			$plist = IPAFile::parseInfoPlist($file_path);
-			$ios_identifier = $plist['CFBundleIdentifier'];
-		}
-
 		$row = array(
 			'app_id' => $app_id,
 			'platform' => $platform,
@@ -191,10 +165,6 @@ class PackageDb extends mfwObjectDb {
 		$pkg = new Package($row);
 		$pkg->insert($con);
 		$pkg->applyTags($tags,$con);
-
-		$file_key = $pkg->getFileKey();
-		S3::upload($file_key,$file,$mime,'private');
-
 		return $pkg;
 	}
 

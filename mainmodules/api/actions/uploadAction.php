@@ -2,51 +2,76 @@
 require_once __DIR__.'/actions.php';
 require_once APP_ROOT.'/model/Application.php';
 require_once APP_ROOT.'/model/Package.php';
+require_once APP_ROOT.'/model/IPAFile.php';
 
 class uploadAction extends apiActions
 {
 	public function executeUpload()
 	{
-		$api_key = mfwRequest::param('api_key');
-		$file = mfwRequest::param('file');
-		$title = mfwRequest::param('title');
-		$description = mfwRequest::param('description');
-		$notify = mfwRequest::param('notify');
-		$tag_names = explode(',',mfwRequest::param('tags'));
-		if(!$api_key||!$file||!$title){
-			return $this->jsonResponse(
-				self::HTTP_400_BADREQUEST,
-				array('error'=>'A required field is not present.'));
-		}
-
-		$app = ApplicationDb::selectByApiKey($api_key);
-		if(!$app){
-			return $this->jsonResponse(
-				self::HTTP_400_BADREQUEST,
-				array('error'=>'Invalid api_key'));
-		}
-
-		$con = mfwDBConnection::getPDO();
-		$con->beginTransaction();
+		$con = null;
 		try{
+			$api_key = mfwRequest::param('api_key');
+			$file_info = mfwRequest::param('file');
+			$title = mfwRequest::param('title');
+			$description = mfwRequest::param('description');
+			$notify = mfwRequest::param('notify');
+			$tag_names = explode(',',mfwRequest::param('tags'));
+			if(!$api_key||!$file_info||!$title){
+				return $this->jsonResponse(
+					self::HTTP_400_BADREQUEST,
+					array('error'=>'A required field is not present.'));
+			}
+
+			$app = ApplicationDb::selectByApiKey($api_key);
+			if(!$app){
+				return $this->jsonResponse(
+					self::HTTP_400_BADREQUEST,
+					array('error'=>'Invalid api_key'));
+			}
+
+			$file_content = file_get_contents($file_info['tmp_name']);
+
+			list($platform,$ext,$mime) = PackageDb::getPackageInfo(
+				$file_info['name'],$file_content,$file_info['type']);
+
+			$ios_identifier = null;
+			if($platform===Package::PF_IOS){
+				$plist = IPAFile::parseInfoPlist($file_info['tmp_name']);
+				$ios_identifier = $plist['CFBundleIdentifier'];
+			}
+
+			$con = mfwDBConnection::getPDO();
+			$con->beginTransaction();
+
 			$app = ApplicationDb::retrieveByPKForUpdate($app->getId());
 
 			$tags = $app->getTagsByName($tag_names,$con);
 
-			$pkg = PackageDb::uploadAndInsertNewPackage(
-				$app->getId(),$file['name'],$file['tmp_name'],$file['type'],
-				$title,$description,$tags,$con);
+			$pkg = PackageDb::insertNewPackage(
+				$app->getId(),$platform,$ext,
+				$title,$description,$ios_identifier,$tags,$con);
+
+			$pkg->uploadFile($file_content,$mime);
+
+			$app->updateLastUpload($con);
 
 			$con->commit();
 		}
 		catch(Exception $e){
+			if($con) $con->rollback();
 			error_log(__METHOD__."$e->getMessage()");
 			return $this->jsonResponse(
 				self::HTTP_500_INTERNALSERVERERROR,
 				array('error'=>$e->getMessage()));
 		}
 
-		return array(array(self::HTTP_200_OK),json_encode($pkg));
+		return $this->jsonResponse(
+			self::HTTP_200_OK,
+			array(
+				'package_url' => mfwRequest::makeUrl("/package?id={$pkg->getId()}"),
+				'application_url' => mfwRequest::makeUrl('/app?id={$app->getId()}'),
+				'platform' => $platform,
+				));
 	}
 
 }
