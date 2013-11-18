@@ -121,7 +121,7 @@
 
         <div class="form-group">
           <div class="col-xs-12">
-          <button class="btn btn-danger"><i class="fa fa-save"></i> Delete</button>
+          <button class="btn btn-danger"><i class="fa fa-trash-o"></i> Delete</button>
           </div>
         </div>
 

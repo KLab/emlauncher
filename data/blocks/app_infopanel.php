@@ -21,10 +21,19 @@
       <dd><?=$app->getCreated()?></dd>
 <?php if($app->getRepository()): ?>
       <dt>repository</dt>
-<?php if(strpos($app->getRepository(),'http')===0): ?>
-      <dd><a href="<?=htmlspecialchars($app->getRepository())?>"><?=htmlspecialchars($app->getRepository())?></a></dd>
+<?php if(preg_match('|https?://([^/]*)/|',$app->getRepository(),$m)):?>
+      <dd>
+        <a target="_blank" href="<?=htmlspecialchars($app->getRepository())?>">
+<?php if(strpos($m[1],'github')!==false): ?>
+          <i class="fa fa-github"></i>
+<?php elseif(strpos($m[1],'bitbucket')!==false): ?>
+          <i class="fa fa-bitbucket"></i>
+<?php endif ?>
+          <?=htmlspecialchars($m[1])?>
+        </a>
+      </dd>
 <?php else: ?>
-      <dd><?=htmlspecialchars($app->getRepository())?></dd>
+      <dd><input type="text" class="form-control" readonly="readonly" value="<?=htmlspecialchars($app->getRepository())?>"></dd>
 <?php endif ?>
 <?php endif ?>
       <dt>owners</dt>

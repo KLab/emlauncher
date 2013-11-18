@@ -17,6 +17,8 @@
 
   <div class="col-xs-12 col-sm-8 col-md-9">
     <form class="form-horizontal" method="post" action="<?=url("/app/upload_post?id={$app->getId()}")?>">
+      <legend>Upload Package</legend>
+
       <div class="form-group">
         <input type="file" class="hidden" id="file-selector">
         <input type="hidden" id="platform" name="platform" value="">
@@ -119,6 +121,7 @@
     $('#file-info').text('-, size: -');
 
     if(!file){
+      $('#file-name-display').html('');
       return false;
     }
 
