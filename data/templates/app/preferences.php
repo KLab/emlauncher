@@ -273,6 +273,34 @@ $('.btn.delete-tags').on('click',function(event){
   $(this).prev().prop('checked',!$(this).hasClass('active'));
 });
 
+// owner form
+$('.edit-owner button').on('click',function(event){
+  var $parent = $(this).parent().parent().parent();
+  if($parent.hasClass('add')){
+    $parent.hide('fast',function(){$parent.remove();});
+  }
+  else if($parent.hasClass('delete')){
+    $parent.removeClass('delete');
+    $('input',$parent).val($('span',$parent).text());
+  }
+  else{
+    $parent.addClass('delete')
+    $('input',$parent).val(null);
+  }
+  return false;
+});
 
+$('#add-owner button').on('click',function(event){
+  var $template = $('#owner-form-template');
+  var $clone = $template.clone(true);
+  var new_owner = $(this).next().val();
+  $('span',$clone).text(new_owner);
+  $('input',$clone).val(new_owner);
+  $clone.removeClass('hidden');
+  $clone.removeAttr('id');
+  $template.before($clone);
+  $(this).next().val(null);
+  return false;
+});
 
 </script>

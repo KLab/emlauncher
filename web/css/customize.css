@@ -163,7 +163,7 @@ h3 {
   border-color: #eed3d7;
   text-decoration: line-through;
 }
-.edit-owner .form-control.delete > button > i:before{
+.edit-owner.delete .form-control > button > i:before{
   content: "\f10c";
 }
 
