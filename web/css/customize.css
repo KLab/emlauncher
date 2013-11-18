@@ -150,3 +150,36 @@ h3 {
   border: 1px solid #9a0200;
 }
 
+.edit-owner .form-control > button {
+  margin-right: 10px;
+}
+.edit-owner .form-control > button > i:before{
+  content: "\f00d";
+}
+
+.edit-owner.delete .form-control {
+  color: #b94a48;
+  background-color: #f2dede;
+  border-color: #eed3d7;
+  text-decoration: line-through;
+}
+.edit-owner .form-control.delete > button > i:before{
+  content: "\f10c";
+}
+
+.edit-owner.add .form-control {
+  background-color: #dff0d8;
+  border-color: #d6e9c6;
+  color: #468847;
+}
+
+#add-owner button {
+  float: left;
+  height: 38px;
+  margin-bottom: -38px;
+  padding: 0 12px;
+}
+#add-owner input[type="text"] {
+  padding-left: 38px;
+}
+

@@ -39,7 +39,7 @@
         <legend>Edit Informations</legend>
 
         <div class="row">
-          <div class="col-md-9 col-xs-12">
+          <div class="col-lg-10 col-md-9 col-xs-12">
             <div class="form-group">
 	          <label for="title" class="control-label col-md-3 required">Title</label>
               <div class="col-md-9">
@@ -66,13 +66,13 @@
             </div>
           </div>
 
-          <div class="col-md-3 hidden-sm hidden-xs text-center">
+          <div class="col-lg-2 col-md-3 hidden-sm hidden-xs text-center">
             <img id="icon-preview" class="img-thumbnail droparea" style="width:96px;height:96px;" src="<?=$app->getIconUrl()?>">
           </div>
         </div>
 
         <div class="row">
-          <div class="col-md-9 col-xs-12">
+          <div class="col-lg-10 col-md-9 col-xs-12">
             <div class="form-group">
               <label for="description" class="control-label col-md-3">Description</label>
               <div class="col-md-9">
@@ -83,7 +83,7 @@
         </div>
 
         <div class="row">
-          <div class="col-md-9 col-xs-12">
+          <div class="col-lg-10 col-md-9 col-xs-12">
             <div class="form-group">
               <label for="repository" class="control-label col-md-3">Repository</label>
               <div class="col-md-9">
@@ -94,7 +94,7 @@
         </div>
 
         <div class="row">
-          <div class="col-md-9 col-xs-12">
+          <div class="col-lg-10 col-md-9 col-xs-12">
             <div class="form-group">
               <div class="col-md-9 col-md-offset-3">
                 <button class="btn btn-primary"><i class="fa fa-save"></i> Update</button>
@@ -129,9 +129,53 @@
     </div>
 
     <div class="well">
-      <form id="owners" class="form-horizontal">
+      <form id="owners" class="form-horizontal" method="post" action="<?=url('/app/preferences_update_owners')?>">
         <input type="hidden" name="id" value="<?=$app->getId()?>">
         <legend>Owners</legend>
+
+        <div class="form-group">
+          <div class="col-xs-12">
+            <div class="form-control" readonly="readonly">
+              <?=htmlspecialchars($login_user->getMail())?>
+            </div>
+          </div>
+        </div>
+
+<?php foreach($app->getOwners() as $owner):?>
+<?php   if($owner->getOwnerMail()===$login_user->getMail()) continue; ?>
+        <div class="form-group edit-owner">
+          <div class="col-xs-12">
+            <div class="form-control" readonly="readonly">
+              <button type="button" class="close pull-left"><i class="fa"></i></button>
+              <span><?=htmlspecialchars($owner->getOwnerMail())?></span>
+              <input type="hidden" name="owners[]" value="<?=htmlspecialchars($owner->getOwnerMail())?>">
+            </div>
+          </div>
+        </div>
+<?php endforeach ?>
+
+        <div id="owner-form-template" class="form-group edit-owner add hidden">
+          <div class="col-xs-12">
+            <div class="form-control" readonly="readonly">
+              <button type="button" class="close pull-left"><i class="fa"></i></button>
+              <span></span>
+              <input type="hidden" name="owners[]">
+            </div>
+          </div>
+        </div>
+
+        <div id="add-owner" class="form-group">
+          <div class="col-xs-12">
+            <button class="close"><i class="fa fa-plus"></i></button>
+            <input type="text" class="form-control">
+          </div>
+        </div>
+
+        <div class="form-group">
+          <div class="col-xs-12">
+            <button class="btn btn-primary"><i class="fa fa-save"></i> Update</button>
+          </div>
+        </div>
 
       </form>
     </div>
