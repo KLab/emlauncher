@@ -50,7 +50,7 @@
       </div>
     </div>
 
-    <div class="container">
+    <div id="<?="{$module}-{$action}"?>" class="container">
       <?=$contents?>
     </div>
   </body>

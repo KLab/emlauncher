@@ -46,6 +46,20 @@ class InstallLog {
 		return $ret;
 	}
 
+	public static function applicationInstallDates(User $user)
+	{
+		$sql = 'SELECT app_id,max(installed) as installed FROM install_log WHERE mail = :mail GROUP BY app_id';
+		$bind = array(
+			':mail'=>$user->getMail()
+			);
+		$rows = mfwDBIBase::getAll($sql,$bind);
+		$ret = array();
+		foreach($rows as $r){
+			$ret[$r['app_id']] = $r['installed'];
+		}
+		return $ret;
+	}
+
 	public static function getPackageInstallCount(Package $pkg)
 	{
 		$sql = 'SELECT count(distinct(mail)) FROM install_log WHERE package_id = ?';

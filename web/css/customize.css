@@ -76,6 +76,16 @@ label.required:after{
   }
 }
 
+.app-icon-sm {
+  width: 72px;
+}
+
+.app-list-item {
+	border-bottom: 1px solid #eee;
+	padding: 5px;
+}
+
+
 [data-toggle="button"].active {
   color: #ffffff;
   background-color: #385a7f;
@@ -202,3 +212,14 @@ h3 {
 #documentation dl.dl-horizontal dd ul li {
 	margin-bottom: 5px;
 }
+
+#documentation .page-header,
+#top-index .page-header {
+	margin-top: 0;
+}
+
+#top-index #create-app-button {
+	margin-top: 10px;
+	padding: 5px;
+}
+

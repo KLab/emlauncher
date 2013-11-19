@@ -31,11 +31,20 @@ class Application extends mfwObject {
 	{
 		return S3::url($this->value('icon_key'));
 	}
-	public function getLastUpload(){
-		return $this->value('last_upload');
+	public function getLastUpload($format=null){
+		$last_upload = $this->value('last_upload');
+		if($last_upload==$this->value('created')){
+			// まだApplication作成しかしていない
+			return null;
+		}
+		if($format){
+			$last_upload = date($format,strtotime($last_upload));
+		}
+		return $last_upload;
 	}
 	public function updateLastUpload($con=null)
 	{
+		// todo: 時間を指定できるようにする。パッケージ削除のとき、残りのうちの最新時刻に更新するため.
 		$this->row['last_upload'] = date('Y-m-d H:i:s');
 		$sql = 'UPDATE application SET last_upload = :now WHERE id = :id';
 		$bind = array(
@@ -59,8 +68,12 @@ class Application extends mfwObject {
 		mfwDBIBase::query($sql,$bind,$con);
 	}
 
-	public function getCreated(){
-		return $this->value('created');
+	public function getCreated($format=null){
+		$created = $this->value('created');
+		if($format){
+			$created = date($format,strtotime($created));
+		}
+		return $created;
 	}
 	public function getOwners()
 	{
@@ -227,13 +240,15 @@ class ApplicationDb extends mfwObjectDb {
 
 	public static function insertNewApp($owner,$title,$image,$description,$repository)
 	{
+		$now = date('Y-m-d H:i:s');
 		// insert new application
 		$row = array(
 			'title' => $title,
 			'api_key' => static::makeApiKey(),
 			'description' => $description,
 			'repository' => $repository,
-			'created' => date('Y-m-d H:i:s'),
+			'last_upload' => $now,
+			'created' => $now,
 			);
 		$app = new Application($row);
 		$app->insert();

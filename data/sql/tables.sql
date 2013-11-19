@@ -15,9 +15,10 @@ create table `application` (
   `icon_key` varchar(255) default null comment 'S3のアイコンファイルのキー',
   `description` varchar(1000) default null,
   `repository` varchar(1000) default null comment 'リポジトリURLなど',
-  `last_upload` datetime default null comment 'パッケージの最終アップロード時刻',
+  `last_upload` datetime not null comment 'パッケージの最終アップロード時刻 (insert時はcreatedと同じ時刻を入れる)',
   `created` datetime not null,
   unique key `idx_api_key` (`api_key`),
+  key idx_last_upload (`last_upload`) comment '新着ソート用',
   primary key (`id`)
 )Engine=InnoDB default charset=utf8;
 
