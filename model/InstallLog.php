@@ -52,7 +52,7 @@ class InstallLog {
 		return (int)mfwDBIBase::getOne($sql,array($pkg->getId()));
 	}
 
-	public static function getApplicationInstallCount(Application $app)
+	public static function getApplicationInstallUserCount(Application $app)
 	{
 		$sql = 'SELECT count(*) FROM app_install_user WHERE app_id = ?';
 		return (int)mfwDBIBase::getOne($sql,array($app->getId()));

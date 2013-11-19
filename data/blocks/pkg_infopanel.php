@@ -6,7 +6,7 @@
         <a href="<?=url("/package/edit?id={$package->getId()}")?>"><i class="fa fa-pencil"></i> Edit</a>
       </li>
       <li>
-        <a href="<?=url("/app/delete?id={$package->getId()}")?>"><i class="fa fa-trash-o"></i> Delete</a>
+        <a href="<?=url("/package/delete_confirm?id={$package->getId()}")?>"><i class="fa fa-trash-o"></i> Delete</a>
       </li>
     </ul>
   </div>

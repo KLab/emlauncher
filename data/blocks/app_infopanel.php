@@ -19,6 +19,8 @@
 <?php endif ?>
       <dt>created</dt>
       <dd><?=$app->getCreated()?></dd>
+      <dt>install user</dt>
+      <dd><?=$app->getInstallUserCount()?></dd>
 <?php if($app->getRepository()): ?>
       <dt>repository</dt>
 <?php if(preg_match('|https?://([^/]*)/|',$app->getRepository(),$m)):?>

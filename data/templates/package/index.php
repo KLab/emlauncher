@@ -48,7 +48,7 @@
     <dl class="dl-horizontal">
       <dt>Platform</dt>
       <dd><?=block('platform_icon',array('with_name'=>true))?></dd>
-      <dt>Installed</dt>
+      <dt>Install user</dt>
       <dd><?=$package->getInstallCount()?></dd>
       <dt>Uploaded</dt>
       <dd><?=$package->getCreated()?></dd>

@@ -99,9 +99,9 @@ class Application extends mfwObject {
 		return $this->tags;
 	}
 
-	public function getInstallCount()
+	public function getInstallUserCount()
 	{
-		return InstallLog::getApplicationInstallCount($this);
+		return InstallLog::getApplicationInstallUserCount($this);
 	}
 
 	/**
