@@ -27,10 +27,6 @@ class editActions extends packageActions
 
 	public function executeEdit_commit()
 	{
-		if(mfwRequest::has('cancel')){
-			return $this->redirect("/package?id={$this->package->getId()}");
-		}
-
 		$title = mfwRequest::param('title');
 		$description = mfwRequest::param('description');
 		$tag_names = mfwRequest::param('tags');

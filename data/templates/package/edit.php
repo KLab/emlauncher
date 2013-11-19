@@ -74,7 +74,7 @@ foreach($app->getTags() as $tag):
       <div class="form-group">
         <div class="col-md-10 col-md-offset-2">
           <button class="btn btn-primary"><i class="fa fa-save"></i> Save</button>
-          <button class="btn btn-default" name="cancel"><i class="fa fa-times"></i> Cancel</button>
+          <a class="btn btn-default" href="<?=url("/package?id={$package->getId()}")?>"><i class="fa fa-times"></i> Cancel</a>
         </div>
       </div>
 
@@ -141,11 +141,6 @@ $('#title').keydown(function(event){
     return false;
   }
   return true;
-});
-
-$('button[name="cancel"]').on('click',function(event){
-  location.href = '<?=url("/package?id={$package->getId()}")?>'
-  return false;
 });
 
 // form validation

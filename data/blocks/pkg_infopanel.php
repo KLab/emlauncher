@@ -5,7 +5,7 @@
       <li<?=($action==='edit')?' class="active"':''?>>
         <a href="<?=url("/package/edit?id={$package->getId()}")?>"><i class="fa fa-pencil"></i> Edit</a>
       </li>
-      <li>
+      <li<?=($action==='delete_confirm')?' class="active"':''?>>
         <a href="<?=url("/package/delete_confirm?id={$package->getId()}")?>"><i class="fa fa-trash-o"></i> Delete</a>
       </li>
     </ul>
