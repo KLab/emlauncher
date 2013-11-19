@@ -43,7 +43,23 @@ class deleteActions extends packageActions
 		$con = mfwDBConnection::getPDO();
 		$con->beginTransaction();
 		try{
+			$this->app = ApplicationDb::retrieveByPKForUpdate($this->app->getId());
+
 			$this->package->delete($con);
+
+			if($this->app->getLastUpload()==$this->package->getCreated()){
+				// 最終アップデート時刻を前のものに戻す
+				$pkgs = PackageDb::selectByAppId($this->app->getId());
+				if($pkgs->count()>0){
+					$pkgs->rewind();
+					$lastupload = $pkgs->current()->getCreated();
+				}
+				else{
+					$lastupload = $this->app->getCreated();
+				}
+				$this->app->updateLastUpload($lastupload,$con);
+			}
+
 			$con->commit();
 		}
 		catch(Exception $e){

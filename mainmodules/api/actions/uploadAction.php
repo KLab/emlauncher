@@ -60,7 +60,7 @@ class uploadAction extends apiActions
 			// S3へアップロード
 			$pkg->uploadFile($file_content,$mime);
 
-			$app->updateLastUpload($con);
+			$app->updateLastUpload($pkg->getCreated(),$con);
 
 			$con->commit();
 		}

@@ -50,7 +50,7 @@ class uploadActions extends appActions
 
 			$pkg->renameTempFile($temp_name);
 
-			$app->updateLastUpload($con);
+			$app->updateLastUpload($pkg->getCreated(),$con);
 
 			$con->commit();
 		}

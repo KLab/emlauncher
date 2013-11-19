@@ -42,10 +42,9 @@ class Application extends mfwObject {
 		}
 		return $last_upload;
 	}
-	public function updateLastUpload($con=null)
+	public function updateLastUpload($date,$con=null)
 	{
-		// todo: 時間を指定できるようにする。パッケージ削除のとき、残りのうちの最新時刻に更新するため.
-		$this->row['last_upload'] = date('Y-m-d H:i:s');
+		$this->row['last_upload'] = $date;
 		$sql = 'UPDATE application SET last_upload = :now WHERE id = :id';
 		$bind = array(
 			':id' => $this->getId(),
