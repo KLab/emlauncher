@@ -1,13 +1,11 @@
 <?php
 require_once __DIR__.'/actions.php';
+require_once APP_ROOT.'/model/Package.php';
 require_once APP_ROOT.'/model/Random.php';
 
 class deleteActions extends packageActions
 {
 	const SESKEY_TOKEN = 'package_delete_token';
-
-	protected $package = null;
-	protected $app = null;
 
 	public function initialize()
 	{
@@ -34,13 +32,34 @@ class deleteActions extends packageActions
 
 	public function executeDelete()
 	{
-		// todo: token確認
+		$token = mfwRequest::param('token',null,'POST');
 
-		// DBから削除
+		if($token!==mfwSession::get(self::SESKEY_TOKEN)){
+			return $this->buildErrorPage(
+				'Bad Request',array(self::HTTP_400_BADREQUEST));
+		}
+		mfwSession::clear(self::SESKEY_TOKEN);
 
-		// S3から削除(例外無視)
+		$con = mfwDBConnection::getPDO();
+		$con->beginTransaction();
+		try{
+			$this->package->delete($con);
+			$con->commit();
+		}
+		catch(Exception $e){
+			$con->rollback();
+			error_log(__METHOD__.": {$e->getMessage()}");
+			throw $e;
+		}
 
-		$this->redirect("/app?id={$this->app->getId()}");
+		try{
+			$this->package->deleteFile();
+		}
+		catch(Exception $e){
+			// S3から削除出来なくてもDBからは消えているので許容する
+		}
+
+		return $this->redirect("/app?id={$this->app->getId()}");
 	}
 
 }

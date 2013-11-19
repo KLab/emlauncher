@@ -98,5 +98,11 @@ class TagDb extends mfwObjectDb {
 		mfwDBIBase::query($sql,$bind,$con);
 	}
 
+	public static function removeFromPackage(Package $pkg,$con=null)
+	{
+		$sql = 'DELETE FROM package_tag WHERE package_id = ?';
+		mfwDBIBase::query($sql,array($pkg->getId()),$con);
+	}
+
 }
 

@@ -90,6 +90,11 @@ class Package extends mfwObject {
 		$newkey = $this->getFileKey();
 		S3::rename($tempkey,$newkey,'private');
 	}
+	public function deleteFile()
+	{
+		$key = $this->getFileKey();
+		S3::delete($key);
+	}
 	public function getFileUrl($expire=null)
 	{
 		return S3::url($this->getFileKey(),$expire);
@@ -111,6 +116,12 @@ class Package extends mfwObject {
 		$this->row['description'] = $description;
 		$this->update($con);
 		$this->applyTags($tags,$con);
+	}
+
+	public function delete($con=null)
+	{
+		TagDb::removeFromPackage($this,$con);
+		return parent::delete($con);
 	}
 }
 

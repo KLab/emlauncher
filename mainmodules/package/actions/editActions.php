@@ -3,9 +3,6 @@ require_once __DIR__.'/actions.php';
 
 class editActions extends packageActions
 {
-	protected $package = null;
-	protected $app = null;
-
 	public function initialize()
 	{
 		if(($err=parent::initialize())){
