@@ -5,8 +5,9 @@ class topActions extends MainActions
 {
 	public function executeIndex()
 	{
+		$apps = ApplicationDb::selectAllByUpdateOrder();
 		$params = array(
-			'applications' => ApplicationDb::selectAll(),
+			'applications' => $apps,
 			);
 		return $this->build($params);
 	}

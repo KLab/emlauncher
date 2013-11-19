@@ -271,5 +271,11 @@ class ApplicationDb extends mfwObjectDb {
 		return $app;
 	}
 
+	public static function selectAllByUpdateOrder()
+	{
+		$query = 'ORDER BY last_upload DESC';
+		return static::selectSet($query);
+	}
+
 }
 
