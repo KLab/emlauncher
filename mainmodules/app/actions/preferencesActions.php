@@ -24,7 +24,7 @@ class preferencesActions extends appActions
 
 	public function executePreferences_refresh_apikey()
 	{
-		$oldkey = mfwRequest::param('api-key','POST');
+		$oldkey = mfwRequest::param('api-key',null,'POST');
 		$con = mfwDBConnection::getPDO();
 		$con->beginTransaction();
 		try{

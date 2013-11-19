@@ -10,6 +10,12 @@ class uploadAction extends apiActions
 	{
 		$con = null;
 		try{
+			if(mfwRequest::method()!=='POST'){
+				return $this->jsonResponse(
+					self::HTTP_405_METHODNOTALLOWED,
+					array('error'=>'Method Not Allowed'));
+			}
+
 			$api_key = mfwRequest::param('api_key');
 			$file_info = mfwRequest::param('file');
 			$title = mfwRequest::param('title');
@@ -29,17 +35,17 @@ class uploadAction extends apiActions
 					array('error'=>'Invalid api_key'));
 			}
 
+			// ファイルフォーマット確認, 情報抽出
 			$file_content = file_get_contents($file_info['tmp_name']);
-
 			list($platform,$ext,$mime) = PackageDb::getPackageInfo(
 				$file_info['name'],$file_content,$file_info['type']);
-
 			$ios_identifier = null;
 			if($platform===Package::PF_IOS){
 				$plist = IPAFile::parseInfoPlist($file_info['tmp_name']);
 				$ios_identifier = $plist['CFBundleIdentifier'];
 			}
 
+			// DBへ保存
 			$con = mfwDBConnection::getPDO();
 			$con->beginTransaction();
 
@@ -51,6 +57,7 @@ class uploadAction extends apiActions
 				$app->getId(),$platform,$ext,
 				$title,$description,$ios_identifier,$tags,$con);
 
+			// S3へアップロード
 			$pkg->uploadFile($file_content,$mime);
 
 			$app->updateLastUpload($con);
