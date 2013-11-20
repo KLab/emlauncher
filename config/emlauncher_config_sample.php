@@ -1,3 +1,4 @@
+<?php
 /**@file
  * EMLauncher設定.
  * emlauncher_config.phpにリネームする.
@@ -31,7 +32,7 @@ $emlauncher_config = array(
 			 *
 			 * 利用する場合, 事前にgoogole appsを作成してOAuthのID, Secretを発行しておく.
 			 */
-			'enaable_google_auth' => true,
+			'enable_google_auth' => true,
 			'google_app_id' => 'xxxxxxxx.apps.googleusercontent.com',
 			'google_app_secret' => 'xxxxxxxx',
 			'allowed_mailaddr_pattern' => '/@klab\.com$/',

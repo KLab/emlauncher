@@ -89,7 +89,7 @@ class appActions extends MainActions
 
 		$pkgs = PackageDb::selectByAppId($this->app->getId(),$pf[$platform]);
 
-		if($pkgs->count()===0 && $platform!=='all'){
+		if($pkgs->count()===0 && !mfwRequest::param('pf')){
 			$platform = 'all';
 			$pkgs = PackageDb::selectByAppId($this->app->getId(),null);
 		}
