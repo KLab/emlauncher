@@ -7,7 +7,7 @@ class User
 
 	protected $mail;
 	protected $pkg_install_dates = array();
-	protected $app_install_dates = null;
+	protected $install_apps = null;
 
 	public function __construct($mail)
 	{
@@ -59,19 +59,22 @@ class User
 		return $date;
 	}
 
+	public function getInstallApps()
+	{
+		if($this->install_apps===null){
+			$this->install_apps = InstallLog::getInstallApps($this);
+		}
+		return $this->install_apps;
+	}
+
 	public function getAppInstallDate(Application $app,$format=null)
 	{
-		if($this->app_install_dates===null){
-			$this->app_install_dates = InstallLog::applicationInstallDates($this);
+		$install_apps = $this->getInstallApps();
+
+		if(isset($install_apps[$app->getId()])){
+			return $install_apps[$app->getId()]->getLastInstalled();
 		}
-		if(!isset($this->app_install_dates[$app->getId()])){
-			return null;
-		}
-		$date = $this->app_install_dates[$app->getId()];
-		if($format){
-			$date = date($format,strtotime($date));
-		}
-		return $date;
+		return null;
 	}
 
 }

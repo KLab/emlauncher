@@ -1,5 +1,6 @@
 <?php
 require_once __DIR__.'/InstallUser.php';
+require_once __DIR__.'/InstallApp.php';
 
 /**
  */
@@ -49,24 +50,17 @@ class InstallLog {
 		return $ret;
 	}
 
-	public static function applicationInstallDates(User $user)
-	{
-		$sql = 'SELECT app_id,max(installed) as installed FROM install_log WHERE mail = :mail GROUP BY app_id';
-		$bind = array(
-			':mail'=>$user->getMail()
-			);
-		$rows = mfwDBIBase::getAll($sql,$bind);
-		$ret = array();
-		foreach($rows as $r){
-			$ret[$r['app_id']] = $r['installed'];
-		}
-		return $ret;
-	}
-
 	public static function getPackageInstallCount(Package $pkg)
 	{
 		$sql = 'SELECT count(distinct(mail)) FROM install_log WHERE package_id = ?';
 		return (int)mfwDBIBase::getOne($sql,array($pkg->getId()));
+	}
+
+	public static function getInstallApps(User $user)
+	{
+		$sql = 'SELECT * FROM app_install_user WHERE mail = ?';
+		$rows = mfwDBIBase::getAll($sql,array($user->getMail()));
+		return new InstallAppSet($rows);
 	}
 
 	public static function getInstallUsers(Application $app)

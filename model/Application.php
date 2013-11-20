@@ -112,12 +112,18 @@ class Application extends mfwObject {
 		return $this->tags;
 	}
 
-	public function getInstallUserCount()
+	public function getInstallUsers()
 	{
 		if($this->install_users===null){
 			$this->install_users = InstallLog::getInstallUsers($this);
 		}
-		return $this->install_users->count();
+		return $this->install_users;
+	}
+
+	public function getInstallUserCount()
+	{
+		$install_users = $this->getInstallUsers();
+		return $install_users->count();
 	}
 
 	/**
