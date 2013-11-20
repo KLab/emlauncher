@@ -1,5 +1,5 @@
 <?php
-require_once APP_ROOT.'/libs/aws/aws-autoloader.php';
+require_once APP_ROOT.'/model/Config.php';
 
 class S3 {
 
@@ -9,8 +9,7 @@ class S3 {
 
 	protected function __construct()
 	{
-		include APP_ROOT.'/config/aws_config.php';
-		$this->config = $aws_config[mfwServerEnv::getEnv()];
+		$this->config = Config::get('aws');
 		$this->client = Aws\S3\S3Client::factory(
 			array(
 				'key' => $this->config['key'],

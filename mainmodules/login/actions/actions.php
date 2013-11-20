@@ -1,4 +1,5 @@
 <?php
+require_once APP_ROOT.'/model/Config.php';
 
 class loginActions extends MainActions
 {
@@ -14,8 +15,7 @@ class loginActions extends MainActions
 			return $this->redirect('/');
 		}
 
-		include APP_ROOT.'/config/login_config.php';
-		$this->config = $login_config[mfwServerEnv::getEnv()];
+		$this->config = Config::get('login');
 
 		return null;
 	}

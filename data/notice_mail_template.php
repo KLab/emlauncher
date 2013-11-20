@@ -4,6 +4,8 @@ New package "<?=$pkg->getTitle()?>" was uploaded to "<?=$app->getTitle()?>".
 "<?=$pkg->getDescription()?>"
 <?php endif ?>
 
+Platform: <?=$pkg->getPlatform()?>
+
 Tags:<?php foreach($pkg->getTags() as $tag): ?>
   <?=$tag->getName()?>
 <?php endforeach ?>

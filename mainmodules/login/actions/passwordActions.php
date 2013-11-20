@@ -32,7 +32,7 @@ class passwordActions extends loginActions
 		$mail = mfwRequest::param('email');
 		$user_pass = UserPassDb::selectByEmail($mail);
 		if($user_pass){
-			$user_pass->sendResetMail($this->config['reminder_address']);
+			$user_pass->sendResetMail();
 		}
 		else{
 			$params['error'] = 1;

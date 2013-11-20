@@ -62,11 +62,8 @@ class uploadActions extends appActions
 
 		if($notify){
 			try{
-				// todo: configの整理
-				include APP_ROOT.'/config/emlauncher.php';
-				$config = $emlauncher_config[mfwServerEnv::getEnv()];
 				$users = $app->getInstallUsers();
-				$users->noticePackageUploaded($pkg,$config['mail_sender']);
+				$users->noticePackageUploaded($pkg);
 			}
 			catch(Exception $e){
 				// アップロード通知が送れなくても許容する

@@ -42,7 +42,7 @@ class InstallUserSet extends mfwObjectSet {
 		parent::unsetCache($id);
 	}
 
-	public function noticePackageUploaded(Package $pkg,$sender)
+	public function noticePackageUploaded(Package $pkg)
 	{
 		$app = $this->app;
 		$package_url = mfwRequest::makeURL("/package?id={$pkg->getId()}");
@@ -61,8 +61,9 @@ class InstallUserSet extends mfwObjectSet {
 		}
 
 		$subject = "New Package Uploaded to {$app->getTitle()}";
+		$sender = Config::get('mail_sender');
 		$to = $sender;
-		$header = "From: EMLauncher <$sender>"
+		$header = "From: $sender"
 			. "\nBcc: " . implode(', ',$addresses);
 
 		mb_language('uni');

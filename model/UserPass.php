@@ -12,7 +12,7 @@ class UserPass extends mfwObject {
 	/**
 	 * @param[in] string $sender 送信アドレス
 	 */
-	public function sendResetMail($sender)
+	public function sendResetMail()
 	{
 		$data = array(
 			'mail' => $this->row['mail'],
@@ -25,7 +25,7 @@ class UserPass extends mfwObject {
 
 		$subject = 'Reset password';
 		$to = $data['mail'];
-		$from = "From: $sender";
+		$from = 'From: '.Config::get('mail_sender');
 
 		$body = "EMLauncher password reset URL:\n$url\n";
 
