@@ -88,6 +88,12 @@ class appActions extends MainActions
 		}
 
 		$pkgs = PackageDb::selectByAppId($this->app->getId(),$pf[$platform]);
+
+		if($pkgs->count()===0 && $platform!=='all'){
+			$platform = 'all';
+			$pkgs = PackageDb::selectByAppId($this->app->getId(),null);
+		}
+
 		$params = array(
 			'pf' => $platform,
 			'is_owner' => $this->app->isOwner($this->login_user),
