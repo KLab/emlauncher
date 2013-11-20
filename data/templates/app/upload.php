@@ -5,7 +5,7 @@
     </a>
   </p>
   <div class="media-body">
-    <h2 class="media-hedding"><?=$app->getTitle()?></h2>
+    <h2 class="media-hedding"><a href="<?=url("/app?id={$app->getId()}")?>"><?=$app->getTitle()?></a></h2>
     <p><?=$app->getDescription()?></p>
   </div>
 </div>
