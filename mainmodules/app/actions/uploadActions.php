@@ -31,6 +31,7 @@ class uploadActions extends appActions
 		$description = mfwRequest::param('description');
 		$tag_names = mfwRequest::param('tags');
 		$ios_identifier = mfwRequest::param('ios_identifier');
+		$notice = mfwRequest::param('notice');
 
 		if(!$temp_name || !$title){
 			error_log(__METHOD__.": bad request: $temp_name, $title");
@@ -59,7 +60,19 @@ class uploadActions extends appActions
 			throw $e;
 		}
 
-		// todo: notification
+		if($notice){
+			try{
+				// todo: configの整理
+				include APP_ROOT.'/config/emlauncher.php';
+				$config = $emlauncher_config[mfwServerEnv::getEnv()];
+				$users = $app->getInstallUsers();
+				$users->noticePackageUploaded($pkg,$config['mail_sender']);
+			}
+			catch(Exception $e){
+				// アップロード通知が送れなくても許容する
+				error_log(__METHOD__.": {$e->getMessage()}");
+			}
+		}
 
 		return $this->redirect("/package?id={$pkg->getId()}");
 	}

@@ -72,7 +72,7 @@ create table install_log (
   `user_agent` varchar(1000) not null,
   `installed` datetime not null comment 'インストール日時',
   key idx_mail_app (`mail`,`app_id`,`package_id`),
-  key idx_package_mail (`package_id`),
+  key idx_package (`package_id`),
   primary key (`id`)
 )Engine=InnoDB default charset=utf8;
 

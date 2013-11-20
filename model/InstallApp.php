@@ -25,6 +25,13 @@ class InstallApp extends mfwObject {
 
 class InstallAppSet extends mfwObjectSet {
 	const PRIMARY_KEY = 'app_id';
+	protected $user;
+
+	public function __construct(User $user,Array $rows=array())
+	{
+		parent::__construct($rows);
+		$this->user = $user;
+	}
 	public static function hypostatize(Array $row=array())
 	{
 		return new InstallApp($row);

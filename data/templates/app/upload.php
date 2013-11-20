@@ -89,6 +89,13 @@
       </div>
 
       <div class="form-group">
+        <label for="notice" class="control-label col-md-2">Notification</label>
+        <div class="col-md-10">
+          <input type="checkbox" id="notice" name="notice" value="1">
+        </div>
+      </div>
+
+      <div class="form-group">
         <div class="col-md-10 col-md-offset-2">
           <button id="submit" class="btn btn-primary" disabled="disabled"><i class="fa fa-upload"></i> Upload</button>
         </div>

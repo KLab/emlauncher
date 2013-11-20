@@ -60,14 +60,14 @@ class InstallLog {
 	{
 		$sql = 'SELECT * FROM app_install_user WHERE mail = ?';
 		$rows = mfwDBIBase::getAll($sql,array($user->getMail()));
-		return new InstallAppSet($rows);
+		return new InstallAppSet($user,$rows);
 	}
 
 	public static function getInstallUsers(Application $app)
 	{
 		$sql = 'SELECT * FROM app_install_user WHERE app_id = ?';
 		$rows = mfwDBIBase::getAll($sql,array($app->getId()));
-		return new InstallUserSet($rows);
+		return new InstallUserSet($app,$rows);
 	}
 
 }
