@@ -31,7 +31,7 @@ class uploadActions extends appActions
 		$description = mfwRequest::param('description');
 		$tag_names = mfwRequest::param('tags');
 		$ios_identifier = mfwRequest::param('ios_identifier');
-		$notice = mfwRequest::param('notice');
+		$notify = mfwRequest::param('notify');
 
 		if(!$temp_name || !$title){
 			error_log(__METHOD__.": bad request: $temp_name, $title");
@@ -60,7 +60,7 @@ class uploadActions extends appActions
 			throw $e;
 		}
 
-		if($notice){
+		if($notify){
 			try{
 				// todo: configの整理
 				include APP_ROOT.'/config/emlauncher.php';

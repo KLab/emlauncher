@@ -72,6 +72,20 @@ class uploadAction extends apiActions
 				array('error'=>$e->getMessage()));
 		}
 
+		if($notify){
+			try{
+				// todo: configの整理
+				include APP_ROOT.'/config/emlauncher.php';
+				$config = $emlauncher_config[mfwServerEnv::getEnv()];
+				$users = $app->getInstallUsers();
+				$users->noticePackageUploaded($pkg,$config['mail_sender']);
+			}
+			catch(Exception $e){
+				// アップロード通知が送れなくても許容する
+				error_log(__METHOD__.": {$e->getMessage()}");
+			}
+		}
+
 		return $this->jsonResponse(
 			self::HTTP_200_OK,
 			array(

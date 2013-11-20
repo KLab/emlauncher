@@ -89,9 +89,9 @@
       </div>
 
       <div class="form-group">
-        <label for="notice" class="control-label col-md-2">Notification</label>
+        <label for="notify" class="control-label col-md-2">Notification</label>
         <div class="col-md-10">
-          <input type="checkbox" id="notice" name="notice" value="1">
+          <input type="checkbox" id="notify" name="notify" value="1">
         </div>
       </div>
 
