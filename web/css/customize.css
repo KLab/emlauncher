@@ -52,11 +52,14 @@ form+.google-login {
   transition: border-color ease-in-out 0.15s, box-shadow ease-in-out 0.15s;
 }
 
-input#notify {
-	height: 22px;
-	width: 22px;
-	margin-top: 8px;
+
+button.checkbox i:before{
+  content: "\f096";
 }
+button.checkbox.active i:before{
+  content: "\f046";
+}
+
 
 h2.media-hedding {
   border-bottom: 1px solid #eee;

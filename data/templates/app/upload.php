@@ -91,7 +91,8 @@
       <div class="form-group">
         <label for="notify" class="control-label col-md-2">Notification</label>
         <div class="col-md-10">
-          <input type="checkbox" id="notify" name="notify" value="1">
+          <input type="checkbox" class="hidden" id="notify" name="notify" value="1">
+          <button class="btn btn-default checkbox" data-toggle="button"><i class="fa"></i></button>
         </div>
       </div>
 
@@ -252,6 +253,15 @@ $('#title').keydown(function(event){
     return false;
   }
   return true;
+});
+
+// initialize notify checkbox button state
+if($('#notify').prop('checked')){
+    $('#notify').next().addClass('active');
+};
+// toggle checkbox
+$('#notify+button.checkbox').on('click',function(event){
+  $(this).prev().prop('checked',!$(this).hasClass('active'));
 });
 
 
