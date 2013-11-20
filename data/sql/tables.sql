@@ -71,8 +71,8 @@ create table install_log (
   `mail` varchar(255) not null,
   `user_agent` varchar(1000) not null,
   `installed` datetime not null comment 'インストール日時',
-  key idx_mail_app (`mail`,`app_id`),
-  key idx_package_mail (`package_id`,`mail`),
+  key idx_mail_app (`mail`,`app_id`,`package_id`),
+  key idx_package_mail (`package_id`),
   primary key (`id`)
 )Engine=InnoDB default charset=utf8;
 
@@ -80,7 +80,9 @@ drop table if exists `app_install_user`;
 create table app_install_user (
   `app_id` integer not null,
   `mail` varchar(255) not null,
-  `get_notifications` tinyint default 1 comment '更新通知設定. 0:受け取らない; 1:受け取る',
-  primary key (`app_id`,`mail`)
+  `notify` tinyint not null default 1 comment '更新通知設定. 0:送る; 1:送らない',
+  `last_installed` datetime not null,
+  key idx_app (`app_id`),
+  primary key (`mail`,`app_id`)
 )Engine=InnoDB default charset=utf8;
 

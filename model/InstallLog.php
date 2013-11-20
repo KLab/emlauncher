@@ -1,4 +1,5 @@
 <?php
+require_once __DIR__.'/InstallUser.php';
 
 /**
  */
@@ -6,6 +7,7 @@ class InstallLog {
 
 	public static function Logging(User $user,Package $pkg,mfwUserAgent $ua,$con=null)
 	{
+		$now = date('Y-m-d H:i:s');
 		$sql = 'INSERT INTO install_log'
 			. ' (app_id,package_id,mail,user_agent,installed)'
 			. ' VALUES (:app_id,:package_id,:mail,:user_agent,:installed)';
@@ -14,14 +16,15 @@ class InstallLog {
 			':package_id' => $pkg->getId(),
 			':mail' => $user->getMail(),
 			':user_agent' => $ua->getString(),
-			':installed' => date('Y-m-d H:i:s'),
+			':installed' => $now,
 			);
 		mfwDBIBase::query($sql,$bind,$con);
 
-		$sql = 'INSERT IGNORE INTO app_install_user (app_id,mail) VALUES (:app_id,:mail)';
+		$sql = 'INSERT INTO app_install_user (app_id,mail,last_installed) VALUES (:app_id,:mail,:last_installed) ON DUPLICATE KEY UPDATE last_installed=:last_installed';
 		$bind = array(
 			':app_id' => $pkg->getAppId(),
 			':mail' => $user->getMail(),
+			':last_installed' => $now,
 			);
 		mfwDBIBase::query($sql,$bind,$con);
 	}
@@ -66,10 +69,11 @@ class InstallLog {
 		return (int)mfwDBIBase::getOne($sql,array($pkg->getId()));
 	}
 
-	public static function getApplicationInstallUserCount(Application $app)
+	public static function getInstallUsers(Application $app)
 	{
-		$sql = 'SELECT count(*) FROM app_install_user WHERE app_id = ?';
-		return (int)mfwDBIBase::getOne($sql,array($app->getId()));
+		$sql = 'SELECT * FROM app_install_user WHERE app_id = ?';
+		$rows = mfwDBIBase::getAll($sql,array($app->getId()));
+		return new InstallUserSet($rows);
 	}
 
 }

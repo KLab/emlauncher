@@ -14,6 +14,7 @@ class Application extends mfwObject {
 
 	protected $owners = null;
 	protected $tags = null;
+	protected $install_users = null;
 
 	public function getId(){
 		return $this->value('id');
@@ -113,7 +114,10 @@ class Application extends mfwObject {
 
 	public function getInstallUserCount()
 	{
-		return InstallLog::getApplicationInstallUserCount($this);
+		if($this->install_users===null){
+			$this->install_users = InstallLog::getInstallUsers($this);
+		}
+		return $this->install_users->count();
 	}
 
 	/**
