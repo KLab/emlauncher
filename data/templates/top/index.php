@@ -1,6 +1,6 @@
 <div class="page-header">
   <h2 class="headding">EMLauncher
-    <small>Only my APP can shoot it.</small>
+    <small class="subtitle">Only my APP can shoot it.</small>
   </h2>
 </div>
 
@@ -36,3 +36,10 @@ $update_time = $upload_time?:$app->getCreated();
 <a class="btn btn-default" href="<?=url('/app/new')?>"><i class="fa fa-plus"></i> New Application</a>
 </div>
 
+<script type="text/javascript">
+
+$('.app-list-item').on('click',function(event){
+  $('a',this)[0].click();
+});
+
+</script>

@@ -89,6 +89,10 @@ label.required:after{
   width: 72px;
 }
 
+h2>.subtitle {
+	white-space: nowrap;
+}
+
 .app-list-item {
 	border-bottom: 1px solid #eee;
 	padding: 5px;

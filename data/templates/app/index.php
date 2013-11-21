@@ -45,7 +45,7 @@
         <td class="text-center logo">
           <?=block('platform_icon',array('package'=>$pkg))?>
         </td>
-        <td>
+        <td class="package-list-item-info">
 	      <div class="row">
             <div class="col-xs-12 col-md-6">
               <a class="title" href="<?=url('/package?id='.$pkg->getId())?>"><?=htmlspecialchars($pkg->getTitle())?></a>
@@ -112,6 +112,8 @@ $('#tag-filter-body>button').on('click',function(){
 
 });
 
-
+$('.package-list-item-info').on('click',function(event){
+  $('a',this)[0].click();
+});
 
 </script>
