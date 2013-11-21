@@ -22,7 +22,7 @@ $upload_time = $app->getLastUpload();
 $update_time = $upload_time?:$app->getCreated();
 ?>
       <?=($upload_time)?'last uploaded':'created'?>: <?=date('Y-m-d H:i',strtotime($update_time))?>
-<?php if($upload_time>$login_user->getAppInstallDate($app)): ?>
+<?php if($login_user->getAppInstallDate($app) && $upload_time>$login_user->getAppInstallDate($app)): ?>
       <span class="label label-success">UPDATE</span>
 <?php elseif(strtotime($update_time)>strtotime('yesterday')): ?>
       <span class="label label-primary">NEW</span>
