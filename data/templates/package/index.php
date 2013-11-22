@@ -49,7 +49,22 @@
       <dt>Platform</dt>
       <dd><?=block('platform_icon',array('with_name'=>true))?></dd>
       <dt>Install user</dt>
+<?php if($app->isOwner($login_user)): ?>
+      <dd>
+        <div class="dropdown">
+          <a class="dropdown-toggle" id="install-user-count" data-toggle="dropdown">
+            <?=$package->getInstallCount()?>
+          </a>
+          <ul class="dropdown-menu" role="menu" aria-labelledby="install-user-count">
+<?php foreach($package->getInstallUsers() as $mail): ?>
+            <li role="presentation"><a role="menuitem" tabindex="-1"><?=$mail?></a></li>
+<?php endforeach ?>
+          </ul>
+        </div>
+      </dd>
+<?php else: ?>
       <dd><?=$package->getInstallCount()?></dd>
+<?php endif ?>
       <dt>Uploaded</dt>
       <dd><?=$package->getCreated()?></dd>
       <dt>Owners</dt>

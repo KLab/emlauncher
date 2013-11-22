@@ -50,10 +50,15 @@ class InstallLog {
 		return $ret;
 	}
 
-	public static function getPackageInstallCount(Package $pkg)
+	public static function getPackageInstallUsers(Package $pkg)
 	{
-		$sql = 'SELECT count(distinct(mail)) FROM install_log WHERE package_id = ?';
-		return (int)mfwDBIBase::getOne($sql,array($pkg->getId()));
+		$sql = 'SELECT distinct(mail) FROM install_log WHERE package_id = ?';
+		$rows = mfwDBIBase::getAll($sql,array($pkg->getId()));
+		$mails = array();
+		foreach($rows as $r){
+			$mails[] = $r['mail'];
+		}
+		return $mails;
 	}
 
 	public static function getInstallApps(User $user)

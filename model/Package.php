@@ -22,6 +22,7 @@ class Package extends mfwObject {
 
 	protected $app = null;
 	protected $tags = null;
+	protected $install_users = null;
 
 	public function getId(){
 		return $this->value('id');
@@ -105,9 +106,18 @@ class Package extends mfwObject {
 		return mfwRequest::makeUrl("/package/install?id={$this->getId()}");
 	}
 
+	public function getInstallUsers()
+	{
+		if($this->install_users===null){
+			$this->install_users = InstallLog::getPackageInstallUsers($this);
+		}
+		return $this->install_users;
+	}
+
 	public function getInstallCount()
 	{
-		return InstallLog::getPackageInstallCount($this);
+		$users = $this->getInstallUsers();
+		return count($users);
 	}
 
 	public function updateInfo($title,$description,TagSet $tags,$con=null)

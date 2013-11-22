@@ -20,7 +20,22 @@
       <dt>created</dt>
       <dd><?=$app->getCreated()?></dd>
       <dt>install user</dt>
+<?php if($app->isOwner($login_user)): ?>
+      <dd>
+        <div class="dropdown">
+          <a class="dropdown-toggle" id="install-user-count" data-toggle="dropdown">
+            <?=$app->getInstallUserCount()?>
+          </a>
+          <ul class="dropdown-menu" role="menu" aria-labelledby="install-user-count">
+<?php foreach($app->getInstallUsers() as $u): ?>
+            <li role="presentation"><a role="menuitem" tabindex="-1"><?=$u->getMail()?></a></li>
+<?php endforeach ?>
+          </ul>
+        </div>
+      </dd>
+<?php else: ?>
       <dd><?=$app->getInstallUserCount()?></dd>
+<?php endif ?>
 <?php if($app->getRepository()): ?>
       <dt>repository</dt>
 <?php if(preg_match('|https?://([^/]*)/|',$app->getRepository(),$m)):?>
