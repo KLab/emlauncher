@@ -8,7 +8,7 @@ class IPAFile {
 		$p = popen("unzip -l \"$ipafile\" \"Payload/*/Info.plist\" 2>/dev/null",'r');
 		$fname = null;
 		while(($l=fgets($p))){
-			if(preg_match('/^ *[0-9]+ +..-..-.. +..:.. +(Payload\/[^\/]+\.app\/Info.plist)\n$/',$l,$m)){
+			if(preg_match('/ +(Payload\/[^\/]+\.app\/Info.plist)\n$/',$l,$m)){
 				$fname = $m[1];
 				break;
 			}
