@@ -36,7 +36,7 @@ class preferencesActions extends appActions
 		}
 		catch(Exception $e){
 			$con->rollback();
-			error_log(__METHOD__.": {$e->getMessage()}");
+			error_log(__METHOD__.'('.__LINE__.'): '.get_class($e).":{$e->getMessage()}");
 			throw $e;
 		}
 		return $this->redirect("/app/preferences?id={$this->app->getId()}#refresh-apikey");
@@ -51,7 +51,7 @@ class preferencesActions extends appActions
 		$image = null;
 
 		if(!$title || ($data&&!preg_match('/^data:[^;]+;base64,(.+)$/',$data,$match))){
-			error_log(__METHOD__.": bad request: $title, ".substr($data,0,30));
+			error_log(__METHOD__.'('.__LINE__."): bad request: $title, ".substr($data,0,30));
 			return $this->response(self::HTTP_400_BADREQUEST);
 		}
 		if($data){
@@ -67,7 +67,7 @@ class preferencesActions extends appActions
 			$con->commit();
 		}
 		catch(Exception $e){
-			error_log(__METHOD__.": {$e->getMessage()}");
+			error_log(__METHOD__.'('.__LINE__.'): '.get_class($e).":{$e->getMessage()}");
 			$con->rollback();
 			throw $e;
 		}
@@ -88,7 +88,7 @@ class preferencesActions extends appActions
 				$con->commit();
 			}
 			catch(Exception $e){
-				error_log(__METHOD__.": {$e->getMessage()}");
+				error_log(__METHOD__.'('.__LINE__.'): '.get_class($e).":{$e->getMessage()}");
 				$con->rollback();
 				throw $e;
 			}
@@ -115,7 +115,7 @@ class preferencesActions extends appActions
 			$con->commit();
 		}
 		catch(Exception $e){
-			error_log(__METHOD__.": {$e->getMessage()}");
+			error_log(__METHOD__.'('.__LINE__.'): '.get_class($e).":{$e->getMessage()}");
 			$con->rollback();
 			throw $e;
 		}

@@ -44,7 +44,7 @@ class appActions extends MainActions
 		$description = mfwRequest::param('description');
 		$repository = mfwRequest::param('repository');
 		if(!$title || !preg_match('/^data:[^;]+;base64,(.+)$/',$data,$match)){
-			error_log(__METHOD__.": bad request: $title, ".substr($data,0,30));
+			error_log(__METHOD__.'('.__LINE__."): bad request: $title, ".substr($data,0,30));
 			return $this->response(self::HTTP_400_BADREQUEST);
 		}
 		$image = base64_decode($match[1]);
@@ -57,7 +57,7 @@ class appActions extends MainActions
 			$con->commit();
 		}
 		catch(Exception $e){
-			error_log(__METHOD__.": {$e->getMessage()}");
+			error_log(__METHOD__.'('.__LINE__.'): '.get_class($e).":{$e->getMessage()}");
 			$con->rollback();
 			throw $e;
 		}

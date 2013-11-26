@@ -34,7 +34,7 @@ class uploadActions extends appActions
 		$notify = mfwRequest::param('notify');
 
 		if(!$temp_name || !$title){
-			error_log(__METHOD__.": bad request: $temp_name, $title");
+			error_log(__METHOD__.'('.__LINE__."): bad request: $temp_name, $title");
 			return $this->response(self::HTTP_400_BADREQUEST);
 		}
 		$ext = pathinfo($temp_name,PATHINFO_EXTENSION);
@@ -56,6 +56,7 @@ class uploadActions extends appActions
 			$con->commit();
 		}
 		catch(Exception $e){
+			error_log(__METHOD__.'('.__LINE__.'): '.get_class($e).":{$e->getMessage()}");
 			$con->rollback();
 			throw $e;
 		}
@@ -67,7 +68,7 @@ class uploadActions extends appActions
 			}
 			catch(Exception $e){
 				// アップロード通知が送れなくても許容する
-				error_log(__METHOD__.": {$e->getMessage()}");
+				error_log(__METHOD__.'('.__LINE__.'): '.get_class($e).":{$e->getMessage()}");
 			}
 		}
 

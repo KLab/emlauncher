@@ -64,7 +64,7 @@ class deleteActions extends packageActions
 		}
 		catch(Exception $e){
 			$con->rollback();
-			error_log(__METHOD__.": {$e->getMessage()}");
+			error_log(__METHOD__.'('.__LINE__.'): '.get_class($e).":{$e->getMessage()}");
 			throw $e;
 		}
 

@@ -28,9 +28,10 @@ class uploadAction extends apiActions
 					array('error'=>'A required field is not present.'));
 			}
 			if(!isset($file_info['error'])||$file_info['error']!==UPLOAD_ERR_OK){
+				error_log(__METHOD__.'('.__LINE__.'): upload file error: $_FILES[file]='.json_encode($file_info));
 				return $this->jsonResponse(
 					self::HTTP_400_BADREQUEST,
-					array('error'=>'file is not uploaded: $_FILES[file]='.json_encode($file_info)));
+					array('error'=>'upload file error: $_FILES[file]='.json_encode($file_info)));
 			}
 
 			$app = ApplicationDb::selectByApiKey($api_key);
@@ -71,10 +72,10 @@ class uploadAction extends apiActions
 		}
 		catch(Exception $e){
 			if($con) $con->rollback();
-			error_log(__METHOD__.": {$e->getMessage()}");
+			error_log(__METHOD__.'('.__LINE__.'): '.get_class($e).":{$e->getMessage()}");
 			return $this->jsonResponse(
 				self::HTTP_500_INTERNALSERVERERROR,
-				array('error'=>$e->getMessage()));
+				array('error'=>$e->getMessage(),'exception'=>get_class($e)));
 		}
 
 		if($notify){
@@ -84,7 +85,7 @@ class uploadAction extends apiActions
 			}
 			catch(Exception $e){
 				// アップロード通知が送れなくても許容する
-				error_log(__METHOD__.": {$e->getMessage()}");
+				error_log(__METHOD__.'('.__LINE__.'): '.get_class($e).":{$e->getMessage()}");
 			}
 		}
 

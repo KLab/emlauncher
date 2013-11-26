@@ -189,7 +189,7 @@ class Application extends mfwObject {
 				S3::delete($old_icon_key);
 			}
 			catch(Exception $e){
-				error_log(__METHOD__.": {$e->getMessage()}");
+				error_log(__METHOD__.'('.__LINE__.'): '.get_class($e).":{$e->getMessage()}");
 				// 画像削除は失敗しても気にしない
 			}
 		}

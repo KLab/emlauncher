@@ -29,7 +29,7 @@ class editActions extends packageActions
 		$tag_names = mfwRequest::param('tags');
 
 		if(!$title){
-			error_log(__METHOD__.": bad request: $temp_name, $title");
+			error_log(__METHOD__.'('.__LINE__."): bad request: $temp_name, $title");
 			return $this->response(self::HTTP_400_BADREQUEST);
 		}
 
