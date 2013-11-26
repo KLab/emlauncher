@@ -27,6 +27,11 @@ class uploadAction extends apiActions
 					self::HTTP_400_BADREQUEST,
 					array('error'=>'A required field is not present.'));
 			}
+			if(!isset($file_info['error'])||$file_info['error']!==UPLOAD_ERR_OK){
+				return $this->jsonResponse(
+					self::HTTP_400_BADREQUEST,
+					array('error'=>'file is not uploaded: $_FILES[file]='.json_encode($file_info)));
+			}
 
 			$app = ApplicationDb::selectByApiKey($api_key);
 			if(!$app){
@@ -66,7 +71,7 @@ class uploadAction extends apiActions
 		}
 		catch(Exception $e){
 			if($con) $con->rollback();
-			error_log(__METHOD__."$e->getMessage()");
+			error_log(__METHOD__.": {$e->getMessage()}");
 			return $this->jsonResponse(
 				self::HTTP_500_INTERNALSERVERERROR,
 				array('error'=>$e->getMessage()));
