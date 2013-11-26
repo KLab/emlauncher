@@ -3,6 +3,21 @@ require_once APP_ROOT.'/libs/CFPropertyList/classes/CFPropertyList/CFPropertyLis
 
 class IPAFile {
 
+	protected function unzipInfoPlistFileName($ipafile)
+	{
+		$p = popen("unzip -l \"$ipafile\" \"Payload/*/Info.plist\" 2>/dev/null",'r');
+		$fname = null;
+		while(($l=fgets($p))){
+			if(preg_match('/^ *[0-9]+ +..-..-.. +..:.. +(Payload\/[^\/]+\.app\/Info.plist)\n$/',$l,$m)){
+				$fname = $m[1];
+				break;
+			}
+		}
+		pclose($p);
+
+		return $fname;
+	}
+
 	protected function unzipFile($ipafile,$filename)
 	{
 		$p = popen("unzip -cq \"$ipafile\" \"$filename\" 2>/dev/null",'r');
@@ -14,7 +29,8 @@ class IPAFile {
 
 	public static function parseInfoPlist($ipafile)
 	{
-		$info_plist = self::unzipFile($ipafile,'Payload/*/Info.plist');
+		$plist_name = self::unzipInfoPlistFileName($ipafile);
+		$info_plist = self::unzipFile($ipafile,$plist_name);
 
 		$plutil = new CFPropertyList\CFPropertyList();
 		$plutil->parse($info_plist);
