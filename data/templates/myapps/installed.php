@@ -40,9 +40,9 @@ $update_time = $upload_time?:$app->getCreated();
       </td>
 
       <td class="text-center">
-        <div class="btn-group notification-toggle">
-          <button class="btn btn-default<?=$ia->getNotifySetting()?' active':''?>">ON</button>
-          <button class="btn btn-default<?=$ia->getNotifySetting()?'':' active'?>">OFF</button>
+        <div class="btn-group notification-toggle" data-app-id="<?=$app->getId()?>">
+          <button class="btn btn-default<?=$ia->getNotifySetting()?' active':''?>" value="1">ON</button>
+          <button class="btn btn-default<?=$ia->getNotifySetting()?'':' active'?>" value="0">OFF</button>
         </div>
       </td>
 
@@ -55,3 +55,26 @@ $update_time = $upload_time?:$app->getCreated();
 
 </div>
 
+<script type="text/javascript">
+
+$('.notification-toggle button').on('click',function(event){
+  var id = $(this).parent().attr('data-app-id');
+  var value = $(this).attr('value');
+  $.ajax({
+    url: "<?=url('/api/notification_setting?id=')?>"+id+"&value="+value,
+    type: "POST",
+    success: function(data){
+      var $btns = $('[data-app-id="'+id+'"]>button');
+      $btns.removeClass('active');
+      if(data.notify){
+        $btns.eq(0).addClass('active');
+      }
+      else{
+        $btns.eq(1).addClass('active');
+      }
+    }
+  });
+});
+
+
+</script>
