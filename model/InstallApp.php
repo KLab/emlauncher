@@ -34,6 +34,19 @@ class InstallApp extends mfwObject {
 	public function setApp(Application $app){
 		$this->app = $app;
 	}
+
+	public function updateNotifySetting($newvalue,$con=null)
+	{
+		$this->row['notify'] = (bool)$newvalue;
+
+		$sql = 'UPDATE app_install_user SET notify = :notify WHERE app_id = :app_id AND mail = :mail';
+		$bind = array(
+			':app_id' => $this->getAppId(),
+			':mail' => $this->getMail(),
+			':notify' => $this->getNotifySetting(),
+			);
+		return mfwDBIBase::query($sql,$bind,$con);
+	}
 }
 
 class InstallAppSet extends mfwObjectSet {
