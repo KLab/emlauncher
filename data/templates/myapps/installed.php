@@ -16,10 +16,10 @@
 <?php foreach($installed_apps as $ia): $app=$ia->getApp()?>
     <tr>
       <td class="text-center icon">
-        <img src="<?=$app->getIconUrl()?>">
+        <a href="<?=url('/app?id='.$app->getId())?>"><img src="<?=$app->getIconUrl()?>"></a>
       </td>
 
-      <td colspan="2" class="app-list-item-info">
+      <td colspan="2" class="app-list-item">
         <div class="row">
           <div class="col-xs-12 col-sm-6">
             <a class="title" href="<?=url('/app?id='.$app->getId())?>"><?=htmlspecialchars($app->getTitle())?></a>
@@ -80,6 +80,10 @@ $('button.delete').on('click',function(event){
   if(confirm("このアプリケーションをインストール済みリストから削除します.\n個々のパッケージのインストール履歴は削除されません.\n削除しますか?")){
     location.href = '<?=url('/myapps/delete?id=')?>' + $(this).attr('data-app-id');
   }
+});
+
+$('.app-list-item').on('click',function(event){
+  $('a',this)[0].click();
 });
 
 </script>
