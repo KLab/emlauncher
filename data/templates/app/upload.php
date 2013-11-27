@@ -77,7 +77,7 @@
           </div>
 
           <div class="btn-group">
-            <a class="btn btn-default dropdown-toggle" href="#" data-toggle="dropdown"><i class="fa fa-plus"></i></a>
+            <a id="add-tag-button" class="btn btn-default dropdown-toggle" href="#" data-toggle="dropdown"><i class="fa fa-plus"></i></a>
             <div id="new-tag-form" class="dropdown-menu">
               <div class="container">
                 <input type="text" id="new-tag-name" class="form-control">
@@ -145,7 +145,7 @@
       xhr: function(){
         var xhr = $.ajaxSettings.xhr();
         xhr.upload.addEventListener('progress',function(event){
-          var p = Math.floor(event.loaded*100/event.total);
+          var p = Math.floor(event.loaded*100 / event.total);
           if(current_xhr){
             $('#progress-bar').css('width',p.toString()+'%');
           }
@@ -226,6 +226,13 @@ $('#new-tag-name').keydown(function(event){
   return true;
 });
 
+// focus #new-tag-name form when form opened.
+$('#add-tag-button').on('focus',function(event){
+  if($(this).parent().hasClass('open')){
+    $('#new-tag-name').focus();
+  }
+});
+
 // create new tag button
 $('#new-tag-create').on('click',function(event){
   var $tagname = $('#new-tag-name');
@@ -241,6 +248,7 @@ $('#new-tag-create').on('click',function(event){
     $tmpl.before(' ');
 
     $tagname.val(null);
+    $c.focus();
   }
   $('.dropdown-toggle').parent().removeClass('open');
   return false;
