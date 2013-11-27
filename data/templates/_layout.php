@@ -34,7 +34,7 @@
         <ul class="nav navbar-nav">
           <li><a href="<?=url('/')?>">Top</a></li>
           <li class="dropdown">
-            <a hfer="#" class="dropdown-toggle" data-toggle="dropdown">MyApps</a>
+            <a hfer="#" class="dropdown-toggle" data-toggle="dropdown">MyApps <b class="caret"></b></a>
             <ul class="dropdown-menu">
               <li><a href="<?=url('/myapps/installed')?>">Installed Apps</a></a>
               <li><a href="<?=url('/myapps/own')?>">Own Apps</a></a>

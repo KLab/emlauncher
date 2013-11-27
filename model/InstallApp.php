@@ -47,6 +47,16 @@ class InstallApp extends mfwObject {
 			);
 		return mfwDBIBase::query($sql,$bind,$con);
 	}
+
+	public function delete()
+	{
+		$sql = 'DELETE FROM app_install_user WHERE app_id = :app_id AND mail = :mail';
+		$bind = array(
+			':app_id' => $this->getAppId(),
+			':mail' => $this->getMail(),
+			);
+		return mfwDBIBase::query($sql,$bind,$con);
+	}
 }
 
 class InstallAppSet extends mfwObjectSet {

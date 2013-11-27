@@ -13,4 +13,16 @@ class myappsActions extends MainActions
 		return $this->build($params);
 	}
 
+	public function executeDelete()
+	{
+		$appid = mfwRequest::param('id');
+		$instapp = InstallLog::getInstallApp($this->login_user,$appid);
+
+		if($instapp){
+			$instapp->delete();
+		}
+
+		return $this->redirect('/myapps/installed');
+	}
+
 }

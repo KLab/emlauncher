@@ -14,7 +14,7 @@
     </tr>
 
 <?php foreach($installed_apps as $ia): $app=$ia->getApp()?>
-    <tr data-app-id="<?=$app->getId()?>">
+    <tr>
       <td class="text-center icon">
         <img src="<?=$app->getIconUrl()?>">
       </td>
@@ -47,7 +47,7 @@ $update_time = $upload_time?:$app->getCreated();
       </td>
 
       <td class="text-center">
-        <button class="btn btn-danger delete"><i class="fa fa-trash-o"></i></button>
+        <button class="btn btn-danger delete" data-app-id="<?=$app->getId()?>"><i class="fa fa-trash-o"></i></button>
       </td>
     </tr>
 <?php endforeach ?>
@@ -76,5 +76,10 @@ $('.notification-toggle button').on('click',function(event){
   });
 });
 
+$('button.delete').on('click',function(event){
+  if(confirm("このアプリケーションをインストール済みリストから削除します.\n個々のパッケージのインストール履歴は削除されません.\n削除しますか?")){
+    location.href = '<?=url('/myapps/delete?id=')?>' + $(this).attr('data-app-id');
+  }
+});
 
 </script>
