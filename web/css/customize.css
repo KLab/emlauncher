@@ -99,6 +99,7 @@ h2>.subtitle {
 }
 
 
+.notification-toggle button.active,
 [data-toggle="button"].active {
   color: #ffffff;
   background-color: #385a7f;
@@ -234,5 +235,27 @@ h3 {
 #top-index #create-app-button {
 	margin-top: 10px;
 	padding: 5px;
+}
+
+#app-list td.icon {
+	width: 50px;
+}
+
+#app-list td.icon img {
+	width: 45px;
+	height: 45px;
+}
+
+#app-list th {
+	text-align: center;
+}
+#app-list .title {
+  font-weight: bolder;
+  font-size: medium;
+}
+#app-list .info {
+  font-size: xx-small;
+  display: inline-block;
+  padding-top: 2px;
 }
 

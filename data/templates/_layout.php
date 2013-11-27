@@ -32,8 +32,15 @@
       <div class="collapse navbar-collapse navbar-ex1-collapse">
 <?php if($login_user): ?>
         <ul class="nav navbar-nav">
-          <li><a href="<?=url('/')?>">App</a></li>
+          <li><a href="<?=url('/')?>">Top</a></li>
+          <li class="dropdown">
+            <a hfer="#" class="dropdown-toggle" data-toggle="dropdown">MyApps</a>
+            <ul class="dropdown-menu">
+              <li><a href="<?=url('/myapps/installed')?>">Installed Apps</a></a>
+              <li><a href="<?=url('/myapps/own')?>">Own Apps</a></a>
+            </ul>
         </ul>
+
         <ul class="nav navbar-nav navbar-right">
           <li class="dropdown">
             <a href="#" class="dropdown-toggle" data-toggle="dropdown"><?=htmlspecialchars($login_user->getMail())?> <b class="caret"></b></a>
