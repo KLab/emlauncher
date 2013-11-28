@@ -5,9 +5,9 @@
 <div>
   <table id="app-list" class="table table-hover">
 
-    <tr>
+    <tr class="hidden-xs">
       <th></th>
-     <th>title</th>
+      <th>title</th>
       <th>last upload</th>
       <th>notification</th>
       <th>delete</th>
@@ -19,8 +19,8 @@
         <a href="<?=url('/app?id='.$app->getId())?>"><img src="<?=$app->getIconUrl()?>"></a>
       </td>
 
-      <td colspan="2" class="app-list-item">
-        <div class="row">
+      <td colspan="2">
+        <div class="row app-list-item-info">
           <div class="col-xs-12 col-sm-6">
             <a class="title" href="<?=url('/app?id='.$app->getId())?>"><?=htmlspecialchars($app->getTitle())?></a>
           </div>
@@ -37,16 +37,26 @@ $update_time = $upload_time?:$app->getCreated();
 <?php endif ?>
           </div>
         </div>
+        <div class="row xs-buttons visible-xs">
+          <b>Notification:</b>
+          <div class="btn-group btn-group-sm notification-toggle" data-app-id="<?=$app->getId()?>">
+            <button class="btn btn-default<?=$ia->getNotifySetting()?' active':''?>" value="1">ON</button>
+            <button class="btn btn-default<?=$ia->getNotifySetting()?'':' active'?>" value="0">OFF</button>
+          </div>
+          <div class="pull-right container">
+            <button class="btn btn-danger btn-sm delete" data-app-id="<?=$app->getId()?>"><i class="fa fa-trash-o"></i> Delete</button>
+          </div>
+        </div>
       </td>
 
-      <td class="text-center">
+      <td class="text-center hidden-xs">
         <div class="btn-group notification-toggle" data-app-id="<?=$app->getId()?>">
           <button class="btn btn-default<?=$ia->getNotifySetting()?' active':''?>" value="1">ON</button>
           <button class="btn btn-default<?=$ia->getNotifySetting()?'':' active'?>" value="0">OFF</button>
         </div>
       </td>
 
-      <td class="text-center">
+      <td class="text-center hidden-xs">
         <button class="btn btn-danger delete" data-app-id="<?=$app->getId()?>"><i class="fa fa-trash-o"></i></button>
       </td>
     </tr>
@@ -64,13 +74,13 @@ $('.notification-toggle button').on('click',function(event){
     url: "<?=url('/api/notification_setting?id=')?>"+id+"&value="+value,
     type: "POST",
     success: function(data){
-      var $btns = $('[data-app-id="'+id+'"]>button');
-      $btns.removeClass('active');
       if(data.notify){
-        $btns.eq(0).addClass('active');
+         $('[data-app-id="'+id+'"]>button[value="1"]').addClass('active');
+         $('[data-app-id="'+id+'"]>button[value="0"]').removeClass('active');
       }
       else{
-        $btns.eq(1).addClass('active');
+         $('[data-app-id="'+id+'"]>button[value="1"]').removeClass('active');
+         $('[data-app-id="'+id+'"]>button[value="0"]').addClass('active');
       }
     }
   });
@@ -82,7 +92,7 @@ $('button.delete').on('click',function(event){
   }
 });
 
-$('.app-list-item').on('click',function(event){
+$('.app-list-item-info').on('click',function(event){
   $('a',this)[0].click();
 });
 
