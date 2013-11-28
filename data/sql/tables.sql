@@ -50,6 +50,8 @@ create table `package` (
   `title` varchar(255) not null,
   `description` varchar(1000) default null,
   `ios_identifier` varchar(255) default null comment 'ipaのCFBundleIdentifier',
+  `original_file_name` varchar(255) default null,
+  `file_size` integer default null,
   `created` datetime not null,
   key `idx_app` (`app_id`),
   primary key (`id`)

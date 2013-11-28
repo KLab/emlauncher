@@ -32,6 +32,8 @@ class uploadActions extends appActions
 		$tag_names = mfwRequest::param('tags');
 		$ios_identifier = mfwRequest::param('ios_identifier');
 		$notify = mfwRequest::param('notify');
+		$org_filename = mfwRequest::param('file_name');
+		$filesize = mfwRequest::param('file_size');
 
 		if(!$temp_name || !$title){
 			error_log(__METHOD__.'('.__LINE__."): bad request: $temp_name, $title");
@@ -47,7 +49,7 @@ class uploadActions extends appActions
 			$tags = $app->getTagsByName($tag_names,$con);
 
 			$pkg = PackageDb::insertNewPackage(
-				$this->app->getId(),$platform,$ext,$title,$description,$ios_identifier,$tags,$con);
+				$this->app->getId(),$platform,$ext,$title,$description,$ios_identifier,$org_filename,$filesize,$tags,$con);
 
 			$pkg->renameTempFile($temp_name);
 
