@@ -61,7 +61,8 @@ class uploadAction extends apiActions
 
 			$pkg = PackageDb::insertNewPackage(
 				$app->getId(),$platform,$ext,
-				$title,$description,$ios_identifier,$tags,$con);
+				$title,$description,$ios_identifier,
+				$file_info['name'],$file_info['size'],$tags,$con);
 
 			// S3へアップロード
 			$pkg->uploadFile($file_content,$mime);
