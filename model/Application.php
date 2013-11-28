@@ -49,7 +49,7 @@ class Application extends mfwObject {
 		$sql = 'UPDATE application SET last_upload = :now WHERE id = :id';
 		$bind = array(
 			':id' => $this->getId(),
-			':now' => $this->getLastUpload(),
+			':now' => $date,
 			);
 		mfwDBIBase::query($sql,$bind,$con);
 	}
