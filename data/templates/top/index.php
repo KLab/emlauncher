@@ -4,8 +4,10 @@
   </h2>
 </div>
 
+<div class="row">
+<?php $counter = 0; ?>
 <?php foreach($applications as $app): ?>
-<div class="media app-list-item">
+<div class="media app-list-item col-md-6">
   <p class="pull-left">
     <a href="<?=url("/app?id={$app->getId()}")?>">
       <img class="app-icon-sm media-object img-rounded" src="<?=$app->getIconUrl()?>">
@@ -30,7 +32,12 @@ $update_time = $upload_time?:$app->getCreated();
     </p>
   </div>
 </div>
+<?php if((++$counter)%2===0): ?>
+</div>
+<div class="row">
+<?php endif ?>
 <?php endforeach ?>
+</div>
 
 <div id="create-app-button">
 <a class="btn btn-default" href="<?=url('/app/new')?>"><i class="fa fa-plus"></i> New Application</a>
