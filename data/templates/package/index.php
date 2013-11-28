@@ -48,6 +48,10 @@
     <dl class="dl-horizontal">
       <dt>Platform</dt>
       <dd><?=block('platform_icon',array('with_name'=>true))?></dd>
+      <dt>Original name</dt>
+      <dd><?=$package->getOriginalFileName()?:'--------.'.pathinfo($package->getBaseFileName(),PATHINFO_EXTENSION)?></dd>
+      <dt>File size</dt>
+      <dd><?=$package->getFileSize()?number_format($package->getFileSize()):'-'?> bytes</dd>
       <dt>Install user</dt>
 <?php if($app->isOwner($login_user)): ?>
       <dd>

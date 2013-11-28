@@ -40,6 +40,9 @@ class Package extends mfwObject {
 	public function getPlatform(){
 		return $this->value('platform');
 	}
+	public function getBaseFileName(){
+		return $this->value('file_name');
+	}
 	public function getTitle(){
 		return $this->value('title');
 	}
@@ -48,6 +51,12 @@ class Package extends mfwObject {
 	}
 	public function getIOSIdentifier(){
 		return $this->value('ios_identifier');
+	}
+	public function getOriginalFileName(){
+		return $this->value('original_file_name');
+	}
+	public function getFileSize(){
+		return $this->value('file_size');
 	}
 	public function getCreated($format=null){
 		$created = $this->value('created');
