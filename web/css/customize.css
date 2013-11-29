@@ -208,11 +208,16 @@ h3 {
   padding-left: 38px;
 }
 
-#documentation h3 {
+#documentation h3.subheader {
   padding: 8px 15px;
   background-color: #f5f5f5;
   border-radius: 4px;
   color: #999999;
+}
+
+#documentation h3.list-group-item-heading {
+  color: #3399f3;
+  text-decoration: underline;
 }
 
 #documentation dl.dl-horizontal dt {

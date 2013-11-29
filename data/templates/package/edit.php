@@ -36,9 +36,7 @@
       <div class="form-group">
         <label for="description" class="control-label col-md-2">Description</label>
         <div class="col-md-10">
-          <textarea class="form-control" row="3" id="description" name="description">
-<?=htmlspecialchars($package->getDescription())?>
-          </textarea>
+          <textarea class="form-control" row="3" id="description" name="description"><?=htmlspecialchars($package->getDescription())?></textarea>
         </div>
       </div>
 

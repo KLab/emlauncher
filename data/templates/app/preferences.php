@@ -27,8 +27,8 @@
         </div>
         <button id="submit-refresh-apikey" type="submit" class="btn btn-warning"><i class="fa fa-refresh"></i> Refresh</button>
         <div class="help-block">
-          Upload APIを利用するために必要なキーです.
-          詳細は<a href="<?=url('/doc/upload_api')?>">APIドキュメント</a>を参照してください.
+          APIを利用するために必要なキーです.
+          詳細は<a href="<?=url('/doc/api')?>">APIドキュメント</a>を参照してください.
         </div>
       </form>
     </div>
