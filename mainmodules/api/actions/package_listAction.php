@@ -25,7 +25,6 @@ class package_listAction extends apiActions
 			}
 		}
 		catch(Exception $e){
-			if($con) $con->rollback();
 			error_log(__METHOD__.'('.__LINE__.'): '.get_class($e).":{$e->getMessage()}");
 			return $this->jsonResponse(
 				self::HTTP_500_INTERNALSERVERERROR,
