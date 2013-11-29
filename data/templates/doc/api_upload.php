@@ -71,7 +71,7 @@
     <h3 class="subheader">Sample Curl</h3>
     <div class="container">
       <pre><code>curl <?=url('/api/upload')."\n"?>
-  -F api_key='application_api_key'
+  -F api_key='{application_api_key}'
   -F file=@emlauncher.apk
   -F title='test upload'
   -F description='upload package via upload api'

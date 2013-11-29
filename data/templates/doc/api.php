@@ -14,7 +14,6 @@
       <h3 class="list-group-item-heading">Upload API</h3>
       <p class="list-gorup-item-text">Upload a package file.</p>
     </a>
-<!-- 
     <a href="<?=url('/doc/api_package_list')?>" class="list-group-item">
       <h3 class="list-group-item-heading">Package List API</h3>
       <p class="list-gorup-item-text">Get package list.</p>
@@ -23,7 +22,6 @@
       <h3 class="list-group-item-heading">Delete API</h3>
       <p class="list-gorup-item-text">Delete a package.</p>
     </a>
--->
   </div>
 
 
