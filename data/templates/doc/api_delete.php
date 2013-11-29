@@ -65,7 +65,7 @@
  <div>
     <h3 class="subheader">Sample Curl</h3>
     <div class="container">
-      <pre><code>curl <?=url('/api/package_list?api_key={application_api_key}&id={package_id}')?></code></pre>
+      <pre><code>curl <?=url('/api/delete?api_key={application_api_key}&id={package_id}')?></code></pre>
     </div>
  </div>
 
