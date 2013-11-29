@@ -38,10 +38,22 @@
         <dt>Sample response:</dt>
         <dd>
           <pre><code>{
-  "package_url": "<?=url('/package?id=3')?>",
-  "application_url": "<?=url('/app?id=1')?>",
+  "package_url": "http://localhost/emlauncher/package?id=3",
+  "application_url": "http://localhost/emlauncher/app?id=1",
+  "id": "3",
   "platform": "Android",
-  "created": "2013-11-19 02:03:04"
+  "title": "test upload",
+  "description": "upload package via upload api",
+  "ios_identifier": "",
+  "original_file_name": "emlauncher.apk",
+  "file_size": "5776313",
+  "created": "2013-11-29 12:26:19",
+  "tags": [
+    "test",
+    "upload-api",
+    "android"
+  ],
+  "install_count": 0
 }</code></pre>
         </dd>
       </dl>
@@ -54,7 +66,7 @@
     <div class="container">
       <pre><code>curl <?=url('/api/upload')."\n"?>
   -F api_key='application_api_key'
-  -F file=@emlauncher.pkg
+  -F file=@emlauncher.apk
   -F title='test upload'
   -F description='upload package via upload api'
   -F tags='test,upload-api,android'

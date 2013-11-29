@@ -92,12 +92,7 @@ class uploadAction extends apiActions
 
 		return $this->jsonResponse(
 			self::HTTP_200_OK,
-			array(
-				'package_url' => mfwRequest::makeUrl("/package?id={$pkg->getId()}"),
-				'application_url' => mfwRequest::makeUrl("/app?id={$app->getId()}"),
-				'platform' => $platform,
-				'created' => $pkg->getCreated(),
-				));
+			$this->makePackageArray($pkg));
 	}
 
 }

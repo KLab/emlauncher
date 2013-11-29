@@ -2,10 +2,14 @@
 
 class docActions extends MainActions
 {
-	public function executeUpload_api()
+
+	public function executeDefaultAction()
 	{
-		$params = array(
-			);
-		return $this->build($params);
+		$template = APP_ROOT.self::TEMPLATEDIR."/doc/{$this->getAction()}.php";
+		if(!file_exists($template)){
+			return array(array(self::HTTP_404_NOTFOUND),'404 Not Found');
+		}
+		return $this->build();
 	}
+
 }
