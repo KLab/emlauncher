@@ -10,7 +10,7 @@
       </li>
     </ul>
   </div>
-<?endif?>
+<?php endif ?>
   <div class="list-group-item">
     <dl>
 <?php if($app->getLastUpload()): ?>

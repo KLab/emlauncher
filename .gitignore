@@ -1,2 +1,6 @@
 config/emlauncher_config.php
+config/mfw_serverenv_config.php
+web/bootstrap/
+web/font-awesome/
+web/jquery/
 dbauth/
