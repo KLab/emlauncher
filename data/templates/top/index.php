@@ -43,6 +43,8 @@ $update_time = $upload_time?:$app->getCreated();
 <a class="btn btn-default" href="<?=url('/app/new')?>"><i class="fa fa-plus"></i> New Application</a>
 </div>
 
+<?=block('paging')?>
+
 <script type="text/javascript">
 
 $('.app-list-item').on('click',function(event){

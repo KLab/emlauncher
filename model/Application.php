@@ -280,11 +280,29 @@ class ApplicationDb extends mfwObjectDb {
 
 		return $app;
 	}
-
-	public static function selectAllByUpdateOrder()
+        
+        public static function selectAllByUpdateOrder()
 	{
 		$query = 'ORDER BY last_upload DESC';
 		return static::selectSet($query);
+	}
+        
+       /**
+         * get record count
+         * @return int
+         */
+        protected static function getRecordCount($query,$bind=array(),$con=null)
+        {
+                $table = static::TABLE_NAME;
+		$sql = "SELECT count(1) FROM `$table` $query";
+		$res = mfwDBIBase::getRow($sql,$bind,$con);
+		return $res->fetchColumn();
+        }
+
+	public static function selectAllByUpdateOrderWithLimit($offset, $count)
+	{
+		$query = 'ORDER BY last_upload DESC LIMIT :offset, :count';
+		return static::selectSet($query, array(':offset' => $offset, ':count' => $count));
 	}
 
 }
