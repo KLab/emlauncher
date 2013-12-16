@@ -4,7 +4,7 @@ require_once APP_ROOT.'/model/Paging.php';
 
 class topActions extends MainActions
 {
-	const LINE_IN_PAGE = 1;
+	const LINE_IN_PAGE = 20;
 
 	public function executeIndex()
 	{
