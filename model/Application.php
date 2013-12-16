@@ -290,8 +290,8 @@ class ApplicationDb extends mfwObjectDb {
 	public static function selectCount()
 	{
 			$table = static::TABLE_NAME;
-			$sql = "SELECT count(*) FROM `$table` $query";
-			return mfwDBIBase::getOne($sql, $bind, $con);
+			$sql = "SELECT count(*) FROM `$table`";
+			return mfwDBIBase::getOne($sql);
 	}
 
 	public static function selectByUpdateOrderWithLimit($offset, $count)
