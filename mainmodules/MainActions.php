@@ -35,7 +35,7 @@ class MainActions extends mfwActions
 		return null;
 	}
 
-	protected function build($params,$headers=array())
+	protected function build($params=array(),$headers=array())
 	{
 		$params['login_user'] = $this->login_user;
 		$params['module'] = $this->module;
