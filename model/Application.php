@@ -287,14 +287,14 @@ class ApplicationDb extends mfwObjectDb {
 		return static::selectSet($query);
 	}
 
-	public static function selectCount($query,$bind=array(),$con=null)
+	public static function selectCount()
 	{
 			$table = static::TABLE_NAME;
 			$sql = "SELECT count(*) FROM `$table` $query";
 			return mfwDBIBase::getOne($sql, $bind, $con);
 	}
 
-	public static function selectAllByUpdateOrderWithLimit($offset, $count)
+	public static function selectByUpdateOrderWithLimit($offset, $count)
 	{
 		$query = sprintf('ORDER BY last_upload DESC LIMIT %d, %d', $offset, $count);
 		return static::selectSet($query);

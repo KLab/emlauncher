@@ -1,10 +1,11 @@
 <?php 
+$candidate_page_number = 5;
 if ($paging instanceof Paging):
 	$total_page_number = $paging->getTotalPageNumber();
 	$current_page = $paging->getCurrentPage();
 
-	$start_page = max($current_page - $paging->getCandidatePageNumber(), 1);
-	$end_page = min($current_page + $paging->getCandidatePageNumber(), $total_page_number);?>
+	$start_page = max($current_page - $candidate_page_number, 1);
+	$end_page = min($current_page + $candidate_page_number, $total_page_number);?>
 	<ul class="pagination">
 		<li><a href='<?=url("/top?page=1")?>'><span>&laquo;&laquo;</span></a></li>
 		<li><a href='<?=url("/top?page=".max($current_page - 1, 1))?>'><span>&laquo;</span></a></li>
