@@ -74,6 +74,9 @@ class uploadActions extends appActions
 			}
 		}
 
+		apache_log('app_id',$app->getId());
+		apache_log('pkg_id',$pkg->getId());
+
 		return $this->redirect("/package?id={$pkg->getId()}");
 	}
 
