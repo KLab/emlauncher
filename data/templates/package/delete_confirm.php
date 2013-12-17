@@ -17,8 +17,10 @@
   <div class="col-xs-12 col-sm-8 col-md-9">
 
     <h3>
-      <?=block('platform_icon')?>
-      <?=htmlspecialchars($package->getTitle())?>
+      <a href="<?=url("/package?id={$package->getId()}")?>">
+        <?=block('platform_icon')?>
+        <?=htmlspecialchars($package->getTitle())?>
+      </a>
     </h3>
 
     <div class="col-md-8 col-md-offset-1">
