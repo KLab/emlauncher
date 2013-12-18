@@ -84,7 +84,7 @@ class packageActions extends MainActions
 
 	public function executeCreate_token()
 	{
-		$token_expire = '+3 hours';
+		$token_expire = '+1 hours';
 
 		$tokendata = array(
 			'mail' => $this->login_user->getMail(),
