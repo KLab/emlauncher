@@ -76,7 +76,7 @@ class packageActions extends MainActions
 		if(!$tokendata){
 			return null;
 		}
-		if(strtotime($tokendata['expire']) < strtotime(date('Y-m-d H:i:s'))){
+		if(strtotime($tokendata['expire']) < time()){
 			return null;
 		}
 		return $tokendata;
@@ -86,13 +86,16 @@ class packageActions extends MainActions
 	{
 		$token_expire = '+1 hours';
 
+		$expire_time = strtotime($token_expire);
+		$mc_expire = $expire_time - time();
+
 		$tokendata = array(
 			'mail' => $this->login_user->getMail(),
 			'package_id' => $this->package->getId(),
-			'expire' => date('Y-m-d H:i:s',strtotime($token_expire)),
+			'expire' => date('Y-m-d H:i:s',$expire_time),
 			);
 		$token = Random::string(32);
-		mfwMemcache::set(self::INSTALL_TOKEN_PREFIX.$token,json_encode($tokendata));
+		mfwMemcache::set(self::INSTALL_TOKEN_PREFIX.$token,json_encode($tokendata),$mc_expire);
 
 		apache_log('token',$token);
 		apache_log('token_data',$tokendata);
