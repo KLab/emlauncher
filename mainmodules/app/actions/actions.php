@@ -62,6 +62,8 @@ class appActions extends MainActions
 			throw $e;
 		}
 
+		apache_log('app_id',$app->getId());
+
 		return $this->redirect("/app?id={$app->getId()}");
 	}
 
