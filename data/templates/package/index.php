@@ -19,8 +19,10 @@
     <div class="row">
       <div class="col-xs-7">
         <h3>
-          <?=block('platform_icon')?>
-          <?=htmlspecialchars($package->getTitle())?>
+          <a href="<?=url("/package?id={$package->getId()}")?>">
+            <?=block('platform_icon')?>
+            <?=htmlspecialchars($package->getTitle())?>
+          </a>
         </h3>
         <p>
           <?=htmlspecialchars($package->getDescription())?>
@@ -76,6 +78,12 @@
         <dd><a href="mailto:<?=$owner->getOwnerMail()?>"><?=$owner->getOwnerMail()?></a></dd>
 <?php endforeach ?>
     </dl>
+
+    <div class="col-xs-12 col-sm-9">
+      <p class="text-center">
+        <a class="btn btn-default" href="<?=url("/package/create_token?id={$package->getId()}")?>"><i class="fa fa-bolt"></i> Create Install Token</a>
+      </p>
+    </div>
 
   </div>
 </div>
