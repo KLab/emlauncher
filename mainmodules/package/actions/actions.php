@@ -13,7 +13,7 @@ class packageActions extends MainActions
 	{
 		if($this->action==='install' && mfwRequest::has('token')){
 			// token付きインストールリンクの場合, token情報のみで認証する.
-			return $this->initializeByToken(mfwRequest::param('token'));
+			return $this->initializeByInstallToken(mfwRequest::param('token'));
 		}
 
 		if(($err=parent::initialize())){
@@ -48,9 +48,11 @@ class packageActions extends MainActions
 	 * インストールトークンを使って初期化.
 	 * parentのinitializeは呼ばず、ここで認証と初期化を済ませる.
 	 */
-	public function initializeByToken($token)
+	public function initializeByInstallToken($token)
 	{
 		$tokendata = $this->getTokenData($token);
+		apache_log('token_data',$tokendata);
+
 		if(!$tokendata){
 			error_log("invalid install token: $token");
 			return $this->response(self::HTTP_403_FORBIDDEN,'invalid token');
@@ -91,6 +93,9 @@ class packageActions extends MainActions
 			);
 		$token = Random::string(32);
 		mfwMemcache::set(self::INSTALL_TOKEN_PREFIX.$token,json_encode($tokendata));
+
+		apache_log('token',$token);
+		apache_log('token_data',$tokendata);
 
 		$params = array(
 			'token' => $token,
