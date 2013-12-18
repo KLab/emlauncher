@@ -62,6 +62,9 @@ class deleteAction extends apiActions
 			// S3から削除出来なくてもDBからは消えているので許容する
 		}
 
+		apache_log('app_id',$app->getId());
+		apache_log('pkg_id',$pkg->getId());
+
 		return $this->jsonResponse(
 			self::HTTP_200_OK,
 			$this->makePackageArray($pkg));

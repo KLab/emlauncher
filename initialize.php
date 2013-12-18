@@ -18,3 +18,13 @@ require_once APP_ROOT.'/mfw/mfwObjectDb.php';
 require_once APP_ROOT.'/mfw/mfwHttp.php';
 //require_once APP_ROOT.'/mfw/mfwOAuth.php';
 
+function apache_log($key,$value)
+{
+	static $log = array();
+	if(function_exists('apache_setenv')){
+		$log['env'] = mfwServerEnv::getEnv();
+		$log[$key] = $value;
+		apache_setenv('LOGMSG',json_encode($log));
+	}
+}
+
