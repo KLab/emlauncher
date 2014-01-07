@@ -16,9 +16,11 @@ class MainActions extends mfwActions
 			return $err;
 		}
 
-		// upload apiはAPI Key認証なのでログイン不要
-		if($this->module==='api' && $this->action==='upload'){
-			return null;
+		// いくつかのapiはAPI Key認証なのでログイン不要
+		if($this->module==='api'){
+			if(in_array($this->action,array('upload','package_list','delete'))){
+				return null;
+			}
 		}
 
 		// package/install_plist はセッションが使えないため別途認証する.
@@ -32,10 +34,13 @@ class MainActions extends mfwActions
 			return $this->redirect('/login');
 		}
 
+		if($this->login_user){
+			apache_log('user',$this->login_user->getMail());
+		}
 		return null;
 	}
 
-	protected function build($params,$headers=array())
+	protected function build($params=array(),$headers=array())
 	{
 		$params['login_user'] = $this->login_user;
 		$params['module'] = $this->module;

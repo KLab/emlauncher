@@ -54,6 +54,10 @@ class installActions extends packageActions
 			throw $e;
 		}
 
+		apache_log('app_id',$this->app->getId());
+		apache_log('pkg_id',$this->package->getId());
+		apache_log('platform',$this->package->getPlatform());
+
 		return $this->redirect($url);
 	}
 

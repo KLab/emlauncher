@@ -31,6 +31,8 @@ class package_listAction extends apiActions
 				array('error'=>$e->getMessage(),'exception'=>get_class($e)));
 		}
 
+		apache_log('app_id',$app->getId());
+
 		return $this->jsonResponse(self::HTTP_200_OK,$ret);
 	}
 

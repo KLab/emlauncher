@@ -79,6 +79,9 @@ class uploadAction extends apiActions
 				array('error'=>$e->getMessage(),'exception'=>get_class($e)));
 		}
 
+		apache_log('app_id',$app->getId());
+		apache_log('pkg_id',$pkg->getId());
+
 		if($notify){
 			try{
 				$users = $app->getInstallUsers();

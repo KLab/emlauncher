@@ -10,7 +10,7 @@
       </li>
     </ul>
   </div>
-<?php endif ?>
+<?php endif?>
   <div class="list-group-item">
     <div class="text-center">
       <p>link to this package</p>

@@ -17,8 +17,10 @@
   <div class="col-xs-12 col-sm-8 col-md-9">
 
     <h3>
-      <?=block('platform_icon')?>
-      <?=htmlspecialchars($package->getTitle())?>
+      <a href="<?=url("/package?id={$package->getId()}")?>">
+        <?=block('platform_icon')?>
+        <?=htmlspecialchars($package->getTitle())?>
+      </a>
     </h3>
 
     <form class="form-horizontal" method="post" action="<?=url("/package/edit_commit?id={$package->getId()}")?>">

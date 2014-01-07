@@ -37,6 +37,7 @@ class googleActions extends loginActions
 		}
 
 		User::login($mail);
+		apache_log('user',$mail);
 
 		return $this->redirectUrlBeforeLogin();
 	}
