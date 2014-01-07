@@ -7,7 +7,7 @@
   </p>
   <div class="media-body">
     <h2 class="media-hedding"><a href="<?=url("/app?id={$app->getId()}")?>"><?=htmlspecialchars($app->getTitle())?></a></h2>
-    <p><?=htmlspecialchars($app->getDescription())?></p>
+    <p><?=nl2br(htmlspecialchars($app->getDescription()))?></p>
   </div>
 </div>
 

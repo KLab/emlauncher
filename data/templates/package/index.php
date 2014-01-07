@@ -25,7 +25,7 @@
           </a>
         </h3>
         <p>
-          <?=htmlspecialchars($package->getDescription())?>
+          <?=nl2br(htmlspecialchars($package->getDescription()))?>
         </p>
       </div>
       <div class="col-xs-5">
