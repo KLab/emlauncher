@@ -62,7 +62,7 @@
   <div class="list-group-item">
     <div class="text-center">
       <p>link to this app</p>
-      <img src="http://chart.apis.google.com/chart?chs=150&cht=qr&chl=<?=urlencode(url("/app?id={$app->getId()}"))?>">
+      <img src="https://chart.googleapis.com/chart?chs=150&cht=qr&chl=<?=urlencode(url("/app?id={$app->getId()}"))?>">
     </div>
   </div>
 </div>

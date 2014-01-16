@@ -32,7 +32,7 @@
       <dd><?=$login_user->getMail()?></dd>
     </dl>
     <p class="text-center">
-      <img src="http://chart.apis.google.com/chart?chs=250&cht=qr&chl=<?=urlencode($token_url)?>">
+      <img src="https://chart.googleapis.com/chart?chs=250&cht=qr&chl=<?=urlencode($token_url)?>">
     </p>
 
   </div>
