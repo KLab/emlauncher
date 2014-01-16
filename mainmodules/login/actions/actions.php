@@ -29,6 +29,13 @@ class loginActions extends MainActions
 
 	public function executeIndex()
 	{
+		// httpsが使えるならlogin画面はhttpsを強制
+		if(Config::get('enable_https')){
+			if(strpos(mfwRequest::url(),'http://')===0){
+				return $this->redirect(mfwrequest::makeUrl('/login','https'));
+			}
+		}
+
 		return $this->build();
 	}
 

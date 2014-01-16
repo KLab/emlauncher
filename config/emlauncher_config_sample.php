@@ -14,6 +14,12 @@ $emlauncher_config = array(
 		 */
 		'mail_sender' => 'EMLauncher <no-reply@example.com>',
 
+		/**
+		 * HTTPSで動作させる.
+		 * ログイン時にHTTPSで無かった場合、HTTPSでリダイレクトする.
+		 */
+		'enable_https' => false,
+
 		/** ログインの設定. */
 		'login' => array(
 			/**

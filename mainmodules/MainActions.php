@@ -1,5 +1,6 @@
 <?php
 require_once APP_ROOT.'/model/User.php';
+require_once APP_ROOT.'/model/Config.php';
 
 class MainActions extends mfwActions
 {
@@ -30,8 +31,9 @@ class MainActions extends mfwActions
 
 		$this->login_user = User::getLoginUser();
 		if(!$this->login_user && $this->getModule()!='login'){
-			$this->saveUrlBeforeLogin();
-			return $this->redirect('/login');
+			$scheme = Config::get('enable_https')?'https':'http';
+			$this->saveUrlBeforeLogin($scheme);
+			return $this->redirect(mfwRequest::makeUrl('/login',$scheme));
 		}
 
 		if($this->login_user){
@@ -67,6 +69,9 @@ class MainActions extends mfwActions
 	{
 		if(mfwRequest::method()==='GET'){
 			$url = mfwRequest::url();
+			if(Config::get('enable_https')){
+				$url = preg_replace('/^http:/','https:',$url);
+			}
 			mfwSession::set(self::SESKEY_URL_BEFORE_LOGIN,$url);
 		}
 		else{
