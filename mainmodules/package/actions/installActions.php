@@ -29,7 +29,7 @@ class installActions extends packageActions
 		if($pf===Package::PF_IOS && $ua->isIOS()){
 			// itms-service での接続はセッションを引き継げない
 			// 一時トークンをURLパラメータに付けることで認証する
-			$scheme = Config::get('enable_https')?'https':'http'; // HTTPSが使えるならHTTPS優先
+			$scheme = Config::get('enable_https')?'https':null; // HTTPSが使えるならHTTPS優先
 			$plist_url = mfwHttp::composeUrl(
 				mfwRequest::makeUrl('/package/install_plist',$scheme),
 				array(

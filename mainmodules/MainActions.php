@@ -31,7 +31,7 @@ class MainActions extends mfwActions
 
 		$this->login_user = User::getLoginUser();
 		if(!$this->login_user && $this->getModule()!='login'){
-			$scheme = Config::get('enable_https')?'https':'http';
+			$scheme = Config::get('enable_https')?'https':null;
 			$this->saveUrlBeforeLogin($scheme);
 			return $this->redirect(mfwRequest::makeUrl('/login',$scheme));
 		}
