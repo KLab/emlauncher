@@ -269,3 +269,7 @@ h3 {
   padding-top: 10px;
 }
 
+.pagination .omission span{
+  padding-left: 5px;
+  padding-right: 5px;
+}
