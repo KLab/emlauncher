@@ -16,7 +16,8 @@
     <link href="//netdna.bootstrapcdn.com/font-awesome/4.0.1/css/font-awesome.min.css" rel="stylesheet">
 <?php endif ?>
     <link rel="stylesheet" href="<?=url('/css/customize.css')?>" type="text/css">
-    <link rel="apple-touch-icon" href="apple-touch-icon.png">
+    <link rel="apple-touch-icon" href="<?=url('/apple-touch-icon.png')?>">
+    <link rel="shortcut icon" href="<?=url('/favicon.ico')?>">
   </head>
   <body>
 
