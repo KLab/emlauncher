@@ -19,6 +19,9 @@ class Package extends mfwObject {
 
 	const FILE_DIR = 'package/';
 	const TEMP_DIR = 'temp-data/';
+	
+	const IOS_SIZE_LIMIT = 104857600;  //100MB
+	const ANDROID_SIZE_LIMIT = 52428800;  //50MB
 
 	protected $app = null;
 	protected $tags = null;
@@ -65,7 +68,16 @@ class Package extends mfwObject {
 		}
 		return $created;
 	}
-
+	
+	public function getFileSizeWarning() {
+		if ($this->getPlatform() === self::PF_IOS && $this->getFileSize() > self::IOS_SIZE_LIMIT) {
+			return self::IOS_SIZE_LIMIT / (1024 * 1024);
+		} elseif ($this->getPlatform() === self::PF_ANDROID && $this->getFileSize() > self::ANDROID_SIZE_LIMIT) {
+			return self::ANDROID_SIZE_LIMIT / (1024 * 1024);
+		} else {
+			return 0;
+		}
+	}
 	public function getTags()
 	{
 		if($this->tags===null){

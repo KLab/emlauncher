@@ -52,6 +52,7 @@
               <span class="info hidden-xs hidden-sm"><?=$pkg->getCreated('Y-m-d H:i')?></span>
             </div>
             <div class="col-xs-12 col-md-6">
+			  <?php if($pkg->getFileSizeWarning()):?><span class="label label-danger"><?='Over'.$pkg->getFileSizeWarning().'MB'?></span><?php endif ?>
 <?php foreach($pkg->getTags() as $tag): ?>
               <span class="label label-default" data="<?=htmlspecialchars($tag->getName())?>"><?=htmlspecialchars($tag->getName())?></span>
 <?php endforeach ?>
