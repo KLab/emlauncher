@@ -4,17 +4,17 @@ if($paging && $paging instanceof Paging):
 $cur_page = $paging->getCurrentPage();
 $max_page = $paging->getTotalPageNumber();
 
-if($max_page <= $candidate+4){ // 省略不要
+if($max_page <= $candidate+2){ // 省略不要
 	$start = 1;
 	$end = $max_page;
 }
 elseif($cur_page <= ceil($candidate/2)){ // 後半のみ省略
 	$start = 1;
-	$end = $candidate;
+	$end = $candidate + 1;
 }
 elseif($cur_page >= $max_page-floor($candidate/2)){ // 前半のみ省略
 	$end = $max_page;
-	$start = $end - $candidate + 1;
+	$start = $end - $candidate;
 }
 else{ // 前後省略
 	$start = max(1,$cur_page-ceil($candidate/2)+1);

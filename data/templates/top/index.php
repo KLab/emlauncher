@@ -42,7 +42,7 @@ $update_time = $upload_time?:$app->getCreated();
 <?php endforeach ?>
 </div>
 
-<div id="create-app-button" class="col-xs-12 hidden-sm hidden-md hidden-lg text-left">
+<div id="create-app-button" class="col-xs-12 visible-xs text-left">
 	<a class="btn btn-default" href="<?=url('/app/new')?>"><i class="fa fa-plus"></i> New Application</a>
 </div>
 
