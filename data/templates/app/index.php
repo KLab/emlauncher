@@ -18,23 +18,24 @@
 
 
   <div class="col-xs-12 col-sm-8 col-md-9">
-    <ul class="nav nav-tabs">
-      <li<?php if($pf==='android'):?> class="active"<?php endif?>>
+    <ul id="pf-nav-tabs" class="nav nav-tabs">
+      <li<?php if($pf==='android'):?> class="active"<?php endif?> id="android">
         <a href="<?="?id={$app->getId()}&pf=android"?>">Android</a>
       </li>
-      <li<?php if($pf==='ios'):?> class="active"<?php endif?>>
+      <li<?php if($pf==='ios'):?> class="active"<?php endif?> id="ios">
         <a href="<?="?id={$app->getId()}&pf=ios"?>">iOS</a>
       </li>
-      <li<?php if($pf==='all'):?> class="active"<?php endif?>>
+      <li<?php if($pf==='all'):?> class="active"<?php endif?> id="all">
         <a href="<?="?id={$app->getId()}&pf=all"?>">All</a>
       </li>
     </ul>
 
     <div id="tag-filter">
       <a id="tag-filter-toggle" class="pull-right badge"><i class="fa fa-angle-double-down"></i></a>
-      <div id="tag-filter-body" style="display:none">
+      <div id="tag-filter-body" style="display: <?=(empty($active_tags) ? 'none': 'block')?>">
 <?php foreach($app->getTags() as $tag): ?>
-	    <button class="btn btn-default" data-toggle="button"><?=htmlspecialchars($tag->getName())?></button>
+        <button id="<?=$tag->getId()?>" class="btn btn-default <?=in_array($tag->getId(), $active_tags) ? 'on active' : '' ?>" data-toggle="button">
+        <?=htmlspecialchars($tag->getName())?></button>
 <?php endforeach ?>
       </div>
     </div>
@@ -46,7 +47,7 @@
           <?=block('platform_icon',array('package'=>$pkg))?>
         </td>
         <td class="package-list-item-info">
-	      <div class="row">
+          <div class="row">
             <div class="col-xs-12 col-md-6">
               <a class="title" href="<?=url('/package?id='.$pkg->getId())?>"><?=htmlspecialchars($pkg->getTitle())?></a>
               <span class="info hidden-xs hidden-sm"><?=$pkg->getCreated('Y-m-d H:i')?></span>
@@ -69,7 +70,7 @@
       </tr>
 <?php endforeach ?>
     </table>
-
+    <?=block('paging',array('urlbase'=>url('/app')))?>
   </div>
 </div>
 
@@ -91,6 +92,26 @@ $('#tag-filter-toggle').on('click',function(){
   $('#tag-filter-body').slideToggle('fast');
 });
 
+function get_url_param_tabs() {
+  var $active_tags = $('#tag-filter-body>button.on');
+  if ($active_tags.length>0) {
+    var tags = '';
+    $active_tags.each(function(i){tags += $active_tags[i].id + '+';});
+    return '&tags=' + tags.substring(0, tags.length - 1);
+  } else {
+    return '';
+  }
+}
+
+function compose_url() {
+  var pf = 'all';
+  var $active_pf_tabs = $('#pf-nav-tabs>li.active');
+  if ($active_pf_tabs.length>0) {
+    pf = $active_pf_tabs[0].id
+  }
+  return "<?="id={$app->getId()}&pf="?>" + pf + get_url_param_tabs();
+}
+
 // filter by tag
 $('#tag-filter-body>button').on('click',function(){
   if($(this).hasClass('on')){
@@ -99,21 +120,24 @@ $('#tag-filter-body>button').on('click',function(){
   else{
     $(this).addClass('on');
   }
-  var $active_tags = $('#tag-filter-body>button.on');
-
-  $list = $('#package-list tr').removeClass('hidden');
-
-  if($active_tags.length>0){
-    $active_tags.each(function(){
-      $list.not(':has(.label[data="'+$(this).text()+'"])').addClass('hidden');
-      $list = $list.not('.hidden');
-    });
-  }
-
+  location.href = '?' + compose_url();
 });
 
 $('.package-list-item-info').on('click',function(event){
   $('a',this)[0].click();
 });
 
+$('#pf-nav-tabs>li').on('click', function(event){
+  if ($('a', this)) {
+    location.href = $('a', this)[0].href + get_url_param_tabs();
+    event.preventDefault();
+  }
+});
+
+$('.pagination>li').on('click', function(event){
+  if ($('a', this)) {
+    location.href = $('a', this)[0].href + '&' + compose_url();
+    event.preventDefault();
+  }
+});
 </script>
