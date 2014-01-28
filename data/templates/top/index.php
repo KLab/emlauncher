@@ -1,7 +1,10 @@
-<div class="page-header">
-  <h2 class="headding">EMLauncher
-    <small class="subtitle">Only my APP can shoot it.</small>
-  </h2>
+<div class="page-header row">
+	<h2 class="headding col-xs-12 col-sm-8">EMLauncher
+		<small class="subtitle">Only my APP can shoot it.</small>
+	</h2>
+	<div id="create-app-button" class="hidden-xs col-sm-4 text-right">
+		<a class="btn btn-default" href="<?=url('/app/new')?>"><i class="fa fa-plus"></i> New Application</a>
+	</div>
 </div>
 
 <div class="row">
@@ -39,8 +42,8 @@ $update_time = $upload_time?:$app->getCreated();
 <?php endforeach ?>
 </div>
 
-<div id="create-app-button">
-<a class="btn btn-default" href="<?=url('/app/new')?>"><i class="fa fa-plus"></i> New Application</a>
+<div id="create-app-button" class="col-xs-12 visible-xs text-left">
+	<a class="btn btn-default" href="<?=url('/app/new')?>"><i class="fa fa-plus"></i> New Application</a>
 </div>
 
 <?=block('paging',array('urlbase'=>url('/')))?>
