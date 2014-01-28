@@ -6,7 +6,7 @@ class appActions extends MainActions
 {
 	protected $app = null;
 
-	const LINE_IN_PAGE = 1;
+	const LINE_IN_PAGE = 20;
 
 	public function initialize()
 	{
