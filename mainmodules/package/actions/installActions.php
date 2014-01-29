@@ -40,7 +40,7 @@ class installActions extends packageActions
 		}
 		else{
 			// iPhone以外でのアクセスはパッケージを直接DL
-			$url = $this->package->getFileUrl('+5 min');
+			$url = $this->package->getFileUrl('+60 min');
 		}
 
 		$con = mfwDBConnection::getPDO();
@@ -73,7 +73,7 @@ class installActions extends packageActions
 		$pkg = $this->package;
 		$app = $pkg->getApplication();
 
-		$ipa_url = $pkg->getFileUrl('+5 min');
+		$ipa_url = $pkg->getFileUrl('+60 min');
 		$image_url = $app->getIconUrl();
 		$bundle_identifier = $pkg->getIOSIdentifier();
 		$pkg_title = $pkg->getTitle();
