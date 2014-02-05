@@ -46,13 +46,15 @@
           <?=block('platform_icon',array('package'=>$pkg))?>
         </td>
         <td class="package-list-item-info">
-	      <div class="row">
+          <div class="row">
             <div class="col-xs-12 col-md-6">
               <a class="title" href="<?=url('/package?id='.$pkg->getId())?>"><?=htmlspecialchars($pkg->getTitle())?></a>
               <span class="info hidden-xs hidden-sm"><?=$pkg->getCreated('Y-m-d H:i')?></span>
             </div>
             <div class="col-xs-12 col-md-6">
-              <?php if($pkg->getFileSizeWarning()):?><span class="label label-danger"><?='Over'.$pkg->getFileSizeWarning().'MB'?></span><?php endif ?>
+<?php if($pkg->isFileSizeWarned()): ?>
+              <span class="label label-danger">Over <?=$pkg->getFileSizeLimitMB()?> MB</span>
+<?php endif ?>
 <?php foreach($pkg->getTags() as $tag): ?>
               <span class="label label-default" data="<?=htmlspecialchars($tag->getName())?>"><?=htmlspecialchars($tag->getName())?></span>
 <?php endforeach ?>
