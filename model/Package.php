@@ -20,6 +20,10 @@ class Package extends mfwObject {
 	const FILE_DIR = 'package/';
 	const TEMP_DIR = 'temp-data/';
 
+	// AppStore, GooglePlayでの制限ファイルサイズ(MB)
+	const IOS_FILE_SIZE_LIMIT_MB = 100;
+	const ANDROID_FILE_SIZE_LIMIT_MB = 50;
+
 	protected $app = null;
 	protected $tags = null;
 	protected $install_users = null;
@@ -64,6 +68,27 @@ class Package extends mfwObject {
 			$created = date($format,strtotime($created));
 		}
 		return $created;
+	}
+
+	public function getFileSizeLimitMB()
+	{
+		switch($this->getPlatform()){
+		case self::PF_IOS:
+			return self::IOS_FILE_SIZE_LIMIT_MB;
+		case self::PF_ANDROID:
+			return self::ANDROID_FILE_SIZE_LIMIT_MB;
+		default:
+			return 0;
+		}
+	}
+
+	public function isFileSizeWarned()
+	{
+		$limit = $this->getFileSizeLimitMB() * 1024 * 1024;
+		if($limit==0){
+			return false;
+		}
+		return ($this->getFileSize() > $limit);
 	}
 
 	public function getTags()

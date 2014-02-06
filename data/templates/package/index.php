@@ -42,6 +42,9 @@
     </div>
 
     <p>
+<?php if($package->isFileSizeWarned()): ?>
+      <span class="label label-danger">Over <?=$package->getFileSizeLimitMB()?> MB</span>
+<?php endif ?>
 <?php foreach($package->getTags() as $tag): ?>
       <span class="label label-default"><?=htmlspecialchars($tag->getName())?></span>
 <?php endforeach ?>
