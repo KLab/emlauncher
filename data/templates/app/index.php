@@ -49,7 +49,7 @@
           <div class="row">
             <div class="col-xs-12 col-md-6">
               <a class="title" href="<?=url('/package?id='.$pkg->getId())?>"><?=htmlspecialchars($pkg->getTitle())?></a>
-              <span class="info hidden-xs hidden-sm"><?=$pkg->getCreated('Y-m-d H:i')?></span>
+			  <span class="info hidden-xs hidden-sm"><?=$pkg->getFileSize()?round($pkg->getFileSize()/1024/1024,1):'--'?> MB, <?=$pkg->getCreated('Y-m-d H:i')?></span>
             </div>
             <div class="col-xs-12 col-md-6">
 <?php if($pkg->isFileSizeWarned()): ?>
@@ -60,6 +60,7 @@
 <?php endforeach ?>
             </div>
           </div>
+          <span class="info visible-xs visible-sm"><?=$pkg->getFileSize()?round($pkg->getFileSize()/1024/1024,1):'--'?> MB</span>
           <span class="info visible-xs visible-sm"><?=$pkg->getCreated('Y-m-d H:i')?></span>
         </td>
         <td class="text-center">
