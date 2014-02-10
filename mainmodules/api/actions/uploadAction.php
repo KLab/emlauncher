@@ -44,7 +44,7 @@ class uploadAction extends apiActions
 			// ファイルフォーマット確認, 情報抽出
 			$file_content = file_get_contents($file_info['tmp_name']);
 			list($platform,$ext,$mime) = PackageDb::getPackageInfo(
-				$file_info['name'],$file_content,$file_info['type']);
+				$file_info['name'],$file_info['tmp_name'],$file_info['type']);
 			$ios_identifier = null;
 			if($platform===Package::PF_IOS){
 				$plist = IPAFile::parseInfoPlist($file_info['tmp_name']);

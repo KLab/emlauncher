@@ -190,11 +190,11 @@ class PackageDb extends mfwObjectDb {
 	const TABLE_NAME = 'package';
 	const SET_CLASS = 'PackageSet';
 
-	public static function getPackageInfo($name,$file,$mime)
+	public static function getPackageInfo($originalname,$filepath,$mime)
 	{
 		$platform = Package::PF_UNKNOWN;
-		$ext = pathinfo($name,PATHINFO_EXTENSION);
-		$is_zip = substr($file,0,4)==="PK\x03\x04";
+		$ext = pathinfo($originalname,PATHINFO_EXTENSION);
+		$is_zip = file_get_contents($filepath,false,null,0,4)==="PK\x03\x04";
 		if($is_zip && $ext==='apk'){
 			$platform = Package::PF_ANDROID;
 			$mime = Package::MIME_ANDROID;

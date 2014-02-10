@@ -21,7 +21,7 @@ class upload_package_temporaryAction extends apiActions
 
 			$file = file_get_contents($file_path);
 
-			list($platform,$ext,$mime) = PackageDb::getPackageInfo($file_name,$file,$file_type);
+			list($platform,$ext,$mime) = PackageDb::getPackageInfo($file_name,$file_path,$file_type);
 
 			$temp_name = Package::uploadTempFile($file,$ext,$mime);
 
