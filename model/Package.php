@@ -108,15 +108,15 @@ class Package extends mfwObject {
 		$key = "{$this->getAppId()}/{$this->getId()}_{$this->value('file_name')}";
 		return static::FILE_DIR.$key;
 	}
-	public function uploadFile($file_content,$mime)
+	public function uploadFile($file_path,$mime)
 	{
 		$key = $this->getFileKey();
-		S3::upload($key,$file_content,$mime,'private');
+		S3::uploadFile($key,$file_path,$mime,'private');
 	}
-	public static function uploadTempFile($file_content,$ext,$mime)
+	public static function uploadTempFile($file_path,$ext,$mime)
 	{
 		$tmp_name = Random::string(16).".$ext";
-		S3::upload(static::TEMP_DIR.$tmp_name,$file_content,$mime,'private');
+		S3::uploadFile(static::TEMP_DIR.$tmp_name,$file_path,$mime,'private');
 		return $tmp_name;
 	}
 	public function renameTempFile($temp_name)

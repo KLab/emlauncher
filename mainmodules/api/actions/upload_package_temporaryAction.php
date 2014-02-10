@@ -19,11 +19,9 @@ class upload_package_temporaryAction extends apiActions
 			$file_path = $file_info['tmp_name'];
 			$file_type = $file_info['type'];
 
-			$file = file_get_contents($file_path);
-
 			list($platform,$ext,$mime) = PackageDb::getPackageInfo($file_name,$file_path,$file_type);
 
-			$temp_name = Package::uploadTempFile($file,$ext,$mime);
+			$temp_name = Package::uploadTempFile($file_path,$ext,$mime);
 
 			$ios_identifier = null;
 			if($platform===Package::PF_IOS){
