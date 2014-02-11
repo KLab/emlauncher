@@ -94,9 +94,14 @@ class MainActions extends mfwActions
 		mfwSession::clear(self::SESKEY_URL_BEFORE_LOGIN);
 	}
 
-	protected function createPaging($current_page, $item_count,$items_per_page)
+	protected function createPaging($current_page, $item_count, $items_per_page)
 	{
 		$max_page = floor(($item_count-1) / $items_per_page) + 1;
-		return new Paging($current_page,$max_page);
+		return new Paging($current_page, $max_page);
+	}
+	
+	protected function createInfinitePaging($current_page, $has_next_page)
+	{
+		return new InfinitePaging($current_page, $has_next_page);
 	}
 }

@@ -1,8 +1,8 @@
 <?php
-$candidate = 5;
 if($paging && $paging instanceof Paging):
 $cur_page = $paging->getCurrentPage();
 $max_page = $paging->getTotalPageNumber();
+$candidate = 5;
 
 if($max_page <= $candidate+2){ // 省略不要
 	$start = 1;
@@ -47,6 +47,44 @@ else{ // 前後省略
 <?php if($end!=$max_page): ?>
 	<li<?=($cur_page==$max_page)?' class="active"':''?>>
 		<a href="<?=mfwHttp::composeUrl($urlbase,array('page'=>$max_page))?>"><?=$max_page?></a>
+	</li>
+<?php endif ?>
+</ul>
+<?php endif ?>
+
+<?php 
+if($paging && $paging instanceof InfinitePaging):
+$cur_page = $paging->getCurrentPage();
+$has_next_page = $paging->hasNextPage();
+
+$end = $cur_page;
+if ($cur_page > 4) {
+	$start = $cur_page - 1;
+} else {
+	$start = 1;
+}
+?>
+<ul class="pagination  pagination-sm">
+<?php if($start!=1): ?>
+	<li<?=($cur_page==1)?' class="active"':''?>>
+		<a href="<?=mfwHttp::composeUrl($urlbase,array('page'=>1))?>">1</a>
+	</li>
+<?php endif ?>
+<?php if($start>2): ?>
+	<li class="disabled omission">
+		<span>..</span>
+	</li>
+<?php endif ?>
+<?php for($i=$start;$i<=$end;++$i): ?>
+	<?php if($i==$cur_page): ?>
+		<li class="disabled active"><span><?=$i?></span></li>
+	<?php else: ?>
+		<li><a href="<?=mfwHttp::composeUrl($urlbase,array('page'=>$i))?>"><?=$i?></a></li>
+	<?php endif ?>
+<?php endfor ?>
+<?php if($has_next_page): ?>
+	<li>
+		<a href="<?=mfwHttp::composeUrl($urlbase,array('page'=>$cur_page+1))?>">&raquo;</a>
 	</li>
 <?php endif ?>
 </ul>

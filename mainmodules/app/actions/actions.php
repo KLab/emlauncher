@@ -94,20 +94,11 @@ class appActions extends MainActions
 		$tags = mfwRequest::param('tags') ? explode(' ', mfwRequest::param('tags')) : array();
 		$current_page = mfwRequest::param('page', 1);
 
-		$pkg_count = PackageDb::selectCountWithPfAndTags($this->app->getId(), $pf[$platform], $tags);
-		$paging = $this->createPaging($current_page, $pkg_count, self::LINE_IN_PAGE);
-		$offset = ($paging->getCurrentPage() - 1) * self::LINE_IN_PAGE;
-
+		$offset = ($current_page - 1) * self::LINE_IN_PAGE;
 		$pkgs = PackageDb::selectByAppIdPfTagsWithLimit(
-			$this->app->getId(), $pf[$platform], $tags, $offset, self::LINE_IN_PAGE
+			$this->app->getId(), $pf[$platform], $tags, $offset, self::LINE_IN_PAGE + 1
 		);
-
-		if($pkgs->count()===0 && !mfwRequest::param('pf')){
-			$platform = 'all';
-			$pkgs = PackageDb::selectByAppIdPfTagsWithLimit(
-				$this->app->getId(), null, array(), $offset, self::LINE_IN_PAGE
-			);
-		}
+		$paging = $this->createInfinitePaging($current_page, $pkgs->count() > self::LINE_IN_PAGE);
 
 		$params = array(
 			'pf' => $platform,
