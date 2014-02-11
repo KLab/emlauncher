@@ -98,7 +98,12 @@ class appActions extends MainActions
 		$pkgs = PackageDb::selectByAppIdPfTagsWithLimit(
 			$this->app->getId(), $pf[$platform], $tags, $offset, self::LINE_IN_PAGE + 1
 		);
-		$paging = $this->createInfinitePaging($current_page, $pkgs->count() > self::LINE_IN_PAGE);
+		if ($pkgs->count() > self::LINE_IN_PAGE) {
+			$pkgs = $pkgs->slice(0, self::LINE_IN_PAGE);
+			$paging = $this->createInfinitePaging($current_page, true);
+		} else {
+			$paging = $this->createInfinitePaging($current_page, false);
+		}
 
 		$params = array(
 			'pf' => $platform,
