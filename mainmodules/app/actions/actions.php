@@ -112,6 +112,7 @@ class appActions extends MainActions
 			'active_tags' => $tags,
 			'current_page' => $current_page,
 			'has_next_page' => $has_next_page,
+			'filter_open' => mfwRequest::param('filter_open'),
 		);
 		return $this->build($params);
 	}

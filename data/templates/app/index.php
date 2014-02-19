@@ -31,8 +31,8 @@
     </ul>
 
     <div id="tag-filter">
-      <a id="tag-filter-toggle" class="pull-right badge"><i class="fa fa-angle-double-down"></i></a>
-      <div id="tag-filter-body" style="display: <?=(empty($active_tags) ? 'none': 'block')?>">
+      <a id="tag-filter-toggle" class="pull-right badge"><i class="fa fa-angle-double-<?=$filter_open?'up':'down'?>"></i></a>
+      <div id="tag-filter-body" style="display: <?=($filter_open)? 'block': 'none'?>">
 <?php foreach($app->getTags() as $tag): ?>
         <button id="<?=$tag->getId()?>" class="btn btn-default <?=in_array($tag->getId(), $active_tags) ? 'on active' : '' ?>" data-toggle="button">
         <?=htmlspecialchars($tag->getName())?></button>
@@ -107,6 +107,15 @@ $('#tag-filter-toggle').on('click',function(){
   if($up){
     $up.removeClass('fa-angle-double-up').addClass('fa-angle-double-down');
   }
+  $('.pager>li>a').each(function(){
+    if($up.length>0){
+      this.href = this.href.replace(/&filter_open=1/,'');
+    }
+    else{
+      this.href = this.href + '&filter_open=1';
+    }
+  });
+
   $('#tag-filter-body').slideToggle('fast');
 });
 
@@ -127,7 +136,11 @@ function compose_url() {
   if ($active_pf_tabs.length>0) {
     pf = $active_pf_tabs[0].id
   }
-  return "<?="id={$app->getId()}&pf="?>" + pf + get_url_param_tabs();
+  var of = '';
+  if ($('i.fa-angle-double-up').length>0) {
+    of = '&filter_open=1';
+  }
+  return "<?="id={$app->getId()}&pf="?>" + pf + get_url_param_tabs() + of;
 }
 
 // filter by tag
@@ -152,10 +165,4 @@ $('#pf-nav-tabs>li').on('click', function(event){
   }
 });
 
-$('.pagination>li').on('click', function(event){
-  if ($('a', this)) {
-    location.href = $('a', this)[0].href + '&' + compose_url();
-    event.preventDefault();
-  }
-});
 </script>
