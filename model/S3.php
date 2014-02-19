@@ -24,7 +24,7 @@ class S3 {
 		return static::$singleton;
 	}
 
-	public static function upload($key,$data,$type,$acl='private')
+	public static function uploadData($key,$data,$type,$acl='private')
 	{
 		$s3 = static::singleton();
 		$r = $s3->client->putObject(
@@ -35,6 +35,23 @@ class S3 {
 				'ContentType' => $type,
 				'Body' => Guzzle\Http\EntityBody::factory($data),
 				));
+		return $r;
+	}
+
+	public static function uploadFile($key,$filename,$type,$acl='private')
+	{
+		$s3 = static::singleton();
+		$fp = fopen($filename,'rb');
+		$r = $s3->client->putObject(
+			array(
+				'Bucket' => $s3->config['bucket_name'],
+				'Key' => $key,
+				'ACL' => $acl,
+				'ContentType' => $type,
+				'Body' => $fp,
+				));
+		// Guzzleが中で勝手にfcloseしやがるのでここでfcloseしてはならない
+		// fclose($fp)
 		return $r;
 	}
 
