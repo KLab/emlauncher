@@ -228,7 +228,7 @@ class ApplicationDb extends mfwObjectDb {
 		$im->setFormat('png');
 
 		$key = static::ICON_DIR."$app_id/".Random::string(16).'.png';
-		S3::upload($key,$im,'image/png','public-read');
+		S3::uploadData($key,$im,'image/png','public-read');
 
 		return $key;
 	}
