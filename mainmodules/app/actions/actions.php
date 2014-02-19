@@ -98,11 +98,11 @@ class appActions extends MainActions
 		$pkgs = PackageDb::selectByAppIdPfTagsWithLimit(
 			$this->app->getId(), $pf[$platform], $tags, $offset, self::LINE_IN_PAGE + 1
 		);
+
+		$has_next_page = false;
 		if ($pkgs->count() > self::LINE_IN_PAGE) {
 			$pkgs = $pkgs->slice(0, self::LINE_IN_PAGE);
-			$paging = $this->createInfinitePaging($current_page, true);
-		} else {
-			$paging = $this->createInfinitePaging($current_page, false);
+			$has_next_page = true;
 		}
 
 		$params = array(
@@ -110,7 +110,8 @@ class appActions extends MainActions
 			'is_owner' => $this->app->isOwner($this->login_user),
 			'packages' => $pkgs,
 			'active_tags' => $tags,
-			'paging' => $paging,
+			'current_page' => $current_page,
+			'has_next_page' => $has_next_page,
 		);
 		return $this->build($params);
 	}
