@@ -6,6 +6,8 @@ class appActions extends MainActions
 {
 	protected $app = null;
 
+	const LINE_IN_PAGE = 20;
+
 	public function initialize()
 	{
 		if(($err=parent::initialize())){
@@ -89,18 +91,29 @@ class appActions extends MainActions
 			}
 		}
 
-		$pkgs = PackageDb::selectByAppId($this->app->getId(),$pf[$platform]);
+		$tags = mfwRequest::param('tags') ? explode(' ', mfwRequest::param('tags')) : array();
+		$current_page = mfwRequest::param('page', 1);
 
-		if($pkgs->count()===0 && !mfwRequest::param('pf')){
-			$platform = 'all';
-			$pkgs = PackageDb::selectByAppId($this->app->getId(),null);
+		$offset = ($current_page - 1) * self::LINE_IN_PAGE;
+		$pkgs = PackageDb::selectByAppIdPfTagsWithLimit(
+			$this->app->getId(), $pf[$platform], $tags, $offset, self::LINE_IN_PAGE + 1
+		);
+
+		$has_next_page = false;
+		if ($pkgs->count() > self::LINE_IN_PAGE) {
+			$pkgs = $pkgs->slice(0, self::LINE_IN_PAGE);
+			$has_next_page = true;
 		}
 
 		$params = array(
 			'pf' => $platform,
 			'is_owner' => $this->app->isOwner($this->login_user),
 			'packages' => $pkgs,
-			);
+			'active_tags' => $tags,
+			'current_page' => $current_page,
+			'has_next_page' => $has_next_page,
+			'filter_open' => mfwRequest::param('filter_open'),
+		);
 		return $this->build($params);
 	}
 

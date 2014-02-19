@@ -236,5 +236,27 @@ class PackageDb extends mfwObjectDb {
 		$query .= ' ORDER BY id DESC';
 		return static::selectSet($query,$bind);
 	}
+
+	public static function selectByAppIdPfTagsWithLimit($app_id, $pf_filter, array $tags, $offset, $count)
+	{
+		if (!$pf_filter && empty($tags)) {
+			$query = 'WHERE app_id = :app_id';
+			$query .= sprintf(' ORDER BY id DESC LIMIT %d, %d', $offset, $count);
+			return static::selectSet($query, array(':app_id' => $app_id));
+		}
+		$sql = 'SELECT p.* FROM package AS p LEFT JOIN package_tag AS t ON p.id = t.package_id WHERE p.app_id = ?';
+		$bind = array($app_id);
+		if ($pf_filter) {
+			$sql .= ' AND p.platform = ?';
+			array_push($bind, $pf_filter);
+		}
+		if (!empty($tags)) {
+			$sql .= ' AND t.tag_id in ('. implode(',', array_fill(0, count($tags), '?')) .')';
+			$bind = array_merge($bind, $tags);
+			$sql .= ' GROUP BY p.id HAVING COUNT(p.id) >= '.count($tags);
+		}
+		$sql .= sprintf(' ORDER BY p.id DESC LIMIT %d, %d', $offset, $count);
+		return new PackageSet(mfwDBIBase::getAll($sql, $bind));
+	}
 }
 
