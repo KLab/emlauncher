@@ -79,11 +79,11 @@
 <?php if($current_page==1): ?>
       <li class="previous disabled"><span>Previous</span></li>
 <?php else: ?>
-      <li class="previous"><a href="<?=mfwHttp::composeURL(mfwRequest::url(),array('page'=>$current_page-1))?>?>">Previous</a></li>
+      <li class="previous"><a href="<?=mfwHttp::composeURL(mfwRequest::url(),array('page'=>$current_page-1))?>">Previous</a></li>
 <?php endif ?>
 
 <?php if($has_next_page):?>
-      <li class="next"><a href="<?=mfwHttp::composeURL(mfwRequest::url(),array('page'=>$current_page+1))?>?>">Next</a></li>
+      <li class="next"><a href="<?=mfwHttp::composeURL(mfwRequest::url(),array('page'=>$current_page+1))?>">Next</a></li>
 <?php else: ?>
       <li class="next disabled"><span>Next</span></li>
 <?php endif ?>
