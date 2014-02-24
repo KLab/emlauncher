@@ -25,4 +25,13 @@ class myappsActions extends MainActions
 		return $this->redirect('/myapps/installed');
 	}
 
+	public function executeOwn()
+	{
+		$own_apps = ApplicationDb::selectOwnApps($this->login_user);
+		$params = array(
+			'own_apps' => $own_apps,
+			);
+		return $this->build($params);
+	}
+
 }
