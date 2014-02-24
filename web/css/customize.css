@@ -273,3 +273,7 @@ h3 {
   padding-left: 5px;
   padding-right: 5px;
 }
+
+#tag-filter-toggle > i.fa-angle-double-down:before {
+  content: "filter tags \f103";
+}
