@@ -2,7 +2,7 @@
 <html lang="ja">
   <head>
     <meta charset="utf-8">
-    <title><?=(isset($page_title))?htmlspecialchars($page_title).' | ':''?>EM-Launcher</title>
+    <title><?=(isset($page_title))?htmlspecialchars($page_title).' | ':''?><?=$title_prefix?>EMLauncher</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <?php if(mfwServerEnv::getEnv()==='local'): ?>
     <link href="/bootstrap/bootswatch/spacelab/bootstrap.min.css" rel="stylesheet" media="screen">
@@ -29,7 +29,7 @@
           <span class="icon-bar"></span>
           <span class="icon-bar"></span>
         </button>
-        <a href="<?=url('/')?>" class="navbar-brand"><span>EM</span><span>Launcher</span></a>
+        <a href="<?=url('/')?>" class="navbar-brand"><?=$title_prefix?><span>EMLauncher</span></a>
       </div>
       <div class="collapse navbar-collapse navbar-ex1-collapse">
 <?php if($login_user): ?>

@@ -15,6 +15,11 @@ $emlauncher_config = array(
 		'mail_sender' => 'EMLauncher <no-reply@example.com>',
 
 		/**
+		 * タイトル等につけるprefix
+		 */
+		'title_prefix' => '',
+
+		/**
 		 * HTTPSで動作させる.
 		 * ログイン時にHTTPSで無かった場合、HTTPSでリダイレクトする.
 		 */
