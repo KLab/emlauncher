@@ -1,7 +1,6 @@
 <?php
 require_once APP_ROOT.'/model/User.php';
 require_once APP_ROOT.'/model/Config.php';
-require_once APP_ROOT.'/model/Paging.php';
 
 class MainActions extends mfwActions
 {
@@ -93,12 +92,6 @@ class MainActions extends mfwActions
 	protected function clearUrlBeforelogin()
 	{
 		mfwSession::clear(self::SESKEY_URL_BEFORE_LOGIN);
-	}
-
-	protected function createPaging($current_page, $item_count, $items_per_page)
-	{
-		$max_page = floor(($item_count-1) / $items_per_page) + 1;
-		return new Paging($current_page, $max_page);
 	}
 
 }
