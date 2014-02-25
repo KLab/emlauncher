@@ -6,8 +6,8 @@
 require_once APP_ROOT.'/libs/aws/aws-autoloader.php';
 
 $emlauncher_config = array(
-	/** ローカル環境用の設定 */
-	'local' => array(
+	/** EC2環境用の設定 (httpd.confでSetEnv MFW_ENV 'ec2') */
+	'ec2' => array(
 
 		/**
 		 * アップデート通知やパスワードリセットのメールの送信元アドレス.
@@ -61,16 +61,16 @@ $emlauncher_config = array(
 			'region' => Aws\Common\Enum\Region::TOKYO,
 
 			/** S3のbucket名. 予め作成しておく. */
-			'bucket_name' => 'emlauncher-dev',
+			'bucket_name' => 'emlauncher',
 			),
 		),
 	);
 
 /**
- * EC2環境 (ApacheでSetEnv MFW_ENV 'ec2') の場合の設定.
- * 基本的にlocalと一緒だが、google認証を無効にして、bucket名も変えている.
+ * ローカル環境用の設定. (MFW_ENV=local)
+ * Googleアカウント認証を無効にし、bucket名も変更している.
  */
-$emlauncher_config['ec2'] = $emlauncher_config['local'];
-$emlauncher_config['ec2']['login']['enable_google_auth'] = false;
-$emlauncher_config['ec2']['aws']['aws_bucket_name'] = 'emlauncher';
+$emlauncher_config['local'] = $emlauncher_config['ec2'];
+$emlauncher_config['local']['login']['enable_google_auth'] = false;
+$emlauncher_config['local']['aws']['bucket_name'] = 'emlauncher-dev';
 
