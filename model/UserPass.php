@@ -36,7 +36,7 @@ class UserPass extends mfwObject {
 
 	protected function randomstring($length)
 	{
-		$chars = '123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
+		$chars = '1234567890abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
 		$strlen = strlen($chars);
 		$str = '';
 		for($i=0;$i<$length;++$i){
@@ -48,7 +48,7 @@ class UserPass extends mfwObject {
 	{
 		$hash = sha1("{$pass}{$salt}");
 		for($i=0;$i<$stretch;++$i){
-			$hash = sha1($hash);
+			$hash = sha1("{$hash}{$salt}");
 		}
 		return $hash;
 	}
