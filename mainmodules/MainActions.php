@@ -48,6 +48,7 @@ class MainActions extends mfwActions
 		$params['login_user'] = $this->login_user;
 		$params['module'] = $this->module;
 		$params['action'] = $this->action;
+		$params['title_prefix'] = Config::get('title_prefix');
 		return parent::build($params,$headers);
 	}
 

@@ -10,6 +10,9 @@ class ApplicationOwner extends mfwObject {
 	public function getOwnerMail(){
 		return $this->value('owner_mail');
 	}
+	public function getAppId(){
+		return $this->value('app_id');
+	}
 }
 
 /**
@@ -42,6 +45,12 @@ class ApplicationOwnerDb extends mfwObjectDb {
 	{
 		$query = "WHERE app_id = ?";
 		return static::selectSet($query,array($app_id));
+	}
+
+	public static function selectByOwnerMail($mail)
+	{
+		$query = "WHERE owner_mail = ?";
+		return static::selectSet($query,array($mail));
 	}
 
 	public static function deleteOwner($app_id,array $owners,$con=null)

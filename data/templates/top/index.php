@@ -43,10 +43,12 @@ $update_time = $upload_time?:$app->getCreated();
 </div>
 
 <div id="create-app-button" class="col-xs-12 visible-xs text-left">
-	<a class="btn btn-default" href="<?=url('/app/new')?>"><i class="fa fa-plus"></i> New Application</a>
+  <a class="btn btn-default" href="<?=url('/app/new')?>"><i class="fa fa-plus"></i> New Application</a>
 </div>
 
-<?=block('paging',array('urlbase'=>url('/')))?>
+<div class="text-center">
+  <?=block('paging',array('urlbase'=>url('/')))?>
+</div>
 
 <script type="text/javascript">
 

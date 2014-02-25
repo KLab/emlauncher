@@ -299,5 +299,20 @@ class ApplicationDb extends mfwObjectDb {
 		$query = sprintf('ORDER BY last_upload DESC LIMIT %d, %d', $offset, $count);
 		return static::selectSet($query);
 	}
+
+	public static function selectOwnApps($user)
+	{
+		$aos = ApplicationOwnerDb::selectByOwnerMail($user->getMail());
+		if($aos->count()==0){
+			return new ApplicationSet();
+		}
+		$ids = array();
+		foreach($aos as $ao){
+			$ids[] = $ao->getAppId();
+		}
+		$bind = array();
+		$pf = static::makeInPlaceholder($ids,$bind);
+		return static::selectSet("WHERE id IN ($pf) ORDER BY id DESC",$bind);
+	}
 }
 
