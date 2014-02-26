@@ -41,7 +41,7 @@ $emlauncher_config = array(
 			 * アカウントのメールアドレスが'allowed_mailaddr_pattern'にマッチするか,
 			 * user_passテーブルに存在したらログインを認める.
 			 *
-			 * 利用する場合, 事前にgoogole appsを作成してOAuthのID, Secretを発行しておく.
+			 * 利用する場合, 事前にgoogoleにアプリを登録してOAuthのID, Secretを発行しておく.
 			 */
 			'enable_google_auth' => true,
 			'google_app_id' => 'xxxxxxxx.apps.googleusercontent.com',
