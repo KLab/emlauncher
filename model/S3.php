@@ -38,6 +38,21 @@ class S3 {
 		return $r;
 	}
 
+	public static function uploadDataWithExpire($key,$data,$type,$expires,$acl='private')
+	{
+		$s3 = static::singleton();
+		$r = $s3->client->putObject(
+			array(
+				'Bucket' => $s3->config['bucket_name'],
+				'Key' => $key,
+				'ACL' => $acl,
+				'ContentType' => $type,
+				'Body' => Guzzle\Http\EntityBody::factory($data),
+				'Expires' => $expires
+				));
+		return $r;
+	}
+
 	public static function uploadFile($key,$filename,$type,$acl='private')
 	{
 		$s3 = static::singleton();

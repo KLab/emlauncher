@@ -30,8 +30,32 @@ class installActions extends packageActions
 			// itms-service での接続はセッションを引き継げない
 			// 一時トークンをURLパラメータに付けることで認証する
 			$scheme = Config::get('enable_https')?'https':null; // HTTPSが使えるならHTTPS優先
+			/*
 			$plist_url = mfwHttp::composeUrl(
 				mfwRequest::makeUrl('/package/install_plist',$scheme),
+				array(
+					'id' => $this->package->getId(),
+					't' => $this->makeToken(),
+					));
+			$url = 'itms-services://?action=download-manifest&url='.urlencode($plist_url);
+			*/
+
+			$pkg = $this->package;
+			$app = $pkg->getApplication();
+
+			$ipa_url = $pkg->getFileUrl('+60 min');
+			$image_url = $app->getIconUrl();
+			$bundle_identifier = $pkg->getIOSIdentifier();
+			$pkg_title = $pkg->getTitle();
+			$app_title = $app->getTitle();
+
+			ob_start();
+			include APP_ROOT.'/data/templates/package/install_plist.php';
+			$plist = ob_get_clean();
+		
+			$plist_key = Package::uploadTempPlist($plist);
+			$plist_url = mfwHttp::composeUrl(
+				Package::getTempPlistUrl($plist_key,'+60 min'),
 				array(
 					'id' => $this->package->getId(),
 					't' => $this->makeToken(),
