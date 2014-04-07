@@ -284,3 +284,25 @@ h3 {
 #tag-filter-toggle > i.fa-angle-double-down:before {
   content: "filter tags \f103";
 }
+
+.balloon {
+  display: inline-block;
+}
+
+.balloon div{
+  padding: 3px 7px;
+  font-size: 12px;
+  font-weight: bold;
+  color: #fff;
+  background-color: #999;
+  border-radius: 3px;
+}
+
+.balloon:after {
+  content: '';
+  position: absolute;
+  margin-left: 5px;
+  border-top: 5px solid #999;
+  border-left: 5px solid transparent;
+}
+
