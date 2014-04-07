@@ -126,6 +126,7 @@ h2>.subtitle {
 #package-list .title {
   font-weight: bolder;
   font-size: medium;
+  word-break: break-all;
 }
 #package-list .info {
   font-size: xx-small;
@@ -143,6 +144,12 @@ h2>.subtitle {
 
 #package-list a.install-link {
   width: 100%;
+}
+
+#package-list .description {
+  margin: 0;
+  font-size: xx-small;
+  word-break: break-all;
 }
 
 .fa-android {

@@ -24,6 +24,8 @@ class Package extends mfwObject {
 	const IOS_FILE_SIZE_LIMIT_MB = 100;
 	const ANDROID_FILE_SIZE_LIMIT_MB = 50;
 
+	const SHORT_DESCRIPTION_LENGTH = 100;
+
 	protected $app = null;
 	protected $tags = null;
 	protected $install_users = null;
@@ -53,6 +55,14 @@ class Package extends mfwObject {
 	public function getDescription(){
 		return $this->value('description');
 	}
+	public function getShortDescription(){
+		$desc = $this->getDescription();
+		if(mb_strlen($desc,'UTF-8')>self::SHORT_DESCRIPTION_LENGTH){
+			$desc = mb_substr($desc,0,self::SHORT_DESCRIPTION_LENGTH,'UTF-8') . '...';
+		}
+		return $desc;
+	}
+
 	public function getIOSIdentifier(){
 		return $this->value('ios_identifier');
 	}

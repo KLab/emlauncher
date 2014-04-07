@@ -48,11 +48,14 @@
         </td>
         <td class="package-list-item-info">
           <div class="row">
-            <div class="col-xs-12 col-md-6">
+            <div class="col-xs-12 col-md-7">
               <a class="title" href="<?=url('/package?id='.$pkg->getId())?>"><?=htmlspecialchars($pkg->getTitle())?></a>
-			  <span class="info hidden-xs hidden-sm"><?=$pkg->getFileSize()?round($pkg->getFileSize()/1024/1024,1):'--'?> MB, <?=$pkg->getCreated('Y-m-d H:i')?></span>
+<?php if($pkg->getDescription()):?>
+              <p class="text-muted description"><?=$pkg->getShortDescription()?></p>
+<?php endif?>
+              <span class="info hidden-xs hidden-sm"><?=$pkg->getFileSize()?round($pkg->getFileSize()/1024/1024,1):'--'?> MB, <?=$pkg->getCreated('Y-m-d H:i')?></span>
             </div>
-            <div class="col-xs-12 col-md-6">
+            <div class="col-xs-12 col-md-5">
 <?php if($pkg->isFileSizeWarned()): ?>
               <span class="label label-danger">Over <?=$pkg->getFileSizeLimitMB()?> MB</span>
 <?php endif ?>
