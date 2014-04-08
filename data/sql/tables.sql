@@ -88,3 +88,17 @@ create table app_install_user (
   primary key (`mail`,`app_id`)
 )Engine=InnoDB default charset=utf8;
 
+drop table if exists `app_comment`;
+create table app_comment (
+  `id` integer not null auto_increment,
+  `app_id` integer not null,
+  `package_id` integer not null,
+  `number` integer not null comment 'アプリ毎の通し番号',
+  `mail` varchar(255) not null comment 'コメントした人',
+  `message` text not null,
+  `created` datetime not null,
+  key idx_app (`app_id`,`number`),
+  key idx_pkg (`package_id`),
+  primary key (`id`)
+)Engine=InnoDB default charset=utf8;
+

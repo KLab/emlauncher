@@ -19,6 +19,11 @@
   <div class="media-body">
     <h3 class="media-hedding">
       <a href="<?=url("/app?id={$app->getId()}")?>"><?=htmlspecialchars($app->getTitle())?></a>
+<?php if(isset($comments[$app->getId()]) && $comments[$app->getId()]>0):?>
+     <div class="balloon">
+       <div title="<?=$comments[$app->getId()]?> comments"><?=$comments[$app->getId()]?></div>
+     </div>
+<?php endif?>
       <small title="Installed by <?=$app->getInstallUserCount()?> users" class="badge"><?=$app->getInstallUserCount()?></small>
     </h3>
     <p>
