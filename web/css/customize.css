@@ -306,3 +306,13 @@ h3 {
   border-left: 5px solid transparent;
 }
 
+#app-index #comments h3 {
+  padding-top: 5px;
+  font-size: medium;
+}
+
+#app-index #comments ul {
+  margin-top: 5px;
+  margin-bottom: 5px;
+}
+

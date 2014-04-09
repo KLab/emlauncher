@@ -1,6 +1,7 @@
 <?php
 require_once APP_ROOT.'/model/Application.php';
 require_once APP_ROOT.'/model/Package.php';
+require_once APP_ROOT.'/model/AppComment.php';
 
 class appActions extends MainActions
 {
@@ -105,6 +106,11 @@ class appActions extends MainActions
 			$has_next_page = true;
 		}
 
+		$comment_count = AppCommentDb::selectCountByAppId($this->app->getId());
+		$top_comments = AppCommentDb::selectByAppId($this->app->getId(),2);
+
+		$commented_package = PackageDb::retrieveByPKs($top_comments->getColumnArray('package_id'));
+
 		$params = array(
 			'pf' => $platform,
 			'is_owner' => $this->app->isOwner($this->login_user),
@@ -113,6 +119,9 @@ class appActions extends MainActions
 			'current_page' => $current_page,
 			'has_next_page' => $has_next_page,
 			'filter_open' => mfwRequest::param('filter_open'),
+			'top_comments' => $top_comments,
+			'comment_count' => $comment_count,
+			'commented_package' => $commented_package,
 		);
 		return $this->build($params);
 	}

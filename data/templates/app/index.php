@@ -18,6 +18,38 @@
 
 
   <div class="col-xs-12 col-sm-8 col-md-9">
+
+    <div id="comments">
+	  <div class="row">
+		<div class="col-xs-6">
+		  <h3><?=$comment_count?> comments</h3>
+		</div>
+		<div class="col-xs-6 text-right">
+		  <a href="<?=url("/app/comment?id={$app->getId()}")?>" class="btn btn-sm btn-default"><i class="fa fa-pencil"></i> write a comment</a>
+		</div>
+	  </div>
+<?php if($comment_count>0): ?>
+      <ul class="list-group">
+<?php
+foreach($top_comments as $c):
+    $pkg = $commented_package[$c->getPackageId()];
+?>
+        <li class="list-group-item">
+          <div><?=htmlspecialchars($c->getMessage())?></div>
+		  <div class="text-right">
+			<a href="<?=url("/package?id={$pkg->getId()}")?>">
+			  <?=block('platform_icon',array('package'=>$pkg))?> <?=htmlspecialchars($pkg->getTitle())?></a>
+			(<?=$c->getCreated('Y-m-d H:i')?>)
+		  </div>
+        </li>
+<?php endforeach ?>
+      </ul>
+	  <div class="text-right">
+		<a href="<?=url("/app/comment?id={$app->getId()}#comments")?>">read more...</a>
+	  </div>
+<?php endif ?>
+    </div>
+
     <ul id="pf-nav-tabs" class="nav nav-tabs">
       <li<?php if($pf==='android'):?> class="active"<?php endif?> id="android">
         <a href="<?="?id={$app->getId()}&pf=android"?>">Android</a>
