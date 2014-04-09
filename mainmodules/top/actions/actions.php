@@ -1,6 +1,6 @@
 <?php
 require_once APP_ROOT.'/model/Application.php';
-require_once APP_ROOT.'/model/AppComment.php';
+require_once APP_ROOT.'/model/Comment.php';
 
 class topActions extends MainActions
 {
@@ -15,7 +15,7 @@ class topActions extends MainActions
 
 		$apps = ApplicationDb::selectByUpdateOrderWithLimit($offset, self::LINE_IN_PAGE);
 
-		$comments = AppCommentDb::selectCountByAppIds($apps->getColumnArray('id'));
+		$comments = CommentDb::selectCountByAppIds($apps->getColumnArray('id'));
 
 		$params = array(
 			'applications' => $apps,

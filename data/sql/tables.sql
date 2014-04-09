@@ -88,8 +88,8 @@ create table app_install_user (
   primary key (`mail`,`app_id`)
 )Engine=InnoDB default charset=utf8;
 
-drop table if exists `app_comment`;
-create table app_comment (
+drop table if exists `comment`;
+create table `comment` (
   `id` integer not null auto_increment,
   `app_id` integer not null,
   `package_id` integer not null,

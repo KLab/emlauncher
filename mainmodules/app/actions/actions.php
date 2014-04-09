@@ -1,7 +1,7 @@
 <?php
 require_once APP_ROOT.'/model/Application.php';
 require_once APP_ROOT.'/model/Package.php';
-require_once APP_ROOT.'/model/AppComment.php';
+require_once APP_ROOT.'/model/Comment.php';
 
 class appActions extends MainActions
 {
@@ -106,8 +106,8 @@ class appActions extends MainActions
 			$has_next_page = true;
 		}
 
-		$comment_count = AppCommentDb::selectCountByAppId($this->app->getId());
-		$top_comments = AppCommentDb::selectByAppId($this->app->getId(),2);
+		$comment_count = CommentDb::selectCountByAppId($this->app->getId());
+		$top_comments = CommentDb::selectByAppId($this->app->getId(),2);
 
 		$commented_package = PackageDb::retrieveByPKs($top_comments->getColumnArray('package_id'));
 

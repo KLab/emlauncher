@@ -1,11 +1,11 @@
 <?php
 
 /**
- * Row object for 'app_comment' table.
+ * Row object for 'comment' table.
  */
-class AppComment extends mfwObject {
-	const DB_CLASS = 'AppCommentDb';
-	const SET_CLASS = 'AppCommentSet';
+class Comment extends mfwObject {
+	const DB_CLASS = 'CommentDb';
+	const SET_CLASS = 'CommentSet';
 
 	public function getMessage(){
 		return $this->value('message');
@@ -24,12 +24,12 @@ class AppComment extends mfwObject {
 }
 
 /**
- * Set of AppComment objects.
+ * Set of Comment objects.
  */
-class AppCommentSet extends mfwObjectSet {
+class CommentSet extends mfwObjectSet {
 	public static function hypostatize(Array $row=array())
 	{
-		return new AppComment($row);
+		return new Comment($row);
 	}
 	protected function unsetCache($id)
 	{
@@ -38,11 +38,11 @@ class AppCommentSet extends mfwObjectSet {
 }
 
 /**
- * database accessor for 'app_comment' table.
+ * database accessor for 'comment' table.
  */
-class AppCommentDb extends mfwObjectDb {
-	const TABLE_NAME = 'app_comment';
-	const SET_CLASS = 'AppCommentSet';
+class CommentDb extends mfwObjectDb {
+	const TABLE_NAME = 'comment';
+	const SET_CLASS = 'CommentSet';
 
 	public static function selectCountByAppId($app_id)
 	{
