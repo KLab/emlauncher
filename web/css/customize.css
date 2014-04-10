@@ -330,3 +330,12 @@ h3 {
 #comments dl.dl-horizontal dd {
   margin-left: 50px;
 }
+
+#comment-form textarea {
+  margin-bottom: 10px;
+}
+#comment-form select {
+  width: auto;
+  display: inline-block;
+}
+

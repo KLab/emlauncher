@@ -18,6 +18,9 @@ class commentActions extends appActions
 
 		$commented_package = PackageDb::retrieveByPKs($comments->getColumnArray('package_id'));
 
+		$install_packages = $this->login_user->getInstallPackages($app_id);
+		$install_packages->sort(function($a,$b){ return $a['id'] < $b['id']; });
+
 		$params = array(
 			'comments_in_page' => self::COMMENTS_IN_PAGE,
 			'comment_count' => $comment_count,
@@ -25,13 +28,14 @@ class commentActions extends appActions
 			'commented_package' => $commented_package,
 			'cur_page' => $current_page,
 			'max_page' => $max_page,
+			'install_packages' => $install_packages,
 			);
 		return $this->build($params);
 	}
 
-	public function executeCommentPost()
+	public function executeComment_post()
 	{
-		throw new Exception("stub!");
+		var_dump($_POST);
 	}
 
 }

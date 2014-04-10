@@ -77,5 +77,11 @@ class User
 		return null;
 	}
 
+	public function getInstallPackages($app_id)
+	{
+		$pkg_ids = InstallLog::getInstallPackageIds($this,$app_id);
+		return PackageDb::retrieveByPKs($pkg_ids);
+	}
+
 }
 

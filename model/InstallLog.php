@@ -89,5 +89,20 @@ class InstallLog {
 		return new InstallUserSet($app,$rows);
 	}
 
+	public static function getInstallPackageIds(User $user,$app_id)
+	{
+		$sql = 'SELECT distinct(package_id) as pkg_id FROM install_log WHERE mail=:mail AND app_id=:app_id';
+		$bind = array(
+			':mail' => $user->getMail(),
+			':app_id' => $app_id,
+			);
+		$rows = mfwDBIBase::getAll($sql,$bind);
+		$ids = array();
+		foreach($rows as $r){
+			$ids[] = $r['pkg_id'];
+		}
+		return $ids;
+	}
+
 }
 
