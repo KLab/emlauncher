@@ -32,13 +32,21 @@
       <ul class="list-group">
 <?php
 foreach($top_comments as $c):
-    $pkg = $commented_package[$c->getPackageId()];
+    $pkg = ($c->getPackageId())? $commented_package[$c->getPackageId()]: null;
+	$comment_page = floor(($comment_count-$c->getNumber())/$comments_in_page)+1;
 ?>
         <li class="list-group-item">
-          <div><?=htmlspecialchars($c->getMessage())?></div>
+		  <dl class="dl-horizontal">
+			<dt><a href="<?=url("/app/comment?id={$app->getId()}&page=$comment_page#comment-{$c->getNumber()}")?>"><?=$c->getNumber()?></a></dt>
+			<dd><?=htmlspecialchars($c->getMessage())?></dd>
+		  </dl>
 		  <div class="text-right">
+<?php if($pkg): ?>
 			<a href="<?=url("/package?id={$pkg->getId()}")?>">
 			  <?=block('platform_icon',array('package'=>$pkg))?> <?=htmlspecialchars($pkg->getTitle())?></a>
+<?php else: ?>
+			<span>No package installed</span>
+<?php endif ?>
 			(<?=$c->getCreated('Y-m-d H:i')?>)
 		  </div>
         </li>

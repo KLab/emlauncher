@@ -306,13 +306,27 @@ h3 {
   border-left: 5px solid transparent;
 }
 
-#app-index #comments h3 {
+#comments h3 {
   padding-top: 5px;
   font-size: medium;
 }
 
-#app-index #comments ul {
+#comments ul {
   margin-top: 5px;
   margin-bottom: 5px;
 }
 
+#comments li {
+  padding: 10px;
+}
+
+#comments dl.dl-horizontal {
+  margin: 0;
+}
+
+#comments dl.dl-horizontal dt {
+  width: 35px;
+}
+#comments dl.dl-horizontal dd {
+  margin-left: 50px;
+}

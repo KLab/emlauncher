@@ -13,6 +13,9 @@ class Comment extends mfwObject {
 	public function getPackageId(){
 		return $this->value('package_id');
 	}
+	public function getNumber(){
+		return $this->value('number');
+	}
 
 	public function getCreated($format=null){
 		$created = $this->value('created');
@@ -71,11 +74,14 @@ class CommentDb extends mfwObjectDb {
 		return $counts;
 	}
 
-	public static function selectByAppId($app_id,$limit=null,$offset=null)
+	public static function selectByAppId($app_id,$limit=null,$offset=0)
 	{
 		$query = 'WHERE app_id = ? ORDER BY id DESC';
 		if($limit!==null && ((int)$limit)>0){
 			$query .= ' LIMIT '.(int)$limit;
+		}
+		if(((int)$offset)>0){
+			$query .= ' OFFSET '.(int)$offset;
 		}
 		return static::selectSet($query,array($app_id));
 	}
