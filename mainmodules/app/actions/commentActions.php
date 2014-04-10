@@ -43,7 +43,7 @@ class commentActions extends appActions
 		try{
 			$this->app = ApplicationDb::retrieveByPkForUpdate($this->app->getId());
 
-			CommentDb::post($this->login_user,$this->app,$package_id,$message);
+			$comment = CommentDb::post($this->login_user,$this->app,$package_id,$message);
 
 			$con->commit();
 		}
@@ -52,6 +52,9 @@ class commentActions extends appActions
 			$con->rollback();
 			throw $e;
 		}
+
+		$owners = $this->app->getOwners();
+		$owners->noticeNewComment($comment,$this->app);
 
 		return $this->redirect('/app/comment',array('id'=>$this->app->getId()));
 	}

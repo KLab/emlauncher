@@ -32,6 +32,32 @@ class ApplicationOwnerSet extends mfwObjectSet {
 	{
 		return $this->getColumnArray('owner_mail');
 	}
+
+	public function noticeNewComment(Comment $comment,Application $app)
+	{
+		$pkg = null;
+		if($comment->getPackageId()){
+			$pkg = PackageDb::retrieveByPK($comment->getPackageId());
+		}
+		$page_url = mfwRequest::makeURL("/app/comment?id={$app->getId()}#comment-{$comment->getNumber()}");
+		ob_start();
+		include APP_ROOT.'/data/notice_comment_mail_template.php';
+		$body = ob_get_clean();
+
+		$addresses = $this->getColumnArray('owner_mail');
+		if(empty($addresses)){
+			return;
+		}
+
+		$subject = "New Comment to {$app->getTitle()}";
+		$sender = Config::get('mail_sender');
+		$to = implode(', ',$addresses);
+		$header = "From: $sender";
+
+		mb_language('uni');
+		mb_internal_encoding('UTF-8');
+		return !mb_send_mail($to,$subject,$body,$header);
+	}
 }
 
 /**
