@@ -55,7 +55,7 @@ class CommentDb extends mfwObjectDb {
 	}
 
 
-	public static function selectCountByAppIds(array $app_ids)
+	public static function selectCountsByAppIds(array $app_ids)
 	{
 		if(empty($app_ids)){
 			return array();
@@ -64,7 +64,7 @@ class CommentDb extends mfwObjectDb {
 		$bind = array();
 		$pf = static::makeInPlaceholder($app_ids,$bind);
 		$table = static::TABLE_NAME;
-		$sql = "SELECT app_id,count(*) FROM $table WHERE app_id IN ($pf)";
+		$sql = "SELECT app_id,count(*) FROM $table WHERE app_id IN ($pf) GROUP BY app_id";
 		$rows = mfwDBIBase::getAll($sql,$bind);
 
 		$counts = array();

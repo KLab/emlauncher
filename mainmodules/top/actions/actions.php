@@ -15,7 +15,7 @@ class topActions extends MainActions
 
 		$apps = ApplicationDb::selectByUpdateOrderWithLimit($offset, self::LINE_IN_PAGE);
 
-		$comments = CommentDb::selectCountByAppIds($apps->getColumnArray('id'));
+		$comments = CommentDb::selectCountsByAppIds($apps->getColumnArray('id'));
 
 		$params = array(
 			'applications' => $apps,
