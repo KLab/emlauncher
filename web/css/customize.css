@@ -284,3 +284,65 @@ h3 {
 #tag-filter-toggle > i.fa-angle-double-down:before {
   content: "filter tags \f103";
 }
+
+.balloon {
+  display: inline-block;
+}
+
+.balloon div{
+  padding: 3px 7px;
+  font-size: 12px;
+  font-weight: bold;
+  color: #fff;
+  background-color: #999;
+  border-radius: 3px;
+}
+
+.balloon:after {
+  content: '';
+  position: absolute;
+  margin-left: 5px;
+  border-top: 5px solid #999;
+  border-left: 5px solid transparent;
+}
+
+#comments h3 {
+  padding-top: 5px;
+  font-size: medium;
+}
+
+#comments ul {
+  margin-top: 5px;
+  margin-bottom: 5px;
+}
+
+#comments li {
+  padding: 10px;
+}
+
+#comments dl {
+  margin: 0;
+}
+
+#comments dl dt {
+  width: 30px;
+  float: left;
+  text-align: center;
+}
+
+#comments dl dd {
+  margin-left: 40px;
+}
+
+#comments dl + div {
+ clear: both;
+}
+
+#comment-form textarea {
+  margin-bottom: 10px;
+}
+#comment-form select {
+  width: auto;
+  display: inline-block;
+}
+
