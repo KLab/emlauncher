@@ -33,11 +33,10 @@
 <?php
 foreach($top_comments as $c):
     $pkg = ($c->getPackageId())? $commented_package[$c->getPackageId()]: null;
-    $comment_page = floor(($comment_count-$c->getNumber())/$comments_in_page)+1;
 ?>
         <li class="list-group-item">
           <dl>
-            <dt><a href="<?=url("/app/comment?id={$app->getId()}&page=$comment_page#comment-{$c->getNumber()}")?>"><?=$c->getNumber()?></a></dt>
+            <dt><a href="<?=url("/app/comment?id={$app->getId()}#comment-{$c->getNumber()}")?>"><?=$c->getNumber()?></a></dt>
             <dd><?=htmlspecialchars($c->getMessage())?></dd>
           </dl>
           <div class="text-right">
