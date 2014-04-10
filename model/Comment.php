@@ -97,6 +97,7 @@ class CommentDb extends mfwObjectDb {
 			'number' => $max_num + 1,
 			'mail' => $user->getMail(),
 			'message' => $message,
+			'created' => date('Y-m-d H:i:s'),
 			);
 
 		$comment = new Comment($row);
