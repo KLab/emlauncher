@@ -85,5 +85,24 @@ class CommentDb extends mfwObjectDb {
 		}
 		return static::selectSet($query,array($app_id));
 	}
+
+	public static function post(User $user,Application $app,$package_id,$message)
+	{
+		$sql = 'SELECT number FROM comment WHERE app_id=?ORDER BY id DESC LIMIT 1';
+		$max_num = (int)mfwDBIBase::getOne($sql,array($app->getId()));
+
+		$row = array(
+			'app_id' => $app->getId(),
+			'package_id' => ($package_id? : null),
+			'number' => $max_num + 1,
+			'mail' => $user->getMail(),
+			'message' => $message,
+			);
+
+		$comment = new Comment($row);
+		$comment->insert();
+
+		return $comment;
+	}
 }
 

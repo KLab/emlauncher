@@ -19,6 +19,9 @@
 
     <div id="comment-form">
       <form class="form-horizontal" method="post" action="<?=url('/app/comment_post')?>">
+        <div id="alert-nomessage" class="alert alert-danger hidden">
+          コメントが入力されていません
+        </div>
         <input type="hidden" name="id" value="<?=$app->getId()?>">
         <label for="message" class="sr-only">Message</label>
         <textarea name="message" class="form-control" rows="3"></textarea>
@@ -37,7 +40,7 @@
             <option value="0" selected="selected">No package installed</option>
           </select>
 <?php endif ?>
-          <button class="btn btn-primary"><i class="fa fa-pencil"></i> Comment</button>
+          <button name="submit" class="btn btn-primary"><i class="fa fa-pencil"></i> Comment</button>
         </div>
       </form>
     </div>
@@ -81,5 +84,15 @@ foreach($comments as $c):
 </div>
 
 <script type="text/javascript">
+
+$('#comment-form form').submit(function(){
+ var msg = $('textarea[name="message"]',this).val();
+ if(msg.length==0){
+   $('#alert-nomessage').removeClass('hidden');
+   return false;
+ }
+ return true;
+});
+
 
 </script>

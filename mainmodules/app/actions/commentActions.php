@@ -35,7 +35,25 @@ class commentActions extends appActions
 
 	public function executeComment_post()
 	{
-		var_dump($_POST);
+		$message = mfwRequest::param('message');
+		$package_id = mfwRequest::param('package_id');
+
+		$con = mfwDBConnection::getPDO();
+		$con->beginTransaction();
+		try{
+			$this->app = ApplicationDb::retrieveByPkForUpdate($this->app->getId());
+
+			CommentDb::post($this->login_user,$this->app,$package_id,$message);
+
+			$con->commit();
+		}
+		catch(Exception $e){
+			error_log(__METHOD__.'('.__LINE__.'): '.get_class($e).":{$e->getMessage()}");
+			$con->rollback();
+			throw $e;
+		}
+
+		return $this->redirect('/app/comment',array('id'=>$this->app->getId()));
 	}
 
 }
