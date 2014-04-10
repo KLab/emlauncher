@@ -320,15 +320,22 @@ h3 {
   padding: 10px;
 }
 
-#comments dl.dl-horizontal {
+#comments dl {
   margin: 0;
 }
 
-#comments dl.dl-horizontal dt {
-  width: 35px;
+#comments dl dt {
+  width: 30px;
+  float: left;
+  text-align: center;
 }
-#comments dl.dl-horizontal dd {
-  margin-left: 50px;
+
+#comments dl dd {
+  margin-left: 40px;
+}
+
+#comments dl + div {
+ clear: both;
 }
 
 #comment-form textarea {

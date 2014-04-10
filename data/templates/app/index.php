@@ -36,7 +36,7 @@ foreach($top_comments as $c):
     $comment_page = floor(($comment_count-$c->getNumber())/$comments_in_page)+1;
 ?>
         <li class="list-group-item">
-          <dl class="dl-horizontal">
+          <dl>
             <dt><a href="<?=url("/app/comment?id={$app->getId()}&page=$comment_page#comment-{$c->getNumber()}")?>"><?=$c->getNumber()?></a></dt>
             <dd><?=htmlspecialchars($c->getMessage())?></dd>
           </dl>
