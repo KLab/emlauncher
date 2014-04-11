@@ -247,6 +247,13 @@ class PackageDb extends mfwObjectDb {
 		return static::selectSet($query,$bind);
 	}
 
+	public static function selectNewestOneByAppId($app_id)
+	{
+		$query = 'WHERE app_id = :app_id ORDER BY id DESC LIMIT 1';
+		$bind = array(':app_id' => $app_id);
+		return static::selectOne($query,$bind);
+	}
+
 	public static function selectByAppIdPfTagsWithLimit($app_id, $pf_filter, array $tags, $offset, $count)
 	{
 		if (!$pf_filter && empty($tags)) {

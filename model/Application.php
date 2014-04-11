@@ -32,27 +32,66 @@ class Application extends mfwObject {
 	{
 		return S3::url($this->value('icon_key'));
 	}
+
 	public function getLastUpload($format=null){
 		$last_upload = $this->value('last_upload');
-		if($last_upload==$this->value('created')){
-			// まだApplication作成しかしていない
-			return null;
-		}
 		if($format){
 			$last_upload = date($format,strtotime($last_upload));
 		}
 		return $last_upload;
 	}
+
+	public function getLastCommented($format=null){
+		$last_commented = $this->value('last_commented');
+		if($format){
+			$last_commented = date($format,strtotime($last_commented));
+		}
+		return $last_commented;
+	}
+	public function getDateToSort($format=null){
+		$date_to_sort = $this->value('date_to_sort');
+		if($format){
+			$date_to_sort = date($format,strtotime($date_to_sort));
+		}
+		return $date_to_sort;
+	}
+
+	protected function calcDateToSort()
+	{
+		$this->row['date_to_sort'] = max(
+			$this->getCreated(),
+			$this->getLastUpload(),
+			$this->getLastCommented());
+	}
+
 	public function updateLastUpload($date,$con=null)
 	{
 		$this->row['last_upload'] = $date;
-		$sql = 'UPDATE application SET last_upload = :now WHERE id = :id';
+		$this->calcDateToSort();
+
+		$sql = 'UPDATE application SET last_upload = :last_upload, date_to_sort = :date_to_sort WHERE id = :id';
 		$bind = array(
+			':last_upload' => $this->getLastUpload(),
+			':date_to_sort' => $this->getDateToSort(),
 			':id' => $this->getId(),
-			':now' => $date,
 			);
 		mfwDBIBase::query($sql,$bind,$con);
 	}
+
+	public function updateLastCommented($date,$con=null)
+	{
+		$this->row['last_commented'] = $date;
+		$this->calcDateToSort();
+
+		$sql = 'UPDATE application SET last_commented = :last_commented, date_to_sort = :date_to_sort WHERE id = :id';
+		$bind = array(
+			':last_commented' => $this->getLastCommented(),
+			':date_to_sort' => $this->getDateToSort(),
+			':id' => $this->getId(),
+			);
+		mfwDBIBase::query($sql,$bind,$con);
+	}
+
 	public function getAPIKey()
 	{
 		return $this->value('api_key');
@@ -256,7 +295,7 @@ class ApplicationDb extends mfwObjectDb {
 			'api_key' => static::makeApiKey(),
 			'description' => $description,
 			'repository' => $repository,
-			'last_upload' => $now,
+			'date_to_sort' => $now,
 			'created' => $now,
 			);
 		$app = new Application($row);
@@ -283,7 +322,7 @@ class ApplicationDb extends mfwObjectDb {
 
 	public static function selectAllByUpdateOrder()
 	{
-		$query = 'ORDER BY last_upload DESC';
+		$query = 'ORDER BY date_to_sort DESC';
 		return static::selectSet($query);
 	}
 
@@ -296,7 +335,7 @@ class ApplicationDb extends mfwObjectDb {
 
 	public static function selectByUpdateOrderWithLimit($offset, $count)
 	{
-		$query = sprintf('ORDER BY last_upload DESC LIMIT %d, %d', $offset, $count);
+		$query = sprintf('ORDER BY date_to_sort DESC LIMIT %d, %d', $offset, $count);
 		return static::selectSet($query);
 	}
 

@@ -34,14 +34,9 @@ class deleteAction extends apiActions
 
 			if($app->getLastUpload()==$pkg->getCreated()){
 				// 最終アップデート時刻を前のものに戻す
-				$pkgs = PackageDb::selectByAppId($app->getId());
-				if($pkgs->count()>0){
-					$pkgs->rewind();
-					$lastupload = $pkgs->current()->getCreated();
-				}
-				else{
-					$lastupload = $app->getCreated();
-				}
+				$pkg = PackageDb::selectNewestOneByAppId($app->getId());
+				$lastupload = ($pkg)? $pkg->getCreated(): null;
+
 				$app->updateLastUpload($lastupload,$con);
 			}
 

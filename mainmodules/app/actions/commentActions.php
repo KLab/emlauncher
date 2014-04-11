@@ -45,6 +45,8 @@ class commentActions extends appActions
 
 			$comment = CommentDb::post($this->login_user,$this->app,$package_id,$message);
 
+			$this->app->updateLastCommented($comment->getCreated());
+
 			$con->commit();
 		}
 		catch(Exception $e){

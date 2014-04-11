@@ -17,6 +17,10 @@
       <dt>last upload</dt>
       <dd><?=$app->getLastUpload()?></dd>
 <?php endif ?>
+<?php if($app->getLastCommented()): ?>
+      <dt>last comment</dt>
+      <dd><?=$app->getLastCommented()?></dd>
+<?php endif ?>
       <dt>created</dt>
       <dd><?=$app->getCreated()?></dd>
       <dt>install user</dt>
