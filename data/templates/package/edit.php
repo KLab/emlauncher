@@ -72,6 +72,14 @@ foreach($app->getTags() as $tag):
       </div>
 
       <div class="form-group">
+        <label for="protect" class="control-label col-md-2">Protect</label>
+        <div class="col-md-10">
+          <input type="checkbox" class="hidden" id="protect" name="protect" value="1">
+          <button class="btn btn-default lock-toggle" data-toggle="button"><i class="fa"></i></button>
+        </div>
+      </div>
+
+      <div class="form-group">
         <div class="col-md-10 col-md-offset-2">
           <button class="btn btn-primary"><i class="fa fa-save"></i> Save</button>
           <a class="btn btn-default" href="<?=url("/package?id={$package->getId()}")?>"><i class="fa fa-times"></i> Cancel</a>
@@ -150,6 +158,16 @@ $('#title').keydown(function(event){
   }
   return true;
 });
+
+// initialize protect button state
+if($('#protect').prop('checked')){
+    $('#protect').next().addClass('active');
+};
+// toggle lock-toggle
+$('#protect+button.lock-toggle').on('click',function(event){
+  $(this).prev().prop('checked',!$(this).hasClass('active'));
+});
+
 
 // form validation
 $('form').submit(function(){
