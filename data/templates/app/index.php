@@ -88,6 +88,9 @@ foreach($top_comments as $c):
         <td class="package-list-item-info">
           <div class="row">
             <div class="col-xs-12 col-md-7">
+<?php if($pkg->isProtected()): ?>
+              <i class="fa fa-lock"></i>
+<?php endif ?>
               <a class="title" href="<?=url('/package?id='.$pkg->getId())?>"><?=htmlspecialchars($pkg->getTitle())?></a>
 <?php if($pkg->getDescription()):?>
               <p class="text-muted description"><?=$pkg->getShortDescription()?></p>
