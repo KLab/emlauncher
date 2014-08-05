@@ -27,6 +27,7 @@ class editActions extends packageActions
 		$title = mfwRequest::param('title');
 		$description = mfwRequest::param('description');
 		$tag_names = mfwRequest::param('tags');
+		$protect = (bool)mfwRequest::param('protect');
 
 		if(!$title){
 			error_log(__METHOD__.'('.__LINE__."): bad request: $temp_name, $title");
@@ -40,7 +41,7 @@ class editActions extends packageActions
 			$tags = $app->getTagsByName($tag_names,$con);
 
 			$pkg = PackageDb::retrieveByPKForUpdate($this->package->getId(),$con);
-			$pkg->updateInfo($title,$description,$tags);
+			$pkg->updateInfo($title,$description,$protect,$tags);
 
 			$con->commit();
 		}

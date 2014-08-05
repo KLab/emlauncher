@@ -74,7 +74,7 @@ foreach($app->getTags() as $tag):
       <div class="form-group">
         <label for="protect" class="control-label col-md-2">Protect</label>
         <div class="col-md-10">
-          <input type="checkbox" class="hidden" id="protect" name="protect" value="1">
+          <input type="checkbox" class="hidden" id="protect" name="protect" value="1"<?=$package->isProtected()?' checked="checked"':''?>>
           <button class="btn btn-default lock-toggle" data-toggle="button"><i class="fa"></i></button>
         </div>
       </div>

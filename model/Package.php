@@ -72,6 +72,9 @@ class Package extends mfwObject {
 	public function getFileSize(){
 		return $this->value('file_size');
 	}
+	public function isProtected(){
+		return (bool)$this->value('protect');
+	}
 	public function getCreated($format=null){
 		$created = $this->value('created');
 		if($created && $format){
@@ -164,10 +167,11 @@ class Package extends mfwObject {
 		return count($users);
 	}
 
-	public function updateInfo($title,$description,TagSet $tags,$con=null)
+	public function updateInfo($title,$description,$protect,TagSet $tags,$con=null)
 	{
 		$this->row['title'] = $title;
 		$this->row['description'] = $description;
+		$this->row['protect'] = $protect? 1: 0;
 		$this->update($con);
 		$this->applyTags($tags,$con);
 	}
