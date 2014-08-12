@@ -282,5 +282,28 @@ class PackageDb extends mfwObjectDb {
 		$sql .= sprintf(' ORDER BY p.id DESC LIMIT %d, %d', $offset, $count);
 		return new PackageSet(mfwDBIBase::getAll($sql, $bind));
 	}
+
+	/**
+	 * 削除すべきパッケージを取得.
+	 * @param[in] Application $app 対象アプリ
+	 * @param[in] int $keep 削除ぜず保持する上限数
+	 */
+	public function selectDeletablePackages(Application $app,$keepcount=100)
+	{
+		$deletable = new PackageSet;
+		$pkgs = static::selectByAppId($app->getId());
+		foreach($pkgs as $pkg){
+			if($keepcount>0){
+				--$keepcount;
+				continue;
+			}
+
+			if(!$pkg->isProtected()){
+				$deletable[] = $pkg;
+			}
+		}
+
+		return $deletable;
+	}
 }
 
