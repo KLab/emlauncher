@@ -22,6 +22,10 @@
       <h3 class="list-group-item-heading">Delete API</h3>
       <p class="list-gorup-item-text">Delete a package.</p>
     </a>
+    <a href="<?=url('/doc/api_create_token')?>" class="list-group-item">
+      <h3 class="list-group-item-heading">Create Token API</h3>
+      <p class="list-gorup-item-text">Create Token and return install url.</p>
+    </a>
   </div>
 
 
