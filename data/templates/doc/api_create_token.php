@@ -67,7 +67,7 @@
  <div>
     <h3 class="subheader">Sample Curl</h3>
     <div class="container">
-      <pre><code>curl <?=url('/api/create_token?api_key={application_api_key}&mail={mail_address}')?></code></pre>
+      <pre><code>curl <?=url('/api/create_token?api_key={application_api_key}&id={package_id}&mail={mail_address}')?></code></pre>
     </div>
  </div>
 
