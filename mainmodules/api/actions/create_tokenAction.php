@@ -3,9 +3,11 @@ require_once __DIR__.'/actions.php';
 require_once APP_ROOT.'/model/Application.php';
 require_once APP_ROOT.'/model/Package.php';
 
-class create_install_tokenAction extends apiActions
+class create_tokenAction extends apiActions
 {
-    public function executeCreate_install()
+    const INSTALL_TOKEN_PREFIX = 'pkg_install_token_';
+
+    public function executeCreate_token()
     {
         try{
             $api_key = mfwRequest::param('api_key');
@@ -45,7 +47,7 @@ class create_install_tokenAction extends apiActions
             apache_log('token_data',$tokendata);
 
             # return
-            $red = $this->makePackageArray($pkg);
+            $ret = $this->makePackageArray($pkg);
             $ret['install_url'] = mfwRequest::makeURL("/package/install?token={$token}");
 
         }
