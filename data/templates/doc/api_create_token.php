@@ -24,8 +24,8 @@
         <dd>
           <ul>
             <li><code>api_key</code> - Required (See the application preferences)</li>
-            <li><code>id</code> - Required (See the application preferences)</li>
-            <li><code>mail</code> - Required (See the application preferences)</li>
+            <li><code>id</code> - Required, package id  to create a token </li>
+            <li><code>mail</code> - Required, your mail address </li>
           </ul>
         </dd>
       </dl>
