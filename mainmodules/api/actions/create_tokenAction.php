@@ -30,6 +30,13 @@ class create_tokenAction extends apiActions
                     self::HTTP_400_BADREQUEST,
                     array('error'=>'Invalid package id'));
             }
+            // mail check
+            $owner_mails = $app->getOwners()->getMailArray();
+            if ( ! in_array($mail, $owner_mails)){
+                return $this->jsonResponse(
+                    self::HTTP_400_BADREQUEST,
+                    array('error'=>'Invalid mail address'));
+            }
 
             // create install token
             $expire_hour = empty($expire_hour) ? 1 :  $expire_hour;

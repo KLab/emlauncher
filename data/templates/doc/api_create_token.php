@@ -25,7 +25,7 @@
           <ul>
             <li><code>api_key</code> - Required (See the application preferences)</li>
             <li><code>id</code> - Required, package id  to create a token </li>
-            <li><code>mail</code> - Required, your mail address </li>
+            <li><code>mail</code> - Required, owner mail address </li>
             <li><code>expire</code> - Optional, expiration time specified in units of hour</li>
           </ul>
         </dd>
