@@ -10,10 +10,12 @@ class create_tokenAction extends apiActions
     public function executeCreate_token()
     {
         try{
-            $api_key = mfwRequest::param('api_key');
-            $pkg_id  = mfwRequest::param('id');
-            $mail    = mfwRequest::param('mail');
+            $api_key     = mfwRequest::param('api_key');
+            $pkg_id      = mfwRequest::param('id');
+            $mail        = mfwRequest::param('mail');
+            $expire_hour = mfwRequest::param('expire_hour');
 
+            // api_key check
             $app = ApplicationDb::selectByApiKey($api_key);
             if(!$app){
                 return $this->jsonResponse(
@@ -21,7 +23,7 @@ class create_tokenAction extends apiActions
                     array('error'=>'Invalid api_key'));
             }
 
-            # id check
+            // id check
             $pkg = PackageDb::retrieveByPK($pkg_id);
             if(!$pkg || $app->getId()!==$pkg->getAppId()){
                 return $this->jsonResponse(
@@ -29,8 +31,9 @@ class create_tokenAction extends apiActions
                     array('error'=>'Invalid package id'));
             }
 
-            # create install token
-            $token_expire = '+1 hours';
+            // create install token
+            $expire_hour = empty($expire_hour) ? 1 :  $expire_hour;
+            $token_expire = sprintf('+%s hours', $expire_hour);
 
             $expire_time = strtotime($token_expire);
             $mc_expire = $expire_time - time();
@@ -46,7 +49,6 @@ class create_tokenAction extends apiActions
             apache_log('token',$token);
             apache_log('token_data',$tokendata);
 
-            # return
             $ret = $this->makePackageArray($pkg);
             $ret['install_url'] = mfwRequest::makeURL("/package/install?token={$token}");
 
