@@ -19,7 +19,7 @@ class MainActions extends mfwActions
 
 		// いくつかのapiはAPI Key認証なのでログイン不要
 		if($this->module==='api'){
-			if(in_array($this->action,array('upload','package_list','delete'))){
+			if(in_array($this->action,array('upload','package_list','delete', 'create_token'))){
 				return null;
 			}
 		}
