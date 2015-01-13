@@ -108,9 +108,10 @@ class Package extends mfwObject {
 		}
 		return $this->tags;
 	}
-	public function applyTags(TagSet $tags,$con=null)
+	public function initTags(TagSet $tags,$con=null)
 	{
-		$this->tags = TagDb::updatePackageTags($this->getId(),$tags,$con);
+		TagDb::insertPackageTags($this,$tags,$con);
+		$this->tags = $tags;
 	}
 
 	protected function getFileKey()
@@ -169,7 +170,9 @@ class Package extends mfwObject {
 		$this->row['title'] = $title;
 		$this->row['description'] = $description;
 		$this->update($con);
-		$this->applyTags($tags,$con);
+		TagDb::removeFromPackage($this,$con);
+		TagDb::insertPackageTags($this,$tags,$con);
+		$this->tags = $tags;
 	}
 
 	public function delete($con=null)
@@ -231,7 +234,7 @@ class PackageDb extends mfwObjectDb {
 			);
 		$pkg = new Package($row);
 		$pkg->insert($con);
-		$pkg->applyTags($tags,$con);
+		$pkg->initTags($tags,$con);
 		return $pkg;
 	}
 
