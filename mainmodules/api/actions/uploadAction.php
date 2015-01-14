@@ -40,6 +40,7 @@ class uploadAction extends apiActions
 					self::HTTP_400_BADREQUEST,
 					array('error'=>'Invalid api_key'));
 			}
+			apache_log('app_id',$app->getId());
 
 			// ファイルフォーマット確認, 情報抽出
 			list($platform,$ext,$mime) = PackageDb::getPackageInfo(
@@ -62,6 +63,7 @@ class uploadAction extends apiActions
 				$app->getId(),$platform,$ext,
 				$title,$description,$ios_identifier,
 				$file_info['name'],$file_info['size'],$tags,$con);
+			apache_log('pkg_id',$pkg->getId());
 
 			// S3へアップロード
 			$pkg->uploadFile($file_info['tmp_name'],$mime);
@@ -77,9 +79,6 @@ class uploadAction extends apiActions
 				self::HTTP_500_INTERNALSERVERERROR,
 				array('error'=>$e->getMessage(),'exception'=>get_class($e)));
 		}
-
-		apache_log('app_id',$app->getId());
-		apache_log('pkg_id',$pkg->getId());
 
 		if($notify){
 			try{
