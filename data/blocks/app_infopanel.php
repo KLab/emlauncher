@@ -42,15 +42,22 @@
 <?php endif ?>
 <?php if($app->getRepository()): ?>
       <dt>repository</dt>
-<?php if(preg_match('|https?://([^/]*)/|',$app->getRepository(),$m)):?>
+<?php if(preg_match('|^https?://([^/]*)/(.*)$|',$app->getRepository(),$m)):?>
       <dd>
-        <a target="_blank" href="<?=htmlspecialchars($app->getRepository())?>">
-<?php if(strpos($m[1],'github')!==false): ?>
+        <a target="_blank" href="<?=htmlspecialchars($app->getRepository())?>" class="repository-link">
+<?php if($m[1]==='github.com'): ?>
           <i class="fa fa-github"></i>
+          <?=htmlspecialchars($m[2]);?>
+<?php elseif(strpos($m[1],'github')!==false): /* may be github enterprise */ ?>
+          <i class="fa fa-github-square"></i>
+          <?=htmlspecialchars($m[2]);?>
 <?php elseif(strpos($m[1],'bitbucket')!==false): ?>
           <i class="fa fa-bitbucket"></i>
+          <?=htmlspecialchars($m[2]);?>
+<?php else: ?>
+          <?=htmlspecialchars("{$m[1]}/{$m[2]}")?>
 <?php endif ?>
-          <?=htmlspecialchars($m[1])?>
+
         </a>
       </dd>
 <?php else: ?>

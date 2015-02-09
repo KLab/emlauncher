@@ -346,3 +346,10 @@ h3 {
   display: inline-block;
 }
 
+.repository-link {
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  overflow: hidden;
+  display: inline-block;
+  width: 100%;
+}
