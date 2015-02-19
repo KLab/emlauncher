@@ -14,6 +14,7 @@ class S3 {
 			array(
 				'key' => $this->config['key'],
 				'secret' => $this->config['secret'],
+				'base_url' => $this->config['base_url'],
 				));
 	}
 	protected function singleton()
@@ -91,9 +92,6 @@ class S3 {
 	{
 		$s3 = static::singleton();
 		$bucket = $s3->config['bucket_name'];
-		if($expires===null){
-			return "https://{$bucket}.s3.amazonaws.com/{$key}";
-		}
 		return $s3->client->getObjectUrl($bucket,$key,$expires);
 	}
 
