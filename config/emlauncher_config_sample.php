@@ -49,21 +49,6 @@ $emlauncher_config = array(
 			'allowed_mailaddr_pattern' => '/@klab\.com$/',
 			),
 
-		/** AWSの設定 */
-		'aws' => array(
-			/**
-			 * APIアクセスのためのKeyとSecret.
-			 */
-			'key' => 'xxxxxxxx',
-			'secret' => 'xxxxxxxx',
-
-			/** S3のRegion. */
-			'region' => Aws\Common\Enum\Region::TOKYO,
-
-			/** S3のbucket名. 予め作成しておく. */
-			'bucket_name' => 'emlauncher',
-			),
-
 		/** Azureの設定 */
 		'azure' => array(
 					'connectionString' => 'DefaultEndpointsProtocol=[http|https];AccountName=[yourAccount];AccountKey=[yourKey]',
