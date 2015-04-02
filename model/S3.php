@@ -19,7 +19,7 @@ class S3 {
 
 			case 'azure' :
 				$this->config = Config::get ( 'azure' );
-				$this->client = ServicesBuilder::getInstance ();
+				$this->client = WindowsAzure\Blob\ServicesBuilder::getInstance ();
 
 				break;
 
