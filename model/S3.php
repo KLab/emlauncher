@@ -55,7 +55,7 @@ class S3 {
 
 			case 'azure' :
 				$blobService = $myInstance->client->createBlobService ( $myInstance->config ['connectionString'] );
-				return $blobService->createBlockBlob ( $container, $key, Guzzle\Http\EntityBody::factory ( $data ) );
+				return $blobService->createBlockBlob ( $myInstance->config ['container'], $key, Guzzle\Http\EntityBody::factory ( $data ) );
 		}
 	}
 	public static function uploadFile($key, $filename, $type, $acl = 'private') {
@@ -121,7 +121,7 @@ class S3 {
 
 			case 'azure' :
 				$blobService = $myInstance->client->createBlobService ( $myInstance->config ['connectionString'] );
-				$blobService->deleteBlob ( $container, $key );
+				$blobService->deleteBlob ( $myInstance->config ['container'], $key );
 				break;
 		}
 	}
