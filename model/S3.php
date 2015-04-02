@@ -1,6 +1,6 @@
 <?php
 require_once APP_ROOT . '/model/Config.php';
-require_once 'vendor\autoload.php';
+require_once APP_ROOT . '/vendor/autoload.php';
 
 use WindowsAzure\Common\ServicesBuilder;
 use WindowsAzure\Blob\Models\CreateContainerOptions;
