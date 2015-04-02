@@ -11,9 +11,9 @@ $serverenv_config = array(
 	'application_identifier' => 'ohoflight2',
 
 	/**
-	 * EC2環境用の設定 (httpd.confでSetEnv MFW_ENV 'ec2')
+	 * WindowsAzure環境用の設定 (httpd.confでSetEnv MFW_ENV 'WindowsAzure')
 	 */
-	'ec2' => array(
+	'WindowsAzure' => array(
 
 		/**
 		 * Database設定
@@ -43,5 +43,5 @@ $serverenv_config = array(
 
 	);
 
-$serverenv_config['local'] = $serverenv_config['ec2'];
+$serverenv_config['local'] = $serverenv_config['WindowsAzure'];
 

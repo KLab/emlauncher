@@ -30,7 +30,7 @@ class Application extends mfwObject {
 	}
 	public function getIconUrl()
 	{
-		return S3::url($this->value('icon_key'));
+		return AzureBlob::url($this->value('icon_key'));
 	}
 
 	public function getLastUpload($format=null){
@@ -225,7 +225,7 @@ class Application extends mfwObject {
 
 		if($old_icon_key){
 			try{
-				S3::delete($old_icon_key);
+				AzureBlob::delete($old_icon_key);
 			}
 			catch(Exception $e){
 				error_log(__METHOD__.'('.__LINE__.'): '.get_class($e).":{$e->getMessage()}");
@@ -267,7 +267,7 @@ class ApplicationDb extends mfwObjectDb {
 		$im->setFormat('png');
 
 		$key = static::ICON_DIR."$app_id/".Random::string(16).'.png';
-		S3::uploadData($key,$im,'image/png','public-read');
+		AzureBlob::uploadData($key,$im,'image/png','public-read');
 
 		return $key;
 	}

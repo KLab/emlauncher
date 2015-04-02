@@ -6,8 +6,8 @@
 require_once APP_ROOT.'/libs/aws/aws-autoloader.php';
 
 $emlauncher_config = array(
-	/** EC2環境用の設定 (httpd.confでSetEnv MFW_ENV 'ec2') */
-	'ec2' => array(
+	/** WindowsAzure環境用の設定 (httpd.confでSetEnv MFW_ENV 'WindowsAzure') */
+	'WindowsAzure' => array(
 
 		/**
 		 * アップデート通知やパスワードリセットのメールの送信元アドレス.
@@ -60,9 +60,9 @@ $emlauncher_config = array(
 
 /**
  * ローカル環境用の設定. (MFW_ENV=local)
- * Googleアカウント認証を無効にし、bucket名も変更している.
+ * Googleアカウント認証を無効にし、container名も変更している.
  */
-$emlauncher_config['local'] = $emlauncher_config['ec2'];
+$emlauncher_config['local'] = $emlauncher_config['WindowsAzure'];
 $emlauncher_config['local']['login']['enable_google_auth'] = false;
-$emlauncher_config['local']['aws']['bucket_name'] = 'emlauncher-dev';
+$emlauncher_config['local']['azure']['container'] = 'emlauncher-dev';
 
