@@ -63,6 +63,13 @@ $emlauncher_config = array(
 			/** S3のbucket名. 予め作成しておく. */
 			'bucket_name' => 'emlauncher',
 			),
+
+		/** Azureの設定 */
+		'azure' => array(
+					'connectionString' => 'DefaultEndpointsProtocol=[http|https];AccountName=[yourAccount];AccountKey=[yourKey]',
+					'container' => '[containerName]',
+					'url' => 'https://xxxx.blob.core.windows.net/xxxx',
+			),
 		),
 	);
 
