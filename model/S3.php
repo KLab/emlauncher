@@ -6,7 +6,6 @@ use WindowsAzure\Common\ServicesBuilder;
 use WindowsAzure\Blob\Models\CreateContainerOptions;
 use WindowsAzure\Blob\Models\PublicAccessType;
 use WindowsAzure\Common\ServiceException;
-
 class S3 {
 	protected static $singleton = null;
 	protected $config;
@@ -55,7 +54,7 @@ class S3 {
 				) );
 
 			case 'azure' :
-				$blobService = $myInstance->client->createBlobService ( $this->config ['connectionString'] );
+				$blobService = $myInstance->client->createBlobService ( $myInstance->config ['connectionString'] );
 				return $blobService->createBlockBlob ( $container, $key, Guzzle\Http\EntityBody::factory ( $data ) );
 		}
 	}
@@ -102,7 +101,7 @@ class S3 {
 				) );
 				break;
 			case 'azure' :
-				$blobService = $myInstance->client->createBlobService ( $this->config ['connectionString'] );
+				$blobService = $myInstance->client->createBlobService ( $myInstance->config ['connectionString'] );
 				$content = $blobService->getBlob ( $myInstance->config ['container'], $srckey )->getContentStream ();
 				$blobService->createBlockBlob ( $myInstance->config ['container'], $dstkey, $content );
 				$blobService->deleteBlob ( $myInstance->config ['container'], $srckey );
@@ -121,7 +120,7 @@ class S3 {
 				break;
 
 			case 'azure' :
-				$blobService = $myInstance->client->createBlobService ( $this->config ['connectionString'] );
+				$blobService = $myInstance->client->createBlobService ( $myInstance->config ['connectionString'] );
 				$blobService->deleteBlob ( $container, $key );
 				break;
 		}
