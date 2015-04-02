@@ -1,5 +1,12 @@
 <?php
 require_once APP_ROOT . '/model/Config.php';
+require_once 'vendor\autoload.php';
+
+use WindowsAzure\Common\ServicesBuilder;
+use WindowsAzure\Blob\Models\CreateContainerOptions;
+use WindowsAzure\Blob\Models\PublicAccessType;
+use WindowsAzure\Common\ServiceException;
+
 class S3 {
 	protected static $singleton = null;
 	protected $config;
@@ -19,7 +26,7 @@ class S3 {
 
 			case 'azure' :
 				$this->config = Config::get ( 'azure' );
-				$this->client = WindowsAzure\Blob\ServicesBuilder::getInstance ();
+				$this->client = ServicesBuilder::getInstance ();
 
 				break;
 
