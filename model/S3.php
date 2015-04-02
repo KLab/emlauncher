@@ -55,7 +55,7 @@ class S3 {
 
 			case 'azure' :
 				$blobService = $myInstance->client->createBlobService ( $myInstance->config ['connectionString'] );
-				return $blobService->createBlockBlob ( $myInstance->config ['container'], $key, $data );
+				return $blobService->createBlockBlob ( $myInstance->config ['container'], $key, (string)$data );
 		}
 	}
 	public static function uploadFile($key, $filename, $type, $acl = 'private') {
