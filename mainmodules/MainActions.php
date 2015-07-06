@@ -9,6 +9,9 @@ class MainActions extends mfwActions
 
 	const SESKEY_URL_BEFORE_LOGIN = 'url_before_login';
 
+	/**
+	 * @var User
+	 */
 	protected $login_user = null;
 
 	public function initialize()
