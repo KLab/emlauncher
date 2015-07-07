@@ -23,6 +23,10 @@ class GuestPass extends mfwObject {
         return $this->value('token');
     }
 
+    public function getCreated(){
+        return $this->value('created');
+    }
+
     public function getExpired(){
         return $this->value('expired');
     }
@@ -83,5 +87,15 @@ class GuestPassDb extends mfwObjectDb {
         $query = 'WHERE token = :token LIMIT 1';
         $bind = array(':token' => $token);
         return static::selectOne($query,$bind);
+    }
+
+    public static function selectByPackageId($pakcage_id, $is_active = true)
+    {
+        $sql = 'SELECT * FROM guest_pass WHERE package_id = ?';
+        if ($is_active) {
+            $sql .=" AND expired > '".date("Y-m-d H:i:s")."'";
+        }
+        $rows = mfwDBIBase::getAll($sql,array($pakcage_id));
+        return new GuestPassSet($rows);
     }
 }
