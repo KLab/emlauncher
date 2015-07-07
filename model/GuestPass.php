@@ -11,6 +11,10 @@ class GuestPass extends mfwObject {
         return $this->value('id');
     }
 
+    public function getPackageId(){
+        return $this->value('package_id');
+    }
+
     public function getMail(){
         return $this->value('mail');
     }
@@ -47,9 +51,8 @@ class GuestPassDb extends mfwObjectDb {
 
 
     /**
-     * @param integer $app_id
-     * @param integer $package_id
-     * @param string $mail
+     * @param Package $package
+     * @param User $user
      * @param string $token
      * @param datetime $expired
      * @param PDO|null $con
@@ -68,5 +71,17 @@ class GuestPassDb extends mfwObjectDb {
         $guest_pass = new GuestPass($row);
         $guest_pass->insert($con);
         return $guest_pass;
+    }
+
+    /**
+     * @param string $token
+     * @param PDO|null $con
+     * @return GuestPass|null
+     */
+    public static function selectByToken($token, PDO $con=null)
+    {
+        $query = 'WHERE token = :token LIMIT 1';
+        $bind = array(':token' => $token);
+        return static::selectOne($query,$bind);
     }
 }

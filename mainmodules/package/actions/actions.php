@@ -24,6 +24,11 @@ class packageActions extends MainActions
 			return $this->initializeByInstallToken(mfwRequest::param('token'));
 		}
 
+		if($this->action==='guestpass_install' && mfwRequest::has('token')){
+			// guestpass installの場合, guestpass token情報のみで認証する.
+			return $this->initializeByGuestPassToken(mfwRequest::param('token'));
+		}
+
 		if(($err=parent::initialize())){
 			return $err;
 		}
@@ -73,6 +78,27 @@ class packageActions extends MainActions
 
 		$this->app = $this->package->getApplication();
 		$this->login_user = new User($tokendata['mail']);
+
+		return null;
+	}
+
+	public function initializeByGuestPassToken($token)
+	{
+		$guest_pass = GuestpassDb::selectByToken($token);
+		apache_log('guest_pass', $guest_pass);
+		if (is_null($guest_pass) || strtotime($guest_pass->getExpired()) < time()) {
+			error_log("invalid guestpass token: $token");
+			return $this->response(self::HTTP_403_FORBIDDEN,'invalid token');
+		}
+
+		$this->package = PackageDb::retrieveByPK($guest_pass->getPackageId());
+
+		if (!$this->package) {
+			return $this->response(self::HTTP_404_NOTFOUND, '');
+		}
+
+		$this->app = $this->package->getApplication();
+		$this->login_user = new User($guest_pass->getMail());
 
 		return null;
 	}
