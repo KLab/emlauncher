@@ -89,8 +89,8 @@
 <?php foreach($package->getGuestPasses() as $guest_pass): ?>
                 <tr>
                     <td><a href="<?=url("/package/guestpass?id={$guest_pass->getPackageId()}&guestpass_id={$guest_pass->getId()}")?>"><?=$guest_pass->getCreated()?></td>
-                    <td>0 views</td>
-                    <td>Expire</td>
+                    <td>0 installed</td>
+                    <td><a href="<?=url("/package/expire_guestpass?id={$guest_pass->getPackageId()}&guestpass_id={$guest_pass->getId()}")?>">Expire</a></td>
                 </tr>
 <?php endforeach; ?>
             </tbody>

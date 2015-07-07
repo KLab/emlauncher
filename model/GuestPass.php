@@ -30,6 +30,15 @@ class GuestPass extends mfwObject {
     public function getExpired(){
         return $this->value('expired');
     }
+
+    public function execExpired(PDO $con = null){
+        $sql = 'UPDATE guest_pass SET expired = :expired WHERE id = :id';
+        $bind = array(
+            ':expired' => date("Y-m-d H:i:s"),
+            ':id' => $this->getId(),
+        );
+        mfwDBIBase::query($sql,$bind,$con);
+    }
 }
 
 /**

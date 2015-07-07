@@ -144,6 +144,10 @@ class packageActions extends MainActions
 
 	public function executeCreate_guestpass()
 	{
+		// オーナー以外はguestpass作成出来ない
+		if ($this->app->isOwner($this->login_user) == false) {
+			return $this->buildErrorPage('Not Found',array(self::HTTP_404_NOTFOUND));
+		}
 		$expired = "+1 week";
 
 		$expire_time = strtotime($expired);
@@ -171,7 +175,7 @@ class packageActions extends MainActions
 		/* @var GuestPass $guest_pass */
 		$guest_pass = GuestPassDb::retrieveByPK(mfwRequest::param('guestpass_id'));
 
-		if (is_null($guest_pass) || $guest_pass->getMail() != $this->login_user->getMail()) {
+		if (is_null($guest_pass) || $this->app->isOwner($this->login_user) == false) {
 			return $this->buildErrorPage('Not Found',array(self::HTTP_404_NOTFOUND));
 		}
 
@@ -181,5 +185,19 @@ class packageActions extends MainActions
 			'guestpass_url' => mfwRequest::makeUrl("/package/guestpass_install?token={$guest_pass->getToken()}"),
 		);
 		return $this->build($params);
+	}
+
+	public function executeExpire_guestpass()
+	{
+		/* @var GuestPass $guest_pass */
+		$guest_pass = GuestPassDb::retrieveByPK(mfwRequest::param('guestpass_id'));
+
+		if (is_null($guest_pass) || $this->app->isOwner($this->login_user) == false) {
+			return $this->buildErrorPage('Not Found',array(self::HTTP_404_NOTFOUND));
+		}
+
+		$guest_pass->execExpired();
+
+		return $this->redirect("/package/?id={$this->package->getId()}");
 	}
 }
