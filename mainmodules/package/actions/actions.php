@@ -1,12 +1,20 @@
 <?php
 require_once APP_ROOT.'/model/Package.php';
 require_once APP_ROOT.'/model/Random.php';
+require_once APP_ROOT.'/model/GuestPass.php';
 
 class packageActions extends MainActions
 {
 	const INSTALL_TOKEN_PREFIX = 'pkg_install_token_';
 
+	/**
+	 * @var Package
+	 */
 	protected $package = null;
+
+	/**
+	 * @var Application
+	 */
 	protected $app = null;
 
 	public function initialize()
@@ -108,4 +116,44 @@ class packageActions extends MainActions
 		return $this->build($params);
 	}
 
+	public function executeCreate_guestpass()
+	{
+		$expired = "+1 week";
+
+		$expire_time = strtotime($expired);
+
+		$tokendata = array(
+			'mail' => $this->login_user->getMail(),
+			'package_id' => $this->package->getId(),
+			'expire' => date('Y-m-d H:i:s', $expire_time),
+		);
+		$token = Random::string(32);
+
+		// TODO guest_passをDBに保存
+		$guest_pass = GuestPassDb::insertNewGuestPass(
+			$this->package,
+			$this->login_user,
+			$token,
+			$tokendata['expire']
+		);
+
+		return $this->redirect("/package/guestpass?id={$this->package->getId()}&guestpass_id={$guest_pass->getId()}");
+	}
+
+	public function executeGuestpass()
+	{
+		/* @var GuestPass $guest_pass */
+		$guest_pass = GuestPassDb::retrieveByPK(mfwRequest::param('guestpass_id'));
+
+		if (is_null($guest_pass) || $guest_pass->getMail() != $this->login_user->getMail()) {
+			return $this->buildErrorPage('Not Found',array(self::HTTP_404_NOTFOUND));
+		}
+
+		$params = array(
+			'token' => $guest_pass->getToken(),
+			'expire' => $guest_pass->getExpired(),
+			'guestpass_url' => mfwRequest::makeUrl("/package/guestpass_install?token={$guest_pass->getToken()}"),
+		);
+		return $this->build($params);
+	}
 }

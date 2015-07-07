@@ -84,7 +84,8 @@
 
     <div class="col-xs-12 col-sm-9">
       <p class="text-center">
-        <a class="btn btn-default" href="<?=url("/package/create_token?id={$package->getId()}")?>"><i class="fa fa-bolt"></i> Create Install Token</a>
+        <a class="btn btn-default" href="<?=url("/package/create_token?id={$package->getId()}")?>"><i class="fa fa-bolt"></i> Create Install Token</a>&nbsp;
+        <a class="btn btn-default" href="<?=url("/package/create_guestpass?id={$package->getId()}")?>"><i class="fa fa-bolt"></i> Create GuestPass</a>
       </p>
     </div>
 
