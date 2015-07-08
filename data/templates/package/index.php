@@ -87,9 +87,9 @@
           <table class="table  table-striped table-bordered">
             <thead>
                 <tr>
-                    <th>有効期限</th>
-                    <th>インストール数</th>
-                    <th>削除</th>
+                    <th>Expire date</th>
+                    <th>Install count</th>
+                    <th></th>
                 </tr>
             </thead>
             <tbody>
@@ -97,7 +97,7 @@
                 <tr>
                     <td><a href="<?=url("/package/guestpass?id={$guest_pass->getPackageId()}&guestpass_id={$guest_pass->getId()}")?>"><?=$guest_pass->getExpired()?></td>
                     <td><?=$guest_pass->getInstallCount()?> installed</td>
-                    <td><a href="<?=url("/package/expire_guestpass?id={$guest_pass->getPackageId()}&guestpass_id={$guest_pass->getId()}")?>">Expire</a></td>
+                    <td><a class="btn btn-default btn-xs" href="<?=url("/package/expire_guestpass?id={$guest_pass->getPackageId()}&guestpass_id={$guest_pass->getId()}")?>">Expire</a></td>
                 </tr>
 <?php endforeach; ?>
             </tbody>
@@ -108,7 +108,7 @@
       <p class="text-center">
         <a class="btn btn-default" href="<?=url("/package/create_token?id={$package->getId()}")?>"><i class="fa fa-bolt"></i> Create Install Token</a>&nbsp;
 <?php if ($app->isOwner($login_user)):?>
-        <a class="btn btn-default" href="<?=url("/package/create_guestpass?id={$package->getId()}")?>"><i class="fa fa-bolt"></i> Create GuestPass</a>
+        <a class="btn btn-default" href="<?=url("/package/create_guestpass?id={$package->getId()}")?>"><i class="fa fa-users"></i> Create GuestPass</a>
 <?php endif; ?>
       </p>
     </div>
