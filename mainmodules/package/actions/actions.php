@@ -182,7 +182,7 @@ class packageActions extends MainActions
 		$guest_pass = GuestPassDb::retrieveByPK(mfwRequest::param('guestpass_id'));
 
 		if (is_null($guest_pass) || $this->app->isOwner($this->login_user) == false) {
-			return $this->buildErrorPage('Not Found',array(self::HTTP_404_NOTFOUND));
+			return $this->buildErrorPage('Forbidden',array(self::HTTP_403_FORBIDDEN));
 		}
 
 		$params = array(
