@@ -81,10 +81,35 @@
         <dd><a href="mailto:<?=$owner->getOwnerMail()?>"><?=$owner->getOwnerMail()?></a></dd>
 <?php endforeach ?>
     </dl>
-
+<?php if ($app->isOwner($login_user)):?>
+      <div class="col-xs-12 col-sm-9">
+          <h3>GuestPass</h3>
+          <table class="table  table-striped table-bordered">
+            <thead>
+                <tr>
+                    <th>Expire date</th>
+                    <th>Install count</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+<?php foreach($package->getGuestPasses() as $guest_pass): /* @var GuestPass $guest_pass */ ?>
+                <tr>
+                    <td><a href="<?=url("/package/guestpass?id={$guest_pass->getPackageId()}&guestpass_id={$guest_pass->getId()}")?>"><?=$guest_pass->getExpired()?></td>
+                    <td><?=$guest_pass->getInstallCount()?> installed</td>
+                    <td><a class="btn btn-default btn-xs" href="<?=url("/package/expire_guestpass?id={$guest_pass->getPackageId()}&guestpass_id={$guest_pass->getId()}")?>">Expire</a></td>
+                </tr>
+<?php endforeach; ?>
+            </tbody>
+          </table>
+      </div>
+<?php endif; ?>
     <div class="col-xs-12 col-sm-9">
       <p class="text-center">
-        <a class="btn btn-default" href="<?=url("/package/create_token?id={$package->getId()}")?>"><i class="fa fa-bolt"></i> Create Install Token</a>
+        <a class="btn btn-default" href="<?=url("/package/create_token?id={$package->getId()}")?>"><i class="fa fa-bolt"></i> Create Install Token</a>&nbsp;
+<?php if ($app->isOwner($login_user)):?>
+        <a class="btn btn-default" href="<?=url("/package/create_guestpass?id={$package->getId()}")?>"><i class="fa fa-users"></i> Create GuestPass</a>
+<?php endif; ?>
       </p>
     </div>
 
