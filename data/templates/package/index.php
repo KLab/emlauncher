@@ -85,10 +85,17 @@
       <div class="col-xs-12 col-sm-9">
           <h3>GuestPass</h3>
           <table class="table  table-striped table-bordered">
+            <thead>
+                <tr>
+                    <th>有効期限</th>
+                    <th>インストール数</th>
+                    <th>削除</th>
+                </tr>
+            </thead>
             <tbody>
 <?php foreach($package->getGuestPasses() as $guest_pass): /* @var GuestPass $guest_pass */ ?>
                 <tr>
-                    <td><a href="<?=url("/package/guestpass?id={$guest_pass->getPackageId()}&guestpass_id={$guest_pass->getId()}")?>"><?=$guest_pass->getCreated()?></td>
+                    <td><a href="<?=url("/package/guestpass?id={$guest_pass->getPackageId()}&guestpass_id={$guest_pass->getId()}")?>"><?=$guest_pass->getExpired()?></td>
                     <td><?=$guest_pass->getInstallCount()?> installed</td>
                     <td><a href="<?=url("/package/expire_guestpass?id={$guest_pass->getPackageId()}&guestpass_id={$guest_pass->getId()}")?>">Expire</a></td>
                 </tr>
