@@ -3,6 +3,7 @@ require_once __DIR__.'/actions.php';
 require_once APP_ROOT.'/model/InstallLog.php';
 require_once APP_ROOT.'/model/Random.php';
 require_once APP_ROOT.'/model/GuestPass.php';
+require_once APP_ROOT.'/model/GuestPassLog.php';
 
 class guestpass_installActions extends packageActions
 {
@@ -43,11 +44,11 @@ class guestpass_installActions extends packageActions
 			// iPhone以外でのアクセスはパッケージを直接DL
 			$url = $this->package->getFileUrl('+60 min');
 		}
-/*
+
 		$con = mfwDBConnection::getPDO();
 		$con->beginTransaction();
 		try{
-			InstallLog::Logging($this->login_user,$this->package,$ua,$con);
+			GuestPassLog::Logging($this->guest_pass ,$ua, $_SERVER['REMOTE_ADDR'],$con);
 			$con->commit();
 		}
 		catch(Exception $e){
@@ -55,7 +56,7 @@ class guestpass_installActions extends packageActions
 			error_log(__METHOD__.'('.__LINE__.'): '.get_class($e).":{$e->getMessage()}");
 			throw $e;
 		}
-*/
+
 		apache_log('app_id',$this->app->getId());
 		apache_log('pkg_id',$this->package->getId());
 		apache_log('platform',$this->package->getPlatform());

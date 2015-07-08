@@ -39,6 +39,14 @@ class GuestPass extends mfwObject {
         );
         mfwDBIBase::query($sql,$bind,$con);
     }
+
+    /**
+     * @return int
+     */
+    public function getInstallCount()
+    {
+        return GuestPassLog::selectCountByGuestPassId($this->getId());
+    }
 }
 
 /**

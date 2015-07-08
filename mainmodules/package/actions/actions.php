@@ -2,6 +2,7 @@
 require_once APP_ROOT.'/model/Package.php';
 require_once APP_ROOT.'/model/Random.php';
 require_once APP_ROOT.'/model/GuestPass.php';
+require_once APP_ROOT.'/model/GuestPassLog.php';
 
 class packageActions extends MainActions
 {
@@ -16,6 +17,11 @@ class packageActions extends MainActions
 	 * @var Application
 	 */
 	protected $app = null;
+
+	/**
+	 * @var GuestPass
+	 */
+	protected $guest_pass = null;
 
 	public function initialize()
 	{
@@ -84,21 +90,21 @@ class packageActions extends MainActions
 
 	public function initializeByGuestPassToken($token)
 	{
-		$guest_pass = GuestpassDb::selectByToken($token);
-		apache_log('guest_pass', $guest_pass);
-		if (is_null($guest_pass) || strtotime($guest_pass->getExpired()) < time()) {
+		$this->guest_pass = GuestpassDb::selectByToken($token);
+		apache_log('guest_pass', $this->guest_pass);
+		if (is_null($this->guest_pass) || strtotime($this->guest_pass->getExpired()) < time()) {
 			error_log("invalid guestpass token: $token");
 			return $this->response(self::HTTP_403_FORBIDDEN,'invalid token');
 		}
 
-		$this->package = PackageDb::retrieveByPK($guest_pass->getPackageId());
+		$this->package = PackageDb::retrieveByPK($this->guest_pass->getPackageId());
 
 		if (!$this->package) {
 			return $this->response(self::HTTP_404_NOTFOUND, '');
 		}
 
 		$this->app = $this->package->getApplication();
-		$this->login_user = new User($guest_pass->getMail());
+		$this->login_user = new User($this->guest_pass->getMail());
 
 		return null;
 	}

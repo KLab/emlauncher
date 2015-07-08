@@ -86,10 +86,10 @@
           <h3>GuestPass</h3>
           <table class="table  table-striped table-bordered">
             <tbody>
-<?php foreach($package->getGuestPasses() as $guest_pass): ?>
+<?php foreach($package->getGuestPasses() as $guest_pass): /* @var GuestPass $guest_pass */ ?>
                 <tr>
                     <td><a href="<?=url("/package/guestpass?id={$guest_pass->getPackageId()}&guestpass_id={$guest_pass->getId()}")?>"><?=$guest_pass->getCreated()?></td>
-                    <td>0 installed</td>
+                    <td><?=$guest_pass->getInstallCount()?> installed</td>
                     <td><a href="<?=url("/package/expire_guestpass?id={$guest_pass->getPackageId()}&guestpass_id={$guest_pass->getId()}")?>">Expire</a></td>
                 </tr>
 <?php endforeach; ?>
