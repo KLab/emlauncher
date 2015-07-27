@@ -83,5 +83,13 @@ class User
 		return PackageDb::retrieveByPKs($pkg_ids);
 	}
 
+
+	/**
+	 * @return GuestPass[]
+	 */
+	public function getGuestpasses()
+	{
+		return GuestPassDB::selectByOwnerMail($this->mail);
+	}
 }
 

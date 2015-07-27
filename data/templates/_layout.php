@@ -49,6 +49,7 @@
           <li class="dropdown">
             <a href="#" class="dropdown-toggle" data-toggle="dropdown"><?=htmlspecialchars($login_user->getMail())?> <b class="caret"></b></a>
             <ul class="dropdown-menu">
+              <li><a href="/guestpass/list">GuestPass history</a></li>
               <li><a href="<?=url('/logout')?>">Logout</a></li>
             </ul>
           </li>
