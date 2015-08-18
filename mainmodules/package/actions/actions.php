@@ -92,9 +92,12 @@ class packageActions extends MainActions
 	{
 		$this->guest_pass = GuestpassDb::selectByToken($token);
 		apache_log('guest_pass', $this->guest_pass);
-		if (is_null($this->guest_pass) || strtotime($this->guest_pass->getExpired()) < time()) {
+		if (is_null($this->guest_pass)) {
+			return $this->BuildErrorPage('Not Found', array(self::HTTP_404_NOTFOUND));
+		}
+		if (strtotime($this->guest_pass->getExpired()) < time()) {
 			error_log("invalid guestpass token: $token");
-			return $this->response(self::HTTP_403_FORBIDDEN,'invalid token');
+			return $this->BuildErrorpage('Invalid token', array(self::HTTP_403_FORBIDDEN));
 		}
 
 		$this->package = PackageDb::retrieveByPK($this->guest_pass->getPackageId());
