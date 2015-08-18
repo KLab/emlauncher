@@ -113,7 +113,7 @@
         <div class="form-group">
           <div class="col-xs-12">
 <?php foreach($app->getTags() as $tag): ?>
-            <input type="checkbox" class="hidden" name="tags[]" value="<?=htmlspecialchars($tag->getName())?>">
+            <input type="checkbox" class="hidden" name="tags[]" value="<?=$tag->getId()?>">
             <button class="btn btn-default delete-tags" data-toggle="button"><?=htmlspecialchars($tag->getName())?></button>
 <?php endforeach ?>
           </div>
