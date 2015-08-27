@@ -7,8 +7,17 @@ class GuestPass extends mfwObject {
     const DB_CLASS = 'GuestPassDb';
     const SET_CLASS = 'GuestPassSet';
 
+    /**
+     * @var Application
+     */
+    private $app = null;
+
     public function getId(){
         return $this->value('id');
+    }
+
+    public function getAppId() {
+        return $this->value('app_id');
     }
 
     public function getPackageId(){
@@ -46,6 +55,14 @@ class GuestPass extends mfwObject {
     public function getInstallCount()
     {
         return GuestPassLog::selectCountByGuestPassId($this->getId());
+    }
+
+    public function getApp()
+    {
+        if($this->app===null){
+            $this->app = ApplicationDb::retrieveByPK($this->getAppId());
+        }
+        return $this->app;
     }
 }
 
@@ -113,6 +130,25 @@ class GuestPassDb extends mfwObjectDb {
             $sql .=" AND expired > '".date("Y-m-d H:i:s")."'";
         }
         $rows = mfwDBIBase::getAll($sql,array($pakcage_id));
+        return new GuestPassSet($rows);
+    }
+
+    /**
+     * 指定したメールアドレスのユーザーがオーナー権を持つguest pass一覧を取得する
+     *
+     * @param $mail
+     * @param bool|true $is_active
+     * @return GuestPass[]
+     */
+    public static function selectByOwnerMail($mail, $is_active = true)
+    {
+        $sql = 'SELECT guest_pass.* FROM guest_pass, application_owner app_owner WHERE app_owner.owner_mail = ? AND guest_pass.app_id = app_owner.app_id';
+        if ($is_active) {
+            $sql .= " AND guest_pass.expired > '".date("Y-m-d H:i:s")."'";
+        }
+        $sql .= " ORDER BY guest_pass.expired ASC";
+
+        $rows = mfwDBIBase::getAll($sql,array($mail));
         return new GuestPassSet($rows);
     }
 }
