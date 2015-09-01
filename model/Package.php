@@ -288,6 +288,8 @@ class PackageDb extends mfwObjectDb {
 			$ph = static::makeInPlaceHolder($tags,$bind,'tag');
 			$c = count($tags);
 			$sql .= " AND t.tag_id in ($ph) GROUP BY p.id HAVING COUNT(p.id) = $c";
+		} else {
+			$sql .= " GROUP BY p.id";
 		}
 
 		$sql .= sprintf(' ORDER BY p.id DESC LIMIT %d, %d', $offset, $count);
