@@ -76,14 +76,14 @@ class preferencesActions extends appActions
 
 	public function executePreferences_delete_tags()
 	{
-		$tag_names = mfwRequest::param('tags');
-		if(!empty($tag_names)){
+		$tag_ids = mfwRequest::param('tags');
+		if(!empty($tag_ids)){
 			$con = mfwDBConnection::getPDO();
 			$con->beginTransaction();
 			try{
 				$this->app = ApplicationDb::retrieveByPkForUpdate($this->app->getId());
 
-				$this->app->deleteTags($tag_names,$con);
+				$this->app->deleteTagsByIds($tag_ids,$con);
 
 				$con->commit();
 			}

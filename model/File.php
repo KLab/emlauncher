@@ -1,4 +1,5 @@
-re_once APP_ROOT.'/model/Config.php';
+<?php
+require_once APP_ROOT.'/model/Config.php';
 
 class File {
 
