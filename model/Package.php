@@ -28,6 +28,7 @@ class Package extends mfwObject {
 
   protected $app = null;
   protected $tags = null;
+  protected $guest_passes = null;
   protected $install_users = null;
 
   public function getId(){
@@ -180,6 +181,17 @@ class Package extends mfwObject {
     TagDb::removeFromPackage($this,$con);
     return parent::delete($con);
   }
+
+  /**
+   * packageに紐付くguestpass一覧を取得する
+   */
+  public function getGuestPasses()
+  {
+    if($this->guest_passes===null){
+      $this->guest_passes = GuestPassDb::selectByPackageId($this->getId());
+    }
+    return $this->guest_passes;
+  }
 }
 
 /**
@@ -276,6 +288,8 @@ class PackageDb extends mfwObjectDb {
       $ph = static::makeInPlaceHolder($tags,$bind,'tag');
       $c = count($tags);
       $sql .= " AND t.tag_id in ($ph) GROUP BY p.id HAVING COUNT(p.id) = $c";
+    } else {
+      $sql .= " GROUP BY p.id";
     }
 
     $sql .= sprintf(' ORDER BY p.id DESC LIMIT %d, %d', $offset, $count);

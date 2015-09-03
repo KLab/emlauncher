@@ -13,7 +13,7 @@
     <link href="//netdna.bootstrapcdn.com/bootswatch/3.0.0/spacelab/bootstrap.min.css" rel="stylesheet" media="screen">
     <script src="//code.jquery.com/jquery.js"></script>
     <script src="//netdna.bootstrapcdn.com/bootstrap/3.0.0/js/bootstrap.min.js"></script>
-    <link href="//netdna.bootstrapcdn.com/font-awesome/4.0.1/css/font-awesome.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css">
 <?php endif ?>
     <link rel="stylesheet" href="<?=url('/css/customize.css')?>" type="text/css">
     <link rel="apple-touch-icon" href="<?=url('/apple-touch-icon.png')?>">
@@ -49,6 +49,7 @@
           <li class="dropdown">
             <a href="#" class="dropdown-toggle" data-toggle="dropdown"><?=htmlspecialchars($login_user->getMail())?> <b class="caret"></b></a>
             <ul class="dropdown-menu">
+              <li><a href="/guestpass/list">GuestPass history</a></li>
               <li><a href="<?=url('/logout')?>">Logout</a></li>
             </ul>
           </li>
