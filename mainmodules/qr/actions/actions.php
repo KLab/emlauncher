@@ -7,7 +7,7 @@ class qrActions extends MainActions
     public function executeCode()
     {
         $text = mfwRequest::param('chl', "");
-        $size =(int)mfwRequest::param('size', 150);
+        $size =(int)mfwRequest::param('chs', 150);
         if ($size > 300) {
             $size = 300;
         }
