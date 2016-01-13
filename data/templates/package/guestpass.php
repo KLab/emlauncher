@@ -32,7 +32,7 @@
             <dd><?=$login_user->getMail()?></dd>
         </dl>
         <p class="text-center">
-            <img src="https://chart.googleapis.com/chart?chs=250&cht=qr&chl=<?=urlencode($guestpass_url)?>">
+            <img src="<?=url("/qr/code");?>?chs=250&cht=qr&chl=<?=urlencode($guestpass_url)?>">
         </p>
 
     </div>
