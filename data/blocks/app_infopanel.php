@@ -73,7 +73,7 @@
   <div class="list-group-item">
     <div class="text-center">
       <p>link to this app</p>
-        <img src="<?=url("/qr/code");?>?chs=150&cht=qr&chl=<?=urlencode(url("/app?id={$app->getId()}"))?>">
+        <img src="<?=url("/qr/code");?>?s=150&q=<?=urlencode("/app?id={$app->getId()}")?>">
     </div>
   </div>
 </div>

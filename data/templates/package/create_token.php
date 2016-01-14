@@ -32,7 +32,7 @@
       <dd><?=$login_user->getMail()?></dd>
     </dl>
     <p class="text-center">
-      <img src="<?=url("/qr/code");?>?chs=250&cht=qr&chl=<?=urlencode($token_url)?>">
+      <img src="<?=url("/qr/code");?>?s=250&q=<?=urlencode($token_url)?>">
     </p>
 
   </div>
