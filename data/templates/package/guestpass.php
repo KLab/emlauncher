@@ -32,7 +32,7 @@
             <dd><?=$login_user->getMail()?></dd>
         </dl>
         <p class="text-center">
-            <img src="<?=url("/qr/code");?>?s=250&q=<?=urlencode($guestpass_url)?>">
+            <img src="<?=url("/qr/code");?>?s=250&q=<?=urlencode("/package/guestpass_install?token={$token}")?>">
         </p>
 
     </div>
