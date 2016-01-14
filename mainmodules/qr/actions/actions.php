@@ -4,23 +4,31 @@ use Endroid\QrCode\QrCode;
 
 class qrActions extends MainActions
 {
+    /**
+     * EMLauncher用のQRコードを生成します。
+     * 渡されるべき q は "/app?id=1"のようなQueryStringのみ
+     * Action側でEMLauncherのHOSTを追加してQRコードを生成します
+     *
+     * @return array
+     * @throws \Endroid\QrCode\Exceptions\ImageFunctionUnknownException
+     */
     public function executeCode()
     {
-        $text = mfwRequest::param('q', "");
+        $query = mfwRequest::param('q', "");
+        $url = url($query);
         $size =(int)mfwRequest::param('s', 150);
         if ($size > 300) {
             $size = 300;
         }
         $qr_code = new QrCode();
         $qr_code
-            ->setText($text)
+            ->setText($url)
             ->setSize($size)
             ->setPadding(10)
             ->setErrorCorrection('high');
         return $this->pngResponse(
             $qr_code->get()
         );
-
     }
 
     private function pngResponse($contents)
