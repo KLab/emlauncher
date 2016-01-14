@@ -24,7 +24,7 @@ class qrActions extends MainActions
         $qr_code
             ->setText($url)
             ->setSize($size)
-            ->setPadding(10)
+            ->setPadding(0)
             ->setErrorCorrection('high');
         return $this->pngResponse(
             $qr_code->get()
