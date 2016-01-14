@@ -32,6 +32,11 @@ class MainActions extends mfwActions
 			return null;
 		}
 
+		// QR CodeはpublicなActionに
+		if($this->module === "qr") {
+			return null;
+		}
+
 		$this->login_user = User::getLoginUser();
 		if(!$this->login_user && $this->getModule()!='login'){
 			$scheme = Config::get('enable_https')?'https':null;
