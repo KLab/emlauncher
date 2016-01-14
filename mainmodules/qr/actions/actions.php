@@ -15,7 +15,7 @@ class qrActions extends MainActions
     public function executeCode()
     {
         $query = mfwRequest::param('q', "");
-        $url = url($query);
+        $url = mfwRequest::makeUrl($query);
         $size =(int)mfwRequest::param('s', 150);
         if ($size > 300) {
             $size = 300;
