@@ -26,7 +26,7 @@
             <li><code>api_key</code> - Required (See the application preferences)</li>
             <li><code>id</code> - Required, package id  to create a token </li>
             <li><code>mail</code> - Required, owner mail address </li>
-            <li><code>expire</code> - Optional, expiration time specified in units of hour</li>
+            <li><code>expire_hour</code> - Optional, expiration time specified in units of hour</li>
           </ul>
         </dd>
       </dl>
@@ -68,7 +68,7 @@
  <div>
     <h3 class="subheader">Sample Curl</h3>
     <div class="container">
-      <pre><code>curl <?=url('/api/create_token?api_key={application_api_key}&id={package_id}&mail={mail_address&expire=5}')?></code></pre>
+      <pre><code>curl <?=url('/api/create_token?api_key={application_api_key}&id={package_id}&mail={mail_address&expire_hour=5}')?></code></pre>
     </div>
  </div>
 
