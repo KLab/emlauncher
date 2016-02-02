@@ -8,6 +8,15 @@ require_once APP_ROOT.'/libs/aws/aws-autoloader.php';
 $emlauncher_config = array(
 	/** EC2環境用の設定 (httpd.confでSetEnv MFW_ENV 'ec2') */
 	'ec2' => array(
+		/** ローカルストレージ用設定 */
+		'storage' => array (
+			'type' => 'file'
+ 		),
+		'file' => array(
+			'class' => 'File',
+			'path' => APP_ROOT. '/web/file/',
+			'url' => 'http://{HOST-NAME}/file/'
+		),
 
 		/**
 		 * アップデート通知やパスワードリセットのメールの送信元アドレス.
