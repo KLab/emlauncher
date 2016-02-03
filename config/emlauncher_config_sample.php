@@ -57,8 +57,8 @@ $emlauncher_config = array(
 			'key' => 'xxxxxxxx',
 			'secret' => 'xxxxxxxx',
 
-			/** S3のRegion. */
-			'region' => Aws\Common\Enum\Region::TOKYO,
+			/** S3のEndpoint URL. */
+			'base_url' => 'https://s3-ap-northeast-1.amazonaws.com',
 
 			/** S3のbucket名. 予め作成しておく. */
 			'bucket_name' => 'emlauncher',
