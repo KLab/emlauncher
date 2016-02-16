@@ -19,6 +19,7 @@ class Package extends mfwObject {
 
 	const FILE_DIR = 'package/';
 	const TEMP_DIR = 'temp-data/';
+	const TEMP_PLIST_DIR = 'temp-data/plist/';
 
 	// AppStore, GooglePlayでの制限ファイルサイズ(MB)
 	const IOS_FILE_SIZE_LIMIT_MB = 100;
@@ -125,6 +126,12 @@ class Package extends mfwObject {
 		$key = $this->getFileKey();
 		S3::uploadFile($key,$file_path,$mime,'private');
 	}
+	public static function uploadTempPlist($plist)
+	{
+		$tmp_name = Random::string(16).".plist";
+		S3::uploadDataWithExpire(static::TEMP_PLIST_DIR.$tmp_name,$plist,'text/xml','+60 min');
+		return $tmp_name;
+	}
 	public static function uploadTempFile($file_path,$ext,$mime)
 	{
 		$tmp_name = Random::string(16).".$ext";
@@ -145,6 +152,10 @@ class Package extends mfwObject {
 	public function getFileUrl($expire=null)
 	{
 		return S3::url($this->getFileKey(),$expire);
+	}
+	public static function getTempPlistUrl($temp_name,$expire=null)
+	{
+		return S3::url(static::TEMP_PLIST_DIR.$temp_name,$expire);
 	}
 
 	public function getInstallUrl()
