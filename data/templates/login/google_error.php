@@ -5,6 +5,7 @@
     </div>
     <div class="panel-body">
       <p>アカウントが確認できないか、許可されていないアカウントです</p>
+      <p>現在のアカウント: <?=htmlspecialchars($mail)?></p>
     </div>
   </div>
 </div>
