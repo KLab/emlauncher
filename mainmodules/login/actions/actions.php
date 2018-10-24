@@ -20,7 +20,7 @@ class loginActions extends MainActions
 		return null;
 	}
 
-	protected function build($params=array())
+	protected function build($params=array(),$headers=array())
 	{
 		$params['enable_password'] = $this->config['enable_password'];
 		$params['enable_google_auth'] = $this->config['enable_google_auth'];

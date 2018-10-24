@@ -25,7 +25,7 @@ class appActions extends MainActions
 		return null;
 	}
 
-	public function build($params)
+	public function build($params=array(),$headers=array())
 	{
 		if(!isset($params['app'])){
 			$params['app'] = $this->app;

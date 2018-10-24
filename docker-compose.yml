@@ -1,0 +1,21 @@
+version: '3'
+
+services:
+  web:
+    build: ./docker/web
+    volumes:
+      - ".:/repo"
+    ports:
+      - "10080:80"
+    links:
+      - memcached
+      - db
+  memcached:
+    image: memcached:latest
+  db:
+    build: ./docker/db
+    environment:
+      MYSQL_ROOT_PASSWORD: password 
+      MYSQL_DATABASE: emlauncher
+      MYSQL_USER: emlauncher
+      MYSQL_PASSWORD: emlauncher
