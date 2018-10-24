@@ -1,4 +1,4 @@
-Develop EMLauncher on docker container
+Develop EMLauncher on docker containers
 ---
 
 # How to run
@@ -29,5 +29,6 @@ docker exec $(docker ps -f "name=emlauncher_db" -q) mysql -uroot -ppassword emla
 ```
 
 5. Open EMLauncher in a browser
+
 http://localhost:10080
 
