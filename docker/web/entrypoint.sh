@@ -7,7 +7,7 @@ echo "$line1 $line2.localdomain" >> /etc/hosts
 cat /etc/hosts
 
 echo "restarting sendmail..."
-service sendmail restart
+service sendmail restart &
 
 echo "run docker-php-entrypoint"
 /usr/local/bin/docker-php-entrypoint /usr/local/bin/apache2-foreground

@@ -24,8 +24,9 @@ RUN set -x \
   && docker-php-ext-enable imagick \
   && a2enmod rewrite
 
-COPY 000-default.conf /etc/apache2/sites-enabled/000-default.conf
 COPY entrypoint.sh /entrypoint.sh
+COPY 000-default.conf /etc/apache2/sites-enabled/000-default.conf
+COPY php.ini /usr/local/etc/php/php.ini
 
 RUN set -x \
   && echo 'emlauncher:emlauncher' > /dbauth \
