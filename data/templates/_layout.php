@@ -4,17 +4,10 @@
     <meta charset="utf-8">
     <title><?=(isset($page_title))?htmlspecialchars($page_title).' | ':''?><?=$title_prefix?>EMLauncher</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<?php if(mfwServerEnv::getEnv()==='local'): ?>
-    <link href="/bootstrap/bootswatch/spacelab/bootstrap.min.css" rel="stylesheet" media="screen">
-    <script src="/jquery/jquery.js"></script>
-    <script src="/bootstrap/3.0.0/js/bootstrap.min.js"></script>
-    <link href="/font-awesome/4.0.1/css/font-awesome.min.css" rel="stylesheet">
-<?php else: ?>
     <link href="//netdna.bootstrapcdn.com/bootswatch/3.0.0/spacelab/bootstrap.min.css" rel="stylesheet" media="screen">
     <script src="//code.jquery.com/jquery.js"></script>
     <script src="//netdna.bootstrapcdn.com/bootstrap/3.0.0/js/bootstrap.min.js"></script>
     <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css">
-<?php endif ?>
     <link rel="stylesheet" href="<?=url('/css/customize.css')?>" type="text/css">
     <link rel="apple-touch-icon" href="<?=url('/apple-touch-icon.png')?>">
     <link rel="shortcut icon" href="<?=url('/favicon.ico')?>">

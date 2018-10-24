@@ -47,7 +47,7 @@ class packageActions extends MainActions
 		return null;
 	}
 
-	public function build($params)
+	public function build($params=array(),$headers=array())
 	{
 		$params['package'] = $this->package;
 		$params['app'] = $this->app;
