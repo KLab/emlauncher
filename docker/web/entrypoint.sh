@@ -1,5 +1,5 @@
 #!/bin/sh
-echo "rewriting hosts..."
+echo "editing hosts..."
 line1=$(cat /etc/hosts | grep -v "localhost" | tail -n 1)
 line2=$(echo $line1 | awk '{print $2}')
 echo "$line1 $line2.localdomain" >> /etc/hosts
