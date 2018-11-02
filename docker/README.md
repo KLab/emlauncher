@@ -25,7 +25,7 @@ docker-compose up --build
 
 4. Add EMLauncher user
 ```sh
-docker exec $(docker ps -f "name=emlauncher_db" -q) mysql -uroot -ppassword emlauncher -e "INSERT INTO user_pass (mail) VALUES ('your-name@example.com');"
+docker-compose exec db mysql -uroot -ppassword emlauncher -e 'INSERT INTO user_pass (mail) VALUES ("your-name@example.com");'
 ```
 
 5. Open EMLauncher in a browser
