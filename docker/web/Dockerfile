@@ -2,8 +2,8 @@ FROM php:7.2-apache
 ENV APACHE_DOCUMENT_ROOT /repo/web
 
 RUN set -x \
-  && apt update \
-  && apt install -y --no-install-recommends \
+  && apt-get update \
+  && apt-get install -y --no-install-recommends \
     unzip libssl-dev libpcre3 libpcre3-dev zlib1g-dev libmagickwand-dev sendmail
 
 RUN set -x \
@@ -19,7 +19,7 @@ RUN set -x \
   && rm -rf /tmp/pecl-memcache-php7 php7.zip
 
 RUN set -x \
-  && docker-php-ext-install pdo_mysql mysqli mbstring \
+  && docker-php-ext-install pdo_mysql mysqli mbstring gd \
   && pecl install imagick-3.4.3 \
   && docker-php-ext-enable imagick \
   && a2enmod rewrite
