@@ -73,6 +73,16 @@ $emlauncher_config = array(
 $emlauncher_config['local'] = $emlauncher_config['ec2'];
 $emlauncher_config['local']['login']['enable_google_auth'] = false;
 $emlauncher_config['local']['aws']['bucket_name'] = 'emlauncher-dev';
+/**
+ * s3(localstack) を mock で利用する際の s3 へ接続するための URL
+ *  base_url: web container から s3(localstack) container へアクセスするときの endpoint となる URL
+ *  s3_external_url: ブラウザから s3 container へアクセスするときの URL
+ *                   Docker for Mac などだと "http://localhost:4572/" などとなる。
+ *                   実端末など外部からアクセスする場合はホストの名前を利用する。
+ *                   アイコンの表示やパッケージのダウンロードなどで必要。
+$emlauncher_config['local']['aws']['base_url'] = 'http://localstack:4572/';
+$emlauncher_config['local']['aws']['s3_external_url'] = 'http://localhost:4572';
+ */
 
 /**
  * Docker開発環境用の設定. (MFW_ENV=docker)

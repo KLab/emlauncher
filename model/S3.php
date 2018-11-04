@@ -14,6 +14,7 @@ class S3 {
 			array(
 				'key' => $this->config['key'],
 				'secret' => $this->config['secret'],
+				'base_url' => isset($this->config['base_url']) ? $this->config['base_url'] : NULL,
 				));
 	}
 	protected function singleton()
@@ -27,6 +28,7 @@ class S3 {
 	public static function uploadData($key,$data,$type,$acl='private')
 	{
 		$s3 = static::singleton();
+		$pathstyle = isset($s3->config['base_url']) ? true : false;
 		$r = $s3->client->putObject(
 			array(
 				'Bucket' => $s3->config['bucket_name'],
@@ -34,6 +36,7 @@ class S3 {
 				'ACL' => $acl,
 				'ContentType' => $type,
 				'Body' => Guzzle\Http\EntityBody::factory($data),
+				'PathStyle' => $pathstyle,
 				));
 		return $r;
 	}
@@ -41,6 +44,7 @@ class S3 {
 	public static function uploadFile($key,$filename,$type,$acl='private')
 	{
 		$s3 = static::singleton();
+		$pathstyle = isset($s3->config['base_url']) ? true : false;
 		$fp = fopen($filename,'rb');
 		$r = $s3->client->putObject(
 			array(
@@ -49,6 +53,7 @@ class S3 {
 				'ACL' => $acl,
 				'ContentType' => $type,
 				'Body' => $fp,
+				'PathStyle' => $pathstyle,
 				));
 		// Guzzleが中で勝手にfcloseしやがるのでここでfcloseしてはならない
 		// fclose($fp)
@@ -59,6 +64,7 @@ class S3 {
 	{
 		$s3 = static::singleton();
 		$bucket = $s3->config['bucket_name'];
+		$pathstyle = isset($s3->config['base_url']) ? true : false;
 
 		// copy
 		$s3->client->copyObject(
@@ -67,12 +73,14 @@ class S3 {
 				'Key' => $dstkey,
 				'ACL' => $acl,
 				'CopySource' => "{$bucket}/{$srckey}",
+				'PathStyle' => $pathstyle,
 				));
 		// delete
 		$s3->client->deleteObject(
 			array(
 				'Bucket' => $bucket,
 				'Key' => $srckey,
+				'PathStyle' => $pathstyle,
 				));
 	}
 
@@ -80,10 +88,12 @@ class S3 {
 	{
 		$s3 = static::singleton();
 		$bucket = $s3->config['bucket_name'];
+		$pathstyle = isset($s3->config['base_url']) ? true : false;
 		$s3->client->deleteObject(
 			array(
 				'Bucket' => $bucket,
 				'Key' => $key,
+				'PathStyle' => $pathstyle,
 				));
 	}
 
@@ -92,7 +102,24 @@ class S3 {
 		$s3 = static::singleton();
 		$bucket = $s3->config['bucket_name'];
 		if($expires===null){
-			return "https://{$bucket}.s3.amazonaws.com/{$key}";
+			if(isset($s3->config['s3_external_url'])){
+				$s3_external_url = rtrim($s3->config['s3_external_url'], '/');
+				error_log("url is {$s3_external_url}/{$bucket}/{$key}");
+				return "{$s3_external_url}/{$bucket}/{$key}";
+			}else{
+				return "https://{$bucket}.s3.amazonaws.com/{$key}";
+			}
+		}
+		if(isset($s3->config['base_url'])){
+			$obj_url = $s3->client->getObjectUrl($bucket,$key,$expires,array('PathStyle' => true));
+			if(isset($s3->config['s3_external_url'])){
+				$obj_url = str_replace(
+					rtrim($s3->config['base_url'], '/'),
+					rtrim($s3->config['s3_external_url'], '/'),
+					$obj_url
+				);
+			}
+			return $obj_url;
 		}
 		return $s3->client->getObjectUrl($bucket,$key,$expires);
 	}

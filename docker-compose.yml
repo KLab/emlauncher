@@ -7,9 +7,6 @@ services:
       - ".:/repo"
     ports:
       - "10080:80"
-    links:
-      - memcached
-      - db
   memcached:
     image: memcached:latest
   db:

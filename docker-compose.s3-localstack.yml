@@ -1,0 +1,16 @@
+version: '3'
+
+services:
+  localstack:
+    image: localstack/localstack:latest
+    #volumes:
+    #  - "./data/:/tmp/localstack"
+    environment:
+      - DEBUG=${DEBUG-1}
+      - SERVICES=s3
+      - DEFAULT_REGION="ap-northeast-1"
+      - HOSTNAME=localstack
+    ports:
+      - "40080:8080" # dashboard
+      - "4572:4572"  # s3 endpoint
+
