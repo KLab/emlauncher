@@ -19,7 +19,7 @@ RUN set -x \
   && rm -rf /tmp/pecl-memcache-php7 php7.zip
 
 RUN set -x \
-  && docker-php-ext-install $(nproc) pdo_mysql mysqli mbstring gd \
+  && docker-php-ext-install -j$(nproc) pdo_mysql mysqli mbstring gd \
   && pecl install imagick-3.4.3 \
   && docker-php-ext-enable imagick \
   && a2enmod rewrite
