@@ -26,6 +26,7 @@
             <li><code>api_key</code> - Required (See the application preferences)</li>
             <li><code>limit</code> - Optional, The limit length of package list. (default = 20, max = 100)</li>
             <li><code>platform</code> - Optional, The platform type string, e.g. "Android" and "iOS".</li>
+            <li><code>tags</code> - Optional, The tag names separated by comma.</li>
           </ul>
         </dd>
       </dl>
