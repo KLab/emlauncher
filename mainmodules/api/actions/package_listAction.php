@@ -9,6 +9,13 @@ class package_listAction extends apiActions
 	{
 		try{
 			$api_key = mfwRequest::param('api_key');
+			$limit = (int)mfwRequest::param('limit', 20);
+			$platform = mfwRequest::param('platform');
+			$tags = array();
+
+			if (100 < $limit) {
+				$limit = 100;
+			}
 
 			$app = ApplicationDb::selectByApiKey($api_key);
 			if(!$app){
@@ -17,7 +24,7 @@ class package_listAction extends apiActions
 					array('error'=>'Invalid api_key'));
 			}
 
-			$pkgs = PackageDb::selectByAppId($app->getId());
+			$pkgs = PackageDb::selectByAppIdPfTagsWithLimit($app->getId(), $platform, $tags, 0, $limit);
 
 			$ret = array();
 			foreach($pkgs as $pkg){

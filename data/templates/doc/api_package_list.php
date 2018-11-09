@@ -20,10 +20,12 @@
         <dd><a href="#"><?=url('/api/package_list')?></a></dd>
         <dt>Response format:</dt>
         <dd>json</dd>
-        <dt>Fiels:</dt>
+        <dt>Fields:</dt>
         <dd>
           <ul>
             <li><code>api_key</code> - Required (See the application preferences)</li>
+            <li><code>limit</code> - Optional, The limit length of package list. (default = 20, max = 100)</li>
+            <li><code>platform</code> - Optional, The platform type string, e.g. "Android" and "iOS".</li>
           </ul>
         </dd>
       </dl>
