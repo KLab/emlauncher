@@ -34,3 +34,4 @@ RUN set -x \
   && sed -ri -e 's!/var/www/!${APACHE_DOCUMENT_ROOT}!g' /etc/apache2/apache2.conf /etc/apache2/conf-available/*.conf
 
 ENTRYPOINT /entrypoint.sh
+ENV MFW_ENV docker
