@@ -194,6 +194,29 @@ class Application extends mfwObject {
 		return $tags;
 	}
 
+	/**
+	 * タグ名からTagSetを取得.
+	 */
+	public function getTagsByNameEx($tag_names,PDO $con=null)
+	{
+		if(empty($tag_names)){
+			return new TagSet();
+		}
+		$this->tags = TagDb::selectByAppId($this->getId(),$con);
+		$tags = new TagSet();
+		// タグの数はたかが知れているので、愚直に一つずつ探す
+		foreach($tag_names as $name){
+			if(!$name){
+				continue;
+			}
+			$pk = $this->tags->searchPK('name',$name);
+			if($pk){
+				$tags[] = $this->tags[$pk];
+			}
+		}
+		return $tags;
+	}
+
 	public function deleteTags($tag_names,PDO $con=null)
 	{
 		$tags = TagDb::selectByAppIdForUpdate($this->getId(),$con);

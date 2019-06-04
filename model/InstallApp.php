@@ -48,7 +48,7 @@ class InstallApp extends mfwObject {
 		return mfwDBIBase::query($sql,$bind,$con);
 	}
 
-	public function delete()
+	public function delete($con=null)
 	{
 		$sql = 'DELETE FROM app_install_user WHERE app_id = :app_id AND mail = :mail';
 		$bind = array(

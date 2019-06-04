@@ -23,9 +23,19 @@ class uploadAction extends apiActions
 			$notify = mfwRequest::param('notify');
 			$tag_names = explode(',',mfwRequest::param('tags'));
 			if(!$api_key||!$file_info||!$title){
+				$fields = array();
+				if(!$apk_key){
+					$fields[] = 'api_key';
+				}
+				if(!$file_info){
+					$fields[] = 'file';
+				}
+				if(!$title){
+					$fields[] = 'title';
+				}
 				return $this->jsonResponse(
 					self::HTTP_400_BADREQUEST,
-					array('error'=>'A required field is not present.'));
+					array('error'=>'A required field ('.implode(',',$fields).') is not present.'));
 			}
 			if(!isset($file_info['error'])||$file_info['error']!==UPLOAD_ERR_OK){
 				error_log(__METHOD__.'('.__LINE__.'): upload file error: $_FILES[file]='.json_encode($file_info));

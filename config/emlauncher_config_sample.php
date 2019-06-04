@@ -83,3 +83,7 @@ $emlauncher_config['local'] = $emlauncher_config['ec2'];
 $emlauncher_config['local']['login']['enable_google_auth'] = false;
 $emlauncher_config['local']['aws']['bucket_name'] = 'emlauncher-dev';
 
+/**
+ * Docker開発環境用の設定. (MFW_ENV=docker)
+ */
+$emlauncher_config['docker'] = $emlauncher_config['local'];
