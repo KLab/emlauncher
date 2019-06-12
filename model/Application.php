@@ -74,7 +74,7 @@ class Application extends mfwObject {
 			':last_upload' => $this->getLastUpload(),
 			':date_to_sort' => $this->getDateToSort(),
 			':id' => $this->getId(),
-		);
+			);
 		mfwDBIBase::query($sql,$bind,$con);
 	}
 
@@ -88,7 +88,7 @@ class Application extends mfwObject {
 			':last_commented' => $this->getLastCommented(),
 			':date_to_sort' => $this->getDateToSort(),
 			':id' => $this->getId(),
-		);
+			);
 		mfwDBIBase::query($sql,$bind,$con);
 	}
 
@@ -103,7 +103,7 @@ class Application extends mfwObject {
 		$bind = array(
 			':id' => $this->getId(),
 			':api_key' => $this->getApiKey(),
-		);
+			);
 		mfwDBIBase::query($sql,$bind,$con);
 	}
 
@@ -279,118 +279,118 @@ class Application extends mfwObject {
  * Set of Application objects.
  */
 class ApplicationSet extends mfwObjectSet {
-  public static function hypostatize(Array $row=array())
-  {
-    return new Application($row);
-  }
-  protected function unsetCache($id)
-  {
-    parent::unsetCache($id);
-  }
+	public static function hypostatize(Array $row=array())
+	{
+		return new Application($row);
+	}
+	protected function unsetCache($id)
+	{
+		parent::unsetCache($id);
+	}
 }
 
 /**
  * database accessor for 'application' table.
  */
 class ApplicationDb extends mfwObjectDb {
-  const TABLE_NAME = 'application';
-  const SET_CLASS = 'ApplicationSet';
+	const TABLE_NAME = 'application';
+	const SET_CLASS = 'ApplicationSet';
 
-  const ICON_DIR = 'app-icons/';
+	const ICON_DIR = 'app-icons/';
 
-  public static function uploadIcon($image,$app_id)
-  {
-    $im = new Imagick();
-    $im->readImageBlob($image);
-    $im->scaleImage(144,144);
-    $im->setFormat('png');
+	public static function uploadIcon($image,$app_id)
+	{
+		$im = new Imagick();
+		$im->readImageBlob($image);
+		$im->scaleImage(144,144);
+		$im->setFormat('png');
 
-    $key = static::ICON_DIR."$app_id/".Random::string(16).'.png';
-    Storage::uploadData($key,$im,'image/png','public-read');
+		$key = static::ICON_DIR."$app_id/".Random::string(16).'.png';
+		Storage::uploadData($key,$im,'image/png','public-read');
 
-    return $key;
-  }
+		return $key;
+	}
 
-  public static function makeApiKey()
-  {
-    do{
-      $api_key = Random::string();
-    }while(static::selectByApiKey($api_key));
-    return $api_key;
-  }
+	public static function makeApiKey()
+	{
+		do{
+			$api_key = Random::string();
+		}while(static::selectByApiKey($api_key));
+		return $api_key;
+	}
 
-  public static function selectByApiKey($key)
-  {
-    $query = 'WHERE api_key = ?';
-    return static::selectOne($query,array($key));
-  }
+	public static function selectByApiKey($key)
+	{
+		$query = 'WHERE api_key = ?';
+		return static::selectOne($query,array($key));
+	}
 
-  public static function insertNewApp($owner,$title,$image,$description,$repository)
-  {
-    $now = date('Y-m-d H:i:s');
-    // insert new application
-    $row = array(
-      'title' => $title,
-      'api_key' => static::makeApiKey(),
-      'description' => $description,
-      'repository' => $repository,
-      'date_to_sort' => $now,
-      'created' => $now,
-      );
-    $app = new Application($row);
-    $app->insert();
+	public static function insertNewApp($owner,$title,$image,$description,$repository)
+	{
+		$now = date('Y-m-d H:i:s');
+		// insert new application
+		$row = array(
+			'title' => $title,
+			'api_key' => static::makeApiKey(),
+			'description' => $description,
+			'repository' => $repository,
+			'date_to_sort' => $now,
+			'created' => $now,
+			);
+		$app = new Application($row);
+		$app->insert();
 
-    // upload icon to S3
-    $icon_key = static::uploadIcon($image,$app->getId());
+		// upload icon to S3
+		$icon_key = static::uploadIcon($image,$app->getId());
 
-    $table = static::TABLE_NAME;
-    mfwDBIBase::query(
-      "UPDATE $table SET icon_key = :icon_key WHERE id= :id",
-      array(':id'=>$app->getId(),':icon_key'=>$icon_key));
+		$table = static::TABLE_NAME;
+		mfwDBIBase::query(
+			"UPDATE $table SET icon_key = :icon_key WHERE id= :id",
+			array(':id'=>$app->getId(),':icon_key'=>$icon_key));
 
-    // insert owner
-    $row = array(
-      'app_id' => $app->getId(),
-      'owner_mail' => $owner->getMail(),
-      );
-    $owner = new ApplicationOwner($row);
-    $owner->insert();
+		// insert owner
+		$row = array(
+			'app_id' => $app->getId(),
+			'owner_mail' => $owner->getMail(),
+			);
+		$owner = new ApplicationOwner($row);
+		$owner->insert();
 
-    return $app;
-  }
+		return $app;
+	}
 
-  public static function selectAllByUpdateOrder()
-  {
-    $query = 'ORDER BY date_to_sort DESC';
-    return static::selectSet($query);
-  }
+	public static function selectAllByUpdateOrder()
+	{
+		$query = 'ORDER BY date_to_sort DESC';
+		return static::selectSet($query);
+	}
 
-  public static function selectCount()
-  {
-      $table = static::TABLE_NAME;
-      $sql = "SELECT count(*) FROM `$table`";
-      return mfwDBIBase::getOne($sql);
-  }
+	public static function selectCount()
+	{
+		$table = static::TABLE_NAME;
+		$sql = "SELECT count(*) FROM `$table`";
+		return mfwDBIBase::getOne($sql);
+	}
 
-  public static function selectByUpdateOrderWithLimit($offset, $count)
-  {
-    $query = sprintf('ORDER BY date_to_sort DESC LIMIT %d, %d', $offset, $count);
-    return static::selectSet($query);
-  }
+	public static function selectByUpdateOrderWithLimit($offset, $count)
+	{
+		$query = sprintf('ORDER BY date_to_sort DESC LIMIT %d, %d', $offset, $count);
+		return static::selectSet($query);
+	}
 
-  public static function selectOwnApps($user)
-  {
-    $aos = ApplicationOwnerDb::selectByOwnerMail($user->getMail());
-    if($aos->count()==0){
-      return new ApplicationSet();
-    }
-    $ids = array();
-    foreach($aos as $ao){
-      $ids[] = $ao->getAppId();
-    }
-    $bind = array();
-    $pf = static::makeInPlaceholder($ids,$bind);
-    return static::selectSet("WHERE id IN ($pf) ORDER BY id DESC",$bind);
-  }
+	public static function selectOwnApps($user)
+	{
+		$aos = ApplicationOwnerDb::selectByOwnerMail($user->getMail());
+		if($aos->count()==0){
+			return new ApplicationSet();
+		}
+		$ids = array();
+		foreach($aos as $ao){
+			$ids[] = $ao->getAppId();
+		}
+		$bind = array();
+		$pf = static::makeInPlaceholder($ids,$bind);
+		return static::selectSet("WHERE id IN ($pf) ORDER BY id DESC",$bind);
+	}
 }
 
