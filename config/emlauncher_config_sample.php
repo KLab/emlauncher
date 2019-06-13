@@ -8,16 +8,6 @@ require_once APP_ROOT.'/libs/aws/aws-autoloader.php';
 $emlauncher_config = array(
 	/** EC2環境用の設定 (httpd.confでSetEnv MFW_ENV 'ec2') */
 	'ec2' => array(
-		/** ローカルストレージ用設定 */
-		'storage' => array (
-			'type' => 'file'
- 		),
-		'file' => array(
-			'class' => 'File',
-			'path' => APP_ROOT. '/web/file/',
-			'url' => 'http://{HOST-NAME}/file/'
-		),
-
 		/**
 		 * アップデート通知やパスワードリセットのメールの送信元アドレス.
 		 */
@@ -58,7 +48,14 @@ $emlauncher_config = array(
 			'allowed_mailaddr_pattern' => '/@klab\.com$/',
 			),
 
-		/** AWSの設定 */
+		/**
+		 * Storage指定
+		 * - S3
+		 * - LocalFile
+		 */
+		'storage_class' => 'S3',
+
+		/** AWSの設定 (storage_class='S3'の場合）*/
 		'aws' => array(
 			/**
 			 * APIアクセスのためのKeyとSecret.
@@ -72,6 +69,16 @@ $emlauncher_config = array(
 			/** S3のbucket名. 予め作成しておく. */
 			'bucket_name' => 'emlauncher',
 			),
+
+		/** LocalFileの設定 (storage_class='LocalFile'の場合) */
+		'local_file' => array(
+			/** 保存先ディレクトリ. 予め作成してApacheに書き込み権限を与えておく. */
+			'path' => '/path/to/directory',
+
+			/** ブラウザからアクセスするときのURLに使われるprefix. */
+			'url_prefix' => '/path/for/url',
+			),
+
 		),
 	);
 
