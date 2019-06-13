@@ -1,8 +1,8 @@
 <?php
 require_once APP_ROOT.'/model/Config.php';
 
-require_once APP_ROOT.'/model/S3.php';
-require_once APP_ROOT.'/model/File.php';
+require_once APP_ROOT.'/model/storage/S3.php';
+require_once APP_ROOT.'/model/storage/LocalFile.php';
 
 class Storage {
 
