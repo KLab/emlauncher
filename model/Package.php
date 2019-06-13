@@ -123,19 +123,19 @@ class Package extends mfwObject {
 	public function uploadFile($file_path,$mime)
 	{
 		$key = $this->getFileKey();
-		Storage::uploadFile($key,$file_path,$mime,'private');
+		Storage::saveFile($key,$file_path,$mime);
 	}
 	public static function uploadTempFile($file_path,$ext,$mime)
 	{
 		$tmp_name = Random::string(16).".$ext";
-		Storage::uploadFile(static::TEMP_DIR.$tmp_name,$file_path,$mime,'private');
+		Storage::saveFile(static::TEMP_DIR.$tmp_name,$file_path,$mime);
 		return $tmp_name;
 	}
 	public function renameTempFile($temp_name)
 	{
 		$tempkey = static::TEMP_DIR.$temp_name;
 		$newkey = $this->getFileKey();
-		Storage::rename($tempkey,$newkey,'private');
+		Storage::rename($tempkey,$newkey);
 	}
 	public function deleteFile()
 	{

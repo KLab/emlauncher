@@ -1,55 +1,59 @@
 <?php
 require_once APP_ROOT.'/model/Config.php';
 
-class File {
+class LocalFile implements StorageImpl {
 
-        public static function uploadData($key, $data, $type, $acl='private')
-        {
-                $config = Config::get('file');
-                $dir = dirname($config["path"] . $key);
-                if( !is_dir($dir)) {
-                        mkdir($dir,  0777,  true);
-                }
-                return file_put_contents ( $config["path"] . $key,  $data);
-        }
+	protected $path;
+	protected $urlprefix;
 
-        public static function uploadFile($key, $filename, $type, $acl='private')
-        {
-                $config = Config::get('file');
-                $dir = dirname($config["path"] . $key);
-                if( !is_dir($dir)) {
-                        mkdir($dir,  0777,  true);
-                }
-                return rename($filename,  $config["path"] . "/".$key);
-        }
+	public function __construct()
+	{
+		$config = Config::get('local_file');
+		$this->path = rtrim($config['path'], '/');
+		$this->urlprefix = rtrim($config['url_prefix'], '/');
+	}
 
-        public static function rename($srckey, $dstkey, $acl='private')
-        {
-                $config = Config::get('file');
-                $dir = dirname($config["path"] . $srckey);
-                if( !is_dir($dir)) {
-                        mkdir($dir,  0777,  true);
-                }
-                $dir = dirname($config["path"] . $dstkey);
-                if( !is_dir($dir)) {
-                        mkdir($dir,  0777,  true);
-                }
-                return rename($config["path"] . "/". $srckey,  $config["path"] . "/". $dstkey);
-        }
+	private function genPath($key)
+	{
+		return implode('/', array($this->path, trim($key, '/')));
+	}
 
-        public static function delete($key)
-        {
+	private function createDir($dir)
+	{
+		if(!file_exists($dir)){
+			mkdir($dir, 0755, true);
+		}
+	}
 
-                $config = Config::get('file');
-                return unlink($config["path"] . "/". $key);
-        }
+	public function saveIcon($key, $data)
+	{
+		$dstfile = $this->genPath($key);
+		$this->createDir(dirname($dstfile));
+		return file_put_contents($dstfile, $data);
+	}
 
-        public static function url($key, $expires=null)
-        {
-                $config = Config::get('file');
-                return $config["url"] . "/". $key;
-        }
+	public function saveFile($key, $filename, $mime)
+	{
+		$dstfile = $this->genPath($key);
+		$this->createDir(dirname($dstfile));
+		copy($filename, $dstfile);
+	}
 
+	public function rename($srckey, $dstkey)
+	{
+		$srcfile = $this->genPath($srckey);
+		$dstfile = $this->genPath($dstkey);
+		$this->createDir(dirname($dstfile));
+		rename($srcfile, $dstfile);
+	}
+
+	public function delete($key)
+	{
+		unlink($this->genPath($key));
+	}
+
+	public function url($key, $expire=null)
+	{
+		return implode('/', array($this->urlprefix, trim($key, '/')));
+	}
 }
-
-

@@ -1,45 +1,56 @@
 <?php
 require_once APP_ROOT.'/model/Config.php';
-
 require_once APP_ROOT.'/model/storage/S3.php';
 require_once APP_ROOT.'/model/storage/LocalFile.php';
 
+interface StorageImpl {
+	public function saveIcon($key, $data);
+	public function saveFile($key, $filename, $mime);
+	public function rename($srckey, $dstkey);
+	public function delete($key);
+	public function url($key, $expires=null);
+}
+
 class Storage {
 
-        protected static function getClass()
-        {
-                $storage= Config::get('storage');
-                $config = Config::get( $storage["type"] );
-                return $config["class"];
-        }
+	protected static $singleton = null;
 
-        public static function uploadData($key, $data, $type, $acl='private')
-        {
-                $class = Storage::getClass();
-                return $class::uploadData($key, $data, $type, $acl);
-        }
+	private static function singleton()
+	{
+		if(static::$singleton===null){
+			$class = Config::get('storage_class');
+			static::$singleton = new $class();
+		}
+		return static::$singleton;
+	}
 
-        public static function uploadFile($key, $filename, $type, $acl='private')
-        {
-                $class = Storage::getClass();
-                return $class::uploadFile($key, $filename, $type, $acl);
-        }
+	public static function saveIcon($name, $data)
+	{
+		$storage = static::singleton();
+		return $storage->saveIcon($name, $data);
+	}
 
-        public static function rename($srckey, $dstkey, $acl='private')
-        {
-                $class = Storage::getClass();
-                return $class::rename($srckey, $dstkey, $acl);
-        }
+	public static function saveFile($name, $fileName, $mime)
+	{
+		$storage = static::singleton();
+		return $storage->saveFile($name, $fileName, $mime);
+	}
 
-        public static function delete($key)
-        {
-                $class = Storage::getClass();
-                return $class::delete($key);
-        }
+	public static function rename($name, $newName)
+	{
+		$storage = static::singleton();
+		return $storage->rename($name, $newName);
+	}
 
-        public static function url($key, $expires=null)
-        {
-                $class = Storage::getClass();
-                return $class::url($key, $expires);
-        }
+	public static function delete($name)
+	{
+		$storage = static::singleton();
+		return $storage->delete($name);
+	}
+
+	public static function url($name, $expire=null)
+	{
+		$storage = static::singleton();
+		return $storage->url($name, $expire);
+	}
 }

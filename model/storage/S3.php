@@ -1,13 +1,13 @@
 <?php
 require_once APP_ROOT.'/model/Config.php';
+require_once APP_ROOT.'/model/Storage.php';
 
-class S3 {
+class S3 implements StorageImpl {
 
-	protected static $singleton = null;
 	protected $config;
 	protected $client;
 
-	protected function __construct()
+	public function __construct()
 	{
 		$this->config = Config::get('aws');
 		$this->client = Aws\S3\S3Client::factory(
@@ -16,20 +16,14 @@ class S3 {
 				'secret' => $this->config['secret'],
 				));
 	}
-	protected function singleton()
-	{
-		if(static::$singleton===null){
-			static::$singleton = new static();
-		}
-		return static::$singleton;
-	}
 
-	public static function uploadData($key,$data,$type,$acl='private')
+	public function saveIcon($key,$data)
 	{
-		$s3 = static::singleton();
-		$r = $s3->client->putObject(
+		$type = 'image/png';
+		$acl = 'public-read';
+		$r = $this->client->putObject(
 			array(
-				'Bucket' => $s3->config['bucket_name'],
+				'Bucket' => $this->config['bucket_name'],
 				'Key' => $key,
 				'ACL' => $acl,
 				'ContentType' => $type,
@@ -38,16 +32,16 @@ class S3 {
 		return $r;
 	}
 
-	public static function uploadFile($key,$filename,$type,$acl='private')
+	public function saveFile($key,$filename,$mime)
 	{
-		$s3 = static::singleton();
+		$acl = 'private';
 		$fp = fopen($filename,'rb');
-		$r = $s3->client->putObject(
+		$r = $this->client->putObject(
 			array(
-				'Bucket' => $s3->config['bucket_name'],
+				'Bucket' => $this->config['bucket_name'],
 				'Key' => $key,
 				'ACL' => $acl,
-				'ContentType' => $type,
+				'ContentType' => $mime,
 				'Body' => $fp,
 				));
 		// Guzzleが中で勝手にfcloseしやがるのでここでfcloseしてはならない
@@ -55,13 +49,13 @@ class S3 {
 		return $r;
 	}
 
-	public static function rename($srckey,$dstkey,$acl='private')
+	public function rename($srckey,$dstkey)
 	{
-		$s3 = static::singleton();
-		$bucket = $s3->config['bucket_name'];
+		$acl = 'private';
+		$bucket = $this->config['bucket_name'];
 
 		// copy
-		$s3->client->copyObject(
+		$this->client->copyObject(
 			array(
 				'Bucket' => $bucket,
 				'Key' => $dstkey,
@@ -69,33 +63,30 @@ class S3 {
 				'CopySource' => "{$bucket}/{$srckey}",
 				));
 		// delete
-		$s3->client->deleteObject(
+		$this->client->deleteObject(
 			array(
 				'Bucket' => $bucket,
 				'Key' => $srckey,
 				));
 	}
 
-	public static function delete($key)
+	public function delete($key)
 	{
-		$s3 = static::singleton();
-		$bucket = $s3->config['bucket_name'];
-		$s3->client->deleteObject(
+		$bucket = $this->config['bucket_name'];
+		$this->client->deleteObject(
 			array(
 				'Bucket' => $bucket,
 				'Key' => $key,
 				));
 	}
 
-	public static function url($key,$expires=null)
+	public function url($key,$expires=null)
 	{
-		$s3 = static::singleton();
-		$bucket = $s3->config['bucket_name'];
+		$bucket = $this->config['bucket_name'];
 		if($expires===null){
 			return "https://{$bucket}.s3.amazonaws.com/{$key}";
 		}
-		return $s3->client->getObjectUrl($bucket,$key,$expires);
+		return $this->client->getObjectUrl($bucket,$key,$expires);
 	}
 
 }
-
