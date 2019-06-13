@@ -31,6 +31,10 @@ COPY php.ini /usr/local/etc/php/php.ini
 RUN set -x \
   && echo 'emlauncher:emlauncher' > /dbauth \
   && sed -ri -e 's!/var/www/html!${APACHE_DOCUMENT_ROOT}!g' /etc/apache2/sites-available/*.conf \
-  && sed -ri -e 's!/var/www/!${APACHE_DOCUMENT_ROOT}!g' /etc/apache2/apache2.conf /etc/apache2/conf-available/*.conf
+  && sed -ri -e 's!/var/www/!${APACHE_DOCUMENT_ROOT}!g' /etc/apache2/apache2.conf /etc/apache2/conf-available/*.conf \
+  && mkdir -p /var/www/emlauncher \
+  && chmod 755 /var/www/emlauncher \
+  && chown www-data:www-data /var/www/emlauncher
 
 ENTRYPOINT /entrypoint.sh
+ENV MFW_ENV docker
