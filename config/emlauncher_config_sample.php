@@ -78,7 +78,24 @@ $emlauncher_config = array(
 			/** ブラウザからアクセスするときのURLに使われるprefix. */
 			'url_prefix' => '/path/for/url',
 			),
+		),
 
+	/**
+	 * Docker開発環境用 (MFS_ENV=docker)
+	 */
+	'docker' => array(
+		'mail_sender' => 'EMLauncher <no-reply@example.com>',
+		'title_prefix' => '[Docker] ',
+		'enable_https' => false,
+		'login' => array(
+			'enable_password' => true,
+			'enable_google_auth' => false,
+			),
+		'storage_class' => 'LocalFile',
+		'local_file' => array(
+			'path' => '/var/www/emlauncher',
+			'url_prefix' => '/files',
+			),
 		),
 	);
 
@@ -89,8 +106,3 @@ $emlauncher_config = array(
 $emlauncher_config['local'] = $emlauncher_config['ec2'];
 $emlauncher_config['local']['login']['enable_google_auth'] = false;
 $emlauncher_config['local']['aws']['bucket_name'] = 'emlauncher-dev';
-
-/**
- * Docker開発環境用の設定. (MFW_ENV=docker)
- */
-$emlauncher_config['docker'] = $emlauncher_config['local'];
