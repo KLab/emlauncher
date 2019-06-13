@@ -2,7 +2,7 @@
 require_once APP_ROOT.'/model/Application.php';
 require_once APP_ROOT.'/model/Tag.php';
 require_once APP_ROOT.'/model/Random.php';
-require_once APP_ROOT.'/model/S3.php';
+require_once APP_ROOT.'/model/Storage.php';
 
 /**
  * Row object for 'package' table.
@@ -123,28 +123,28 @@ class Package extends mfwObject {
 	public function uploadFile($file_path,$mime)
 	{
 		$key = $this->getFileKey();
-		S3::uploadFile($key,$file_path,$mime,'private');
+		Storage::saveFile($key,$file_path,$mime);
 	}
 	public static function uploadTempFile($file_path,$ext,$mime)
 	{
 		$tmp_name = Random::string(16).".$ext";
-		S3::uploadFile(static::TEMP_DIR.$tmp_name,$file_path,$mime,'private');
+		Storage::saveFile(static::TEMP_DIR.$tmp_name,$file_path,$mime);
 		return $tmp_name;
 	}
 	public function renameTempFile($temp_name)
 	{
 		$tempkey = static::TEMP_DIR.$temp_name;
 		$newkey = $this->getFileKey();
-		S3::rename($tempkey,$newkey,'private');
+		Storage::rename($tempkey,$newkey);
 	}
 	public function deleteFile()
 	{
 		$key = $this->getFileKey();
-		S3::delete($key);
+		Storage::delete($key);
 	}
 	public function getFileUrl($expire=null)
 	{
-		return S3::url($this->getFileKey(),$expire);
+		return Storage::url($this->getFileKey(),$expire);
 	}
 
 	public function getInstallUrl()
@@ -296,4 +296,3 @@ class PackageDb extends mfwObjectDb {
 		return new PackageSet(mfwDBIBase::getAll($sql, $bind));
 	}
 }
-
