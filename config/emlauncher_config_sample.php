@@ -30,8 +30,8 @@ $emlauncher_config = array(
 			 * email+passwordによるログインを許可.
 			 * `user_pass`テーブルに登録されているアカウントでログイン可能にする.
 			 * @note
-			 *  ユーザを追加する時は`user_pass`テーブルに`email`のみを登録し
-			 *  パスワードリセットの手順を踏むことでパスワードを登録する.
+			 *	ユーザを追加する時は`user_pass`テーブルに`email`のみを登録し
+			 *	パスワードリセットの手順を踏むことでパスワードを登録する.
 			 */
 			'enable_password' => true,
 
@@ -68,6 +68,17 @@ $emlauncher_config = array(
 
 			/** S3のbucket名. 予め作成しておく. */
 			'bucket_name' => 'emlauncher',
+
+			/** S3互換ストレージを利用する場合のURL（LocalSackなど）
+			 *	AWSのS3を利用するときは指定しない
+			 *	base_url: EMLauncherからアクセスするときのAPIエンドポイント
+			 *			  Dockerでlocalstackを利用する場合、
+			 *			  webコンテナから見えるs3コンテナのエンドポイントを指定する
+			 *	external_url: ブラウザからアクセスするときのURL
+			 *				  base_urlと同じ場合は指定しない
+			 */
+			// 'base_url => 'http://localstack:4572',
+			// 'external_url => 'http://localhost:4572',
 			),
 
 		/** LocalFileの設定 (storage_class='LocalFile'の場合) */
@@ -91,10 +102,17 @@ $emlauncher_config = array(
 			'enable_password' => true,
 			'enable_google_auth' => false,
 			),
-		'storage_class' => 'LocalFile',
+		'storage_class' => 'LocalFile', // LocalStackを利用する場合は'S3'を指定する
 		'local_file' => array(
 			'path' => '/var/www/emlauncher',
 			'url_prefix' => '/files',
+			),
+		'aws' => array(
+			'bucket_name' => 'emlauncher-dev',
+			'key' => 'mykey',
+			'secret' => 'mysecret',
+			'base_url' => 'http://localstack:4572',
+			'external_url' => 'http://localhost:4572',
 			),
 		),
 	);
@@ -106,14 +124,3 @@ $emlauncher_config = array(
 $emlauncher_config['local'] = $emlauncher_config['ec2'];
 $emlauncher_config['local']['login']['enable_google_auth'] = false;
 $emlauncher_config['local']['aws']['bucket_name'] = 'emlauncher-dev';
-
-/**
- * s3(localstack) を mock で利用する際の s3 へ接続するための URL
- *  base_url: web container から s3(localstack) container へアクセスするときの endpoint となる URL
- *  s3_external_url: ブラウザから s3 container へアクセスするときの URL
- *                   Docker for Mac などだと "http://localhost:4572/" などとなる。
- *                   実端末など外部からアクセスする場合はホストの名前を利用する。
- *                   アイコンの表示やパッケージのダウンロードなどで必要。
-$emlauncher_config['local']['aws']['base_url'] = 'http://localstack:4572/';
-$emlauncher_config['local']['aws']['s3_external_url'] = 'http://localhost:4572';
- */
