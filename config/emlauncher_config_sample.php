@@ -30,8 +30,8 @@ $emlauncher_config = array(
 			 * email+passwordによるログインを許可.
 			 * `user_pass`テーブルに登録されているアカウントでログイン可能にする.
 			 * @note
-			 *	ユーザを追加する時は`user_pass`テーブルに`email`のみを登録し
-			 *	パスワードリセットの手順を踏むことでパスワードを登録する.
+			 *  ユーザを追加する時は`user_pass`テーブルに`email`のみを登録し
+			 *  パスワードリセットの手順を踏むことでパスワードを登録する.
 			 */
 			'enable_password' => true,
 
@@ -70,12 +70,12 @@ $emlauncher_config = array(
 			'bucket_name' => 'emlauncher',
 
 			/** S3互換ストレージを利用する場合のURL（LocalSackなど）
-			 *	AWSのS3を利用するときは指定しない
-			 *	base_url: EMLauncherからアクセスするときのAPIエンドポイント
-			 *			  Dockerでlocalstackを利用する場合、
-			 *			  webコンテナから見えるs3コンテナのエンドポイントを指定する
-			 *	external_url: ブラウザからアクセスするときのURL
-			 *				  base_urlと同じ場合は指定しない
+			 *  AWSのS3を利用するときは指定しない
+			 *  base_url: EMLauncherからアクセスするときのAPIエンドポイント
+			 *            Dockerでlocalstackを利用する場合、
+			 *            webコンテナから見えるs3コンテナのエンドポイントを指定する
+			 *  external_url: ブラウザからアクセスするときのURL
+			 *                base_urlと同じ場合は指定しない
 			 */
 			// 'base_url => 'http://localstack:4572',
 			// 'external_url => 'http://localhost:4572',
