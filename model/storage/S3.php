@@ -4,17 +4,35 @@ require_once APP_ROOT.'/model/Storage.php';
 
 class S3 implements StorageImpl {
 
-	protected $config;
+	protected $bucket;
+	protected $pathstyle;
+	protected $base_url;
+	protected $external_url;
 	protected $client;
 
 	public function __construct()
 	{
-		$this->config = Config::get('aws');
+		$config = Config::get('aws');
+		$this->bucket = $config['bucket_name'];
+		if(isset($config['base_url'])){
+			$this->pathstyle = TRUE;
+			$this->base_url = rtrim($config['base_url'],'/');
+			$this->external_url = NULL;
+			if(isset($config['external_url'])){
+				$this->external_url = rtrim($config['external_url'], '/');
+			}
+		}
+		else{
+			$this->pathstyle = false;
+			$this->base_url = NULL;
+			$this->external_url = NULL;
+		}
+
 		$this->client = Aws\S3\S3Client::factory(
 			array(
-				'key' => $this->config['key'],
-				'secret' => $this->config['secret'],
-				'base_url' => isset($this->config['base_url']) ? $this->config['base_url'] : NULL,
+				'key' => $config['key'],
+				'secret' => $config['secret'],
+				'base_url' => $this->base_url,
 				));
 	}
 
@@ -22,15 +40,14 @@ class S3 implements StorageImpl {
 	{
 		$type = 'image/png';
 		$acl = 'public-read';
-		$pathstyle = isset($this->config['base_url']) ? true : false;
 		$r = $this->client->putObject(
 			array(
-				'Bucket' => $this->config['bucket_name'],
+				'Bucket' => $this->bucket,
 				'Key' => $key,
 				'ACL' => $acl,
 				'ContentType' => $type,
 				'Body' => Guzzle\Http\EntityBody::factory($data),
-				'PathStyle' => $pathstyle,
+				'PathStyle' => $this->pathstyle,
 				));
 		return $r;
 	}
@@ -39,15 +56,14 @@ class S3 implements StorageImpl {
 	{
 		$acl = 'private';
 		$fp = fopen($filename,'rb');
-		$pathstyle = isset($this->config['base_url']) ? true : false;
 		$r = $this->client->putObject(
 			array(
-				'Bucket' => $this->config['bucket_name'],
+				'Bucket' => $this->bucket,
 				'Key' => $key,
 				'ACL' => $acl,
 				'ContentType' => $mime,
 				'Body' => $fp,
-				'PathStyle' => $pathstyle,
+				'PathStyle' => $this->pathstyle,
 				));
 		// Guzzleが中で勝手にfcloseしやがるのでここでfcloseしてはならない
 		// fclose($fp)
@@ -57,63 +73,50 @@ class S3 implements StorageImpl {
 	public function rename($srckey,$dstkey)
 	{
 		$acl = 'private';
-		$bucket = $this->config['bucket_name'];
-		$pathstyle = isset($this->config['base_url']) ? true : false;
 
 		// copy
 		$this->client->copyObject(
 			array(
-				'Bucket' => $bucket,
+				'Bucket' => $this->bucket,
 				'Key' => $dstkey,
 				'ACL' => $acl,
 				'CopySource' => "{$bucket}/{$srckey}",
-				'PathStyle' => $pathstyle,
+				'PathStyle' => $this->pathstyle,
 				));
 		// delete
 		$this->client->deleteObject(
 			array(
-				'Bucket' => $bucket,
+				'Bucket' => $this->bucket,
 				'Key' => $srckey,
-				'PathStyle' => $pathstyle,
+				'PathStyle' => $this->pathstyle,
 				));
 	}
 
 	public function delete($key)
 	{
-		$bucket = $this->config['bucket_name'];
-		$pathstyle = isset($s3->config['base_url']) ? true : false;
 		$this->client->deleteObject(
 			array(
-				'Bucket' => $bucket,
+				'Bucket' => $this->bucket,
 				'Key' => $key,
-				'PathStyle' => $pathstyle,
+				'PathStyle' => $this->pathstyle,
 				));
 	}
 
 	public function url($key,$expires=null)
 	{
-		$bucket = $this->config['bucket_name'];
+		$bucket = $this->bucket;
 		if($expires===null){
-			if(isset($this->config['s3_external_url'])){
-				$s3_external_url = rtrim($this->config['s3_external_url'], '/');
-				error_log("url is {$s3_external_url}/{$bucket}/{$key}");
-				return "{$s3_external_url}/{$bucket}/{$key}";
-			}else{
+			if($this->base_url===NULL){
 				return "https://{$bucket}.s3.amazonaws.com/{$key}";
 			}
+			$base_url = $this->external_url ?: $this->base_url;
+			return "{$base_url}/{$bucket}/{$key}";
 		}
-		if(isset($this->config['base_url'])){
-			$obj_url = $this->client->getObjectUrl($bucket,$key,$expires,array('PathStyle' => true));
-			if(isset($this->config['s3_external_url'])){
-				$obj_url = str_replace(
-					rtrim($this->config['base_url'], '/'),
-					rtrim($this->config['s3_external_url'], '/'),
-					$obj_url
-				);
-			}
-			return $obj_url;
-		}
-		return $this->client->getObjectUrl($bucket,$key,$expires);
-	}
 
+		$obj_url = $this->client->getObjectUrl($bucket,$key,$expires,array('PathStyle' => $this->pathstyle));
+		if($this->external_url){
+			$obj_url = str_replace($this->base_url, $this->external_url, $obj_url);
+		}
+		return $obj_url;
+	}
 }
