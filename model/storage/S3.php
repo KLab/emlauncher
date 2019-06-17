@@ -3,6 +3,9 @@ require_once APP_ROOT.'/libs/aws/aws-autoloader.php';
 require_once APP_ROOT.'/model/Config.php';
 require_once APP_ROOT.'/model/Storage.php';
 
+use Aws\S3\S3Client;
+use Aws\Credentials\Credentials;
+
 class S3 implements StorageImpl {
 
 	protected $bucket;
@@ -29,11 +32,13 @@ class S3 implements StorageImpl {
 			$this->external_url = NULL;
 		}
 
-		$this->client = Aws\S3\S3Client::factory(
+		$this->client = new S3Client(
 			array(
-				'key' => $config['key'],
-				'secret' => $config['secret'],
-				'base_url' => $this->base_url,
+				'region' => $config['region'],
+				'version' => '2006-03-01',
+				'signature_version' => 'v4',
+				'credentials' => new Credentials($config['key'],$config['secret']),
+				'endpoint' => $this->base_url,
 				));
 	}
 
@@ -47,8 +52,7 @@ class S3 implements StorageImpl {
 				'Key' => $key,
 				'ACL' => $acl,
 				'ContentType' => $type,
-				'Body' => Guzzle\Http\EntityBody::factory($data),
-				'PathStyle' => $this->pathstyle,
+				'Body' => GuzzleHttp\Psr7\stream_for($data->getImageBlob()),
 				));
 		return $r;
 	}
@@ -64,10 +68,8 @@ class S3 implements StorageImpl {
 				'ACL' => $acl,
 				'ContentType' => $mime,
 				'Body' => $fp,
-				'PathStyle' => $this->pathstyle,
 				));
-		// Guzzleが中で勝手にfcloseしやがるのでここでfcloseしてはならない
-		// fclose($fp)
+		fclose($fp);
 		return $r;
 	}
 
@@ -82,14 +84,12 @@ class S3 implements StorageImpl {
 				'Key' => $dstkey,
 				'ACL' => $acl,
 				'CopySource' => "{$this->bucket}/{$srckey}",
-				'PathStyle' => $this->pathstyle,
 				));
 		// delete
 		$this->client->deleteObject(
 			array(
 				'Bucket' => $this->bucket,
 				'Key' => $srckey,
-				'PathStyle' => $this->pathstyle,
 				));
 	}
 
@@ -99,7 +99,6 @@ class S3 implements StorageImpl {
 			array(
 				'Bucket' => $this->bucket,
 				'Key' => $key,
-				'PathStyle' => $this->pathstyle,
 				));
 	}
 
@@ -114,7 +113,9 @@ class S3 implements StorageImpl {
 			return "{$base_url}/{$bucket}/{$key}";
 		}
 
-		$obj_url = $this->client->getObjectUrl($bucket,$key,$expires,array('PathStyle' => $this->pathstyle));
+		$cmd = $this->client->getCommand(
+			'GetObject', array('Bucket' => $this->bucket, 'Key' => $key));
+		$obj_url = $this->client->createPresignedRequest($cmd, $expires)->getUri();
 		if($this->external_url){
 			$obj_url = str_replace($this->base_url, $this->external_url, $obj_url);
 		}
