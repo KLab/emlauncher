@@ -1,4 +1,5 @@
 <?php
+require_once APP_ROOT.'/libs/aws/aws-autoloader.php';
 require_once APP_ROOT.'/model/Config.php';
 require_once APP_ROOT.'/model/Storage.php';
 
@@ -80,7 +81,7 @@ class S3 implements StorageImpl {
 				'Bucket' => $this->bucket,
 				'Key' => $dstkey,
 				'ACL' => $acl,
-				'CopySource' => "{$bucket}/{$srckey}",
+				'CopySource' => "{$this->bucket}/{$srckey}",
 				'PathStyle' => $this->pathstyle,
 				));
 		// delete
