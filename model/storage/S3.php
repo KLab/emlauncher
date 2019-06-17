@@ -9,7 +9,6 @@ use Aws\Credentials\Credentials;
 class S3 implements StorageImpl {
 
 	protected $bucket;
-	protected $pathstyle;
 	protected $base_url;
 	protected $external_url;
 	protected $client;
@@ -19,7 +18,7 @@ class S3 implements StorageImpl {
 		$config = Config::get('aws');
 		$this->bucket = $config['bucket_name'];
 		if(isset($config['base_url'])){
-			$this->pathstyle = TRUE;
+			$pathstyle = true;
 			$this->base_url = rtrim($config['base_url'],'/');
 			$this->external_url = NULL;
 			if(isset($config['external_url'])){
@@ -27,7 +26,7 @@ class S3 implements StorageImpl {
 			}
 		}
 		else{
-			$this->pathstyle = false;
+			$pathstyle = false;
 			$this->base_url = NULL;
 			$this->external_url = NULL;
 		}
@@ -39,6 +38,7 @@ class S3 implements StorageImpl {
 				'signature_version' => 'v4',
 				'credentials' => new Credentials($config['key'],$config['secret']),
 				'endpoint' => $this->base_url,
+				'use_path_style_endpoint' => $pathstyle,
 				));
 	}
 
