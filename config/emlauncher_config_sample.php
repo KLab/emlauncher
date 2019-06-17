@@ -72,10 +72,7 @@ $emlauncher_config = array(
 			/** S3互換ストレージを利用する場合のURL（LocalSackなど）
 			 *  AWSのS3を利用するときは指定しない
 			 *  base_url: EMLauncherからアクセスするときのAPIエンドポイント
-			 *            Dockerでlocalstackを利用する場合、
-			 *            webコンテナから見えるs3コンテナのエンドポイントを指定する
-			 *  external_url: ブラウザからアクセスするときのURL
-			 *                base_urlと同じ場合は指定しない
+			 *  external_url: ブラウザからアクセスするときのURL (base_urlと同じ場合は省略可)
 			 */
 			// 'base_url => 'http://localstack:4572',
 			// 'external_url => 'http://localhost:4572',
@@ -111,8 +108,9 @@ $emlauncher_config = array(
 			'bucket_name' => 'emlauncher-dev',
 			'key' => 'mykey',
 			'secret' => 'mysecret',
-			'base_url' => 'http://localstack:4572',
-			'external_url' => 'http://localhost:4572',
+			// LocalStackの設定は docker-compose.s3-localstack.yml を参照
+			'base_url' => 'http://localstack:4572', // webコンテナから見えるs3コンテナのエンドポイント
+			'external_url' => 'http://localhost:4572', // ブラウザからアクセスするときのURL
 			),
 		),
 	);
