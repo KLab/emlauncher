@@ -106,11 +106,7 @@ class S3 implements StorageImpl {
 	{
 		$bucket = $this->bucket;
 		if($expires===null){
-			if($this->base_url===NULL){
-				return "https://{$bucket}.s3.amazonaws.com/{$key}";
-			}
-			$base_url = $this->external_url ?: $this->base_url;
-			return "{$base_url}/{$bucket}/{$key}";
+			return $this->client->getObjectUrl($this->bucket, $key);
 		}
 
 		$cmd = $this->client->getCommand(
