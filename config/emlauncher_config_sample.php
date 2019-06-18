@@ -3,7 +3,6 @@
  * EMLauncher設定.
  * emlauncher_config.phpにリネームする.
  */
-require_once APP_ROOT.'/libs/aws/aws-autoloader.php';
 
 $emlauncher_config = array(
 	/** EC2環境用の設定 (httpd.confでSetEnv MFW_ENV 'ec2') */
@@ -64,7 +63,7 @@ $emlauncher_config = array(
 			'secret' => 'xxxxxxxx',
 
 			/** S3のRegion. */
-			'region' => Aws\Common\Enum\Region::TOKYO,
+			'region' => 'ap-northeast-1',
 
 			/** S3のbucket名. 予め作成しておく. */
 			'bucket_name' => 'emlauncher',
@@ -108,6 +107,7 @@ $emlauncher_config = array(
 			'bucket_name' => 'emlauncher-dev',
 			'key' => 'mykey',
 			'secret' => 'mysecret',
+			'region' => 'ap-northeast-1',
 			// LocalStackの設定は docker-compose.s3-localstack.yml を参照
 			'base_url' => 'http://localstack:4572', // webコンテナから見えるs3コンテナのエンドポイント
 			'external_url' => 'http://localhost:4572', // ブラウザからアクセスするときのURL

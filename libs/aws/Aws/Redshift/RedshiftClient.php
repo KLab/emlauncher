@@ -1,105 +1,172 @@
 <?php
-/**
- * Copyright 2010-2013 Amazon.com, Inc. or its affiliates. All Rights Reserved.
- *
- * Licensed under the Apache License, Version 2.0 (the "License").
- * You may not use this file except in compliance with the License.
- * A copy of the License is located at
- *
- * http://aws.amazon.com/apache2.0
- *
- * or in the "license" file accompanying this file. This file is distributed
- * on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either
- * express or implied. See the License for the specific language governing
- * permissions and limitations under the License.
- */
-
 namespace Aws\Redshift;
 
-use Aws\Common\Client\AbstractClient;
-use Aws\Common\Client\ClientBuilder;
-use Aws\Common\Enum\ClientOptions as Options;
-use Guzzle\Common\Collection;
-use Guzzle\Service\Resource\Model;
-use Guzzle\Service\Resource\ResourceIteratorInterface;
+use Aws\AwsClient;
 
 /**
- * Client to interact with Amazon Redshift
+ * This client is used to interact with the **Amazon Redshift** service.
  *
- * @method Model authorizeClusterSecurityGroupIngress(array $args = array()) {@command Redshift AuthorizeClusterSecurityGroupIngress}
- * @method Model authorizeSnapshotAccess(array $args = array()) {@command Redshift AuthorizeSnapshotAccess}
- * @method Model copyClusterSnapshot(array $args = array()) {@command Redshift CopyClusterSnapshot}
- * @method Model createCluster(array $args = array()) {@command Redshift CreateCluster}
- * @method Model createClusterParameterGroup(array $args = array()) {@command Redshift CreateClusterParameterGroup}
- * @method Model createClusterSecurityGroup(array $args = array()) {@command Redshift CreateClusterSecurityGroup}
- * @method Model createClusterSnapshot(array $args = array()) {@command Redshift CreateClusterSnapshot}
- * @method Model createClusterSubnetGroup(array $args = array()) {@command Redshift CreateClusterSubnetGroup}
- * @method Model deleteCluster(array $args = array()) {@command Redshift DeleteCluster}
- * @method Model deleteClusterParameterGroup(array $args = array()) {@command Redshift DeleteClusterParameterGroup}
- * @method Model deleteClusterSecurityGroup(array $args = array()) {@command Redshift DeleteClusterSecurityGroup}
- * @method Model deleteClusterSnapshot(array $args = array()) {@command Redshift DeleteClusterSnapshot}
- * @method Model deleteClusterSubnetGroup(array $args = array()) {@command Redshift DeleteClusterSubnetGroup}
- * @method Model describeClusterParameterGroups(array $args = array()) {@command Redshift DescribeClusterParameterGroups}
- * @method Model describeClusterParameters(array $args = array()) {@command Redshift DescribeClusterParameters}
- * @method Model describeClusterSecurityGroups(array $args = array()) {@command Redshift DescribeClusterSecurityGroups}
- * @method Model describeClusterSnapshots(array $args = array()) {@command Redshift DescribeClusterSnapshots}
- * @method Model describeClusterSubnetGroups(array $args = array()) {@command Redshift DescribeClusterSubnetGroups}
- * @method Model describeClusterVersions(array $args = array()) {@command Redshift DescribeClusterVersions}
- * @method Model describeClusters(array $args = array()) {@command Redshift DescribeClusters}
- * @method Model describeDefaultClusterParameters(array $args = array()) {@command Redshift DescribeDefaultClusterParameters}
- * @method Model describeEvents(array $args = array()) {@command Redshift DescribeEvents}
- * @method Model describeOrderableClusterOptions(array $args = array()) {@command Redshift DescribeOrderableClusterOptions}
- * @method Model describeReservedNodeOfferings(array $args = array()) {@command Redshift DescribeReservedNodeOfferings}
- * @method Model describeReservedNodes(array $args = array()) {@command Redshift DescribeReservedNodes}
- * @method Model describeResize(array $args = array()) {@command Redshift DescribeResize}
- * @method Model modifyCluster(array $args = array()) {@command Redshift ModifyCluster}
- * @method Model modifyClusterParameterGroup(array $args = array()) {@command Redshift ModifyClusterParameterGroup}
- * @method Model modifyClusterSubnetGroup(array $args = array()) {@command Redshift ModifyClusterSubnetGroup}
- * @method Model purchaseReservedNodeOffering(array $args = array()) {@command Redshift PurchaseReservedNodeOffering}
- * @method Model rebootCluster(array $args = array()) {@command Redshift RebootCluster}
- * @method Model resetClusterParameterGroup(array $args = array()) {@command Redshift ResetClusterParameterGroup}
- * @method Model restoreFromClusterSnapshot(array $args = array()) {@command Redshift RestoreFromClusterSnapshot}
- * @method Model revokeClusterSecurityGroupIngress(array $args = array()) {@command Redshift RevokeClusterSecurityGroupIngress}
- * @method Model revokeSnapshotAccess(array $args = array()) {@command Redshift RevokeSnapshotAccess}
- * @method waitUntilClusterAvailable(array $input) Wait using the ClusterAvailable waiter. The input array uses the parameters of the DescribeClusters operation and waiter specific settings
- * @method waitUntilClusterDeleted(array $input) Wait using the ClusterDeleted waiter. The input array uses the parameters of the DescribeClusters operation and waiter specific settings
- * @method waitUntilSnapshotAvailable(array $input) Wait using the SnapshotAvailable waiter. The input array uses the parameters of the DescribeClusterSnapshots operation and waiter specific settings
- * @method ResourceIteratorInterface getDescribeClusterParameterGroupsIterator(array $args = array()) The input array uses the parameters of the DescribeClusterParameterGroups operation
- * @method ResourceIteratorInterface getDescribeClusterParametersIterator(array $args = array()) The input array uses the parameters of the DescribeClusterParameters operation
- * @method ResourceIteratorInterface getDescribeClusterSecurityGroupsIterator(array $args = array()) The input array uses the parameters of the DescribeClusterSecurityGroups operation
- * @method ResourceIteratorInterface getDescribeClusterSnapshotsIterator(array $args = array()) The input array uses the parameters of the DescribeClusterSnapshots operation
- * @method ResourceIteratorInterface getDescribeClusterSubnetGroupsIterator(array $args = array()) The input array uses the parameters of the DescribeClusterSubnetGroups operation
- * @method ResourceIteratorInterface getDescribeClusterVersionsIterator(array $args = array()) The input array uses the parameters of the DescribeClusterVersions operation
- * @method ResourceIteratorInterface getDescribeClustersIterator(array $args = array()) The input array uses the parameters of the DescribeClusters operation
- * @method ResourceIteratorInterface getDescribeDefaultClusterParametersIterator(array $args = array()) The input array uses the parameters of the DescribeDefaultClusterParameters operation
- * @method ResourceIteratorInterface getDescribeEventsIterator(array $args = array()) The input array uses the parameters of the DescribeEvents operation
- * @method ResourceIteratorInterface getDescribeOrderableClusterOptionsIterator(array $args = array()) The input array uses the parameters of the DescribeOrderableClusterOptions operation
- * @method ResourceIteratorInterface getDescribeReservedNodeOfferingsIterator(array $args = array()) The input array uses the parameters of the DescribeReservedNodeOfferings operation
- * @method ResourceIteratorInterface getDescribeReservedNodesIterator(array $args = array()) The input array uses the parameters of the DescribeReservedNodes operation
- *
- * @link http://docs.aws.amazon.com/aws-sdk-php/guide/latest/service-redshift.html User guide
- * @link http://docs.aws.amazon.com/aws-sdk-php/latest/class-Aws.Redshift.RedshiftClient.html API docs
+ * @method \Aws\Result acceptReservedNodeExchange(array $args = [])
+ * @method \GuzzleHttp\Promise\Promise acceptReservedNodeExchangeAsync(array $args = [])
+ * @method \Aws\Result authorizeClusterSecurityGroupIngress(array $args = [])
+ * @method \GuzzleHttp\Promise\Promise authorizeClusterSecurityGroupIngressAsync(array $args = [])
+ * @method \Aws\Result authorizeSnapshotAccess(array $args = [])
+ * @method \GuzzleHttp\Promise\Promise authorizeSnapshotAccessAsync(array $args = [])
+ * @method \Aws\Result batchDeleteClusterSnapshots(array $args = [])
+ * @method \GuzzleHttp\Promise\Promise batchDeleteClusterSnapshotsAsync(array $args = [])
+ * @method \Aws\Result batchModifyClusterSnapshots(array $args = [])
+ * @method \GuzzleHttp\Promise\Promise batchModifyClusterSnapshotsAsync(array $args = [])
+ * @method \Aws\Result cancelResize(array $args = [])
+ * @method \GuzzleHttp\Promise\Promise cancelResizeAsync(array $args = [])
+ * @method \Aws\Result copyClusterSnapshot(array $args = [])
+ * @method \GuzzleHttp\Promise\Promise copyClusterSnapshotAsync(array $args = [])
+ * @method \Aws\Result createCluster(array $args = [])
+ * @method \GuzzleHttp\Promise\Promise createClusterAsync(array $args = [])
+ * @method \Aws\Result createClusterParameterGroup(array $args = [])
+ * @method \GuzzleHttp\Promise\Promise createClusterParameterGroupAsync(array $args = [])
+ * @method \Aws\Result createClusterSecurityGroup(array $args = [])
+ * @method \GuzzleHttp\Promise\Promise createClusterSecurityGroupAsync(array $args = [])
+ * @method \Aws\Result createClusterSnapshot(array $args = [])
+ * @method \GuzzleHttp\Promise\Promise createClusterSnapshotAsync(array $args = [])
+ * @method \Aws\Result createClusterSubnetGroup(array $args = [])
+ * @method \GuzzleHttp\Promise\Promise createClusterSubnetGroupAsync(array $args = [])
+ * @method \Aws\Result createEventSubscription(array $args = [])
+ * @method \GuzzleHttp\Promise\Promise createEventSubscriptionAsync(array $args = [])
+ * @method \Aws\Result createHsmClientCertificate(array $args = [])
+ * @method \GuzzleHttp\Promise\Promise createHsmClientCertificateAsync(array $args = [])
+ * @method \Aws\Result createHsmConfiguration(array $args = [])
+ * @method \GuzzleHttp\Promise\Promise createHsmConfigurationAsync(array $args = [])
+ * @method \Aws\Result createSnapshotCopyGrant(array $args = [])
+ * @method \GuzzleHttp\Promise\Promise createSnapshotCopyGrantAsync(array $args = [])
+ * @method \Aws\Result createSnapshotSchedule(array $args = [])
+ * @method \GuzzleHttp\Promise\Promise createSnapshotScheduleAsync(array $args = [])
+ * @method \Aws\Result createTags(array $args = [])
+ * @method \GuzzleHttp\Promise\Promise createTagsAsync(array $args = [])
+ * @method \Aws\Result deleteCluster(array $args = [])
+ * @method \GuzzleHttp\Promise\Promise deleteClusterAsync(array $args = [])
+ * @method \Aws\Result deleteClusterParameterGroup(array $args = [])
+ * @method \GuzzleHttp\Promise\Promise deleteClusterParameterGroupAsync(array $args = [])
+ * @method \Aws\Result deleteClusterSecurityGroup(array $args = [])
+ * @method \GuzzleHttp\Promise\Promise deleteClusterSecurityGroupAsync(array $args = [])
+ * @method \Aws\Result deleteClusterSnapshot(array $args = [])
+ * @method \GuzzleHttp\Promise\Promise deleteClusterSnapshotAsync(array $args = [])
+ * @method \Aws\Result deleteClusterSubnetGroup(array $args = [])
+ * @method \GuzzleHttp\Promise\Promise deleteClusterSubnetGroupAsync(array $args = [])
+ * @method \Aws\Result deleteEventSubscription(array $args = [])
+ * @method \GuzzleHttp\Promise\Promise deleteEventSubscriptionAsync(array $args = [])
+ * @method \Aws\Result deleteHsmClientCertificate(array $args = [])
+ * @method \GuzzleHttp\Promise\Promise deleteHsmClientCertificateAsync(array $args = [])
+ * @method \Aws\Result deleteHsmConfiguration(array $args = [])
+ * @method \GuzzleHttp\Promise\Promise deleteHsmConfigurationAsync(array $args = [])
+ * @method \Aws\Result deleteSnapshotCopyGrant(array $args = [])
+ * @method \GuzzleHttp\Promise\Promise deleteSnapshotCopyGrantAsync(array $args = [])
+ * @method \Aws\Result deleteSnapshotSchedule(array $args = [])
+ * @method \GuzzleHttp\Promise\Promise deleteSnapshotScheduleAsync(array $args = [])
+ * @method \Aws\Result deleteTags(array $args = [])
+ * @method \GuzzleHttp\Promise\Promise deleteTagsAsync(array $args = [])
+ * @method \Aws\Result describeAccountAttributes(array $args = [])
+ * @method \GuzzleHttp\Promise\Promise describeAccountAttributesAsync(array $args = [])
+ * @method \Aws\Result describeClusterDbRevisions(array $args = [])
+ * @method \GuzzleHttp\Promise\Promise describeClusterDbRevisionsAsync(array $args = [])
+ * @method \Aws\Result describeClusterParameterGroups(array $args = [])
+ * @method \GuzzleHttp\Promise\Promise describeClusterParameterGroupsAsync(array $args = [])
+ * @method \Aws\Result describeClusterParameters(array $args = [])
+ * @method \GuzzleHttp\Promise\Promise describeClusterParametersAsync(array $args = [])
+ * @method \Aws\Result describeClusterSecurityGroups(array $args = [])
+ * @method \GuzzleHttp\Promise\Promise describeClusterSecurityGroupsAsync(array $args = [])
+ * @method \Aws\Result describeClusterSnapshots(array $args = [])
+ * @method \GuzzleHttp\Promise\Promise describeClusterSnapshotsAsync(array $args = [])
+ * @method \Aws\Result describeClusterSubnetGroups(array $args = [])
+ * @method \GuzzleHttp\Promise\Promise describeClusterSubnetGroupsAsync(array $args = [])
+ * @method \Aws\Result describeClusterTracks(array $args = [])
+ * @method \GuzzleHttp\Promise\Promise describeClusterTracksAsync(array $args = [])
+ * @method \Aws\Result describeClusterVersions(array $args = [])
+ * @method \GuzzleHttp\Promise\Promise describeClusterVersionsAsync(array $args = [])
+ * @method \Aws\Result describeClusters(array $args = [])
+ * @method \GuzzleHttp\Promise\Promise describeClustersAsync(array $args = [])
+ * @method \Aws\Result describeDefaultClusterParameters(array $args = [])
+ * @method \GuzzleHttp\Promise\Promise describeDefaultClusterParametersAsync(array $args = [])
+ * @method \Aws\Result describeEventCategories(array $args = [])
+ * @method \GuzzleHttp\Promise\Promise describeEventCategoriesAsync(array $args = [])
+ * @method \Aws\Result describeEventSubscriptions(array $args = [])
+ * @method \GuzzleHttp\Promise\Promise describeEventSubscriptionsAsync(array $args = [])
+ * @method \Aws\Result describeEvents(array $args = [])
+ * @method \GuzzleHttp\Promise\Promise describeEventsAsync(array $args = [])
+ * @method \Aws\Result describeHsmClientCertificates(array $args = [])
+ * @method \GuzzleHttp\Promise\Promise describeHsmClientCertificatesAsync(array $args = [])
+ * @method \Aws\Result describeHsmConfigurations(array $args = [])
+ * @method \GuzzleHttp\Promise\Promise describeHsmConfigurationsAsync(array $args = [])
+ * @method \Aws\Result describeLoggingStatus(array $args = [])
+ * @method \GuzzleHttp\Promise\Promise describeLoggingStatusAsync(array $args = [])
+ * @method \Aws\Result describeOrderableClusterOptions(array $args = [])
+ * @method \GuzzleHttp\Promise\Promise describeOrderableClusterOptionsAsync(array $args = [])
+ * @method \Aws\Result describeReservedNodeOfferings(array $args = [])
+ * @method \GuzzleHttp\Promise\Promise describeReservedNodeOfferingsAsync(array $args = [])
+ * @method \Aws\Result describeReservedNodes(array $args = [])
+ * @method \GuzzleHttp\Promise\Promise describeReservedNodesAsync(array $args = [])
+ * @method \Aws\Result describeResize(array $args = [])
+ * @method \GuzzleHttp\Promise\Promise describeResizeAsync(array $args = [])
+ * @method \Aws\Result describeSnapshotCopyGrants(array $args = [])
+ * @method \GuzzleHttp\Promise\Promise describeSnapshotCopyGrantsAsync(array $args = [])
+ * @method \Aws\Result describeSnapshotSchedules(array $args = [])
+ * @method \GuzzleHttp\Promise\Promise describeSnapshotSchedulesAsync(array $args = [])
+ * @method \Aws\Result describeStorage(array $args = [])
+ * @method \GuzzleHttp\Promise\Promise describeStorageAsync(array $args = [])
+ * @method \Aws\Result describeTableRestoreStatus(array $args = [])
+ * @method \GuzzleHttp\Promise\Promise describeTableRestoreStatusAsync(array $args = [])
+ * @method \Aws\Result describeTags(array $args = [])
+ * @method \GuzzleHttp\Promise\Promise describeTagsAsync(array $args = [])
+ * @method \Aws\Result disableLogging(array $args = [])
+ * @method \GuzzleHttp\Promise\Promise disableLoggingAsync(array $args = [])
+ * @method \Aws\Result disableSnapshotCopy(array $args = [])
+ * @method \GuzzleHttp\Promise\Promise disableSnapshotCopyAsync(array $args = [])
+ * @method \Aws\Result enableLogging(array $args = [])
+ * @method \GuzzleHttp\Promise\Promise enableLoggingAsync(array $args = [])
+ * @method \Aws\Result enableSnapshotCopy(array $args = [])
+ * @method \GuzzleHttp\Promise\Promise enableSnapshotCopyAsync(array $args = [])
+ * @method \Aws\Result getClusterCredentials(array $args = [])
+ * @method \GuzzleHttp\Promise\Promise getClusterCredentialsAsync(array $args = [])
+ * @method \Aws\Result getReservedNodeExchangeOfferings(array $args = [])
+ * @method \GuzzleHttp\Promise\Promise getReservedNodeExchangeOfferingsAsync(array $args = [])
+ * @method \Aws\Result modifyCluster(array $args = [])
+ * @method \GuzzleHttp\Promise\Promise modifyClusterAsync(array $args = [])
+ * @method \Aws\Result modifyClusterDbRevision(array $args = [])
+ * @method \GuzzleHttp\Promise\Promise modifyClusterDbRevisionAsync(array $args = [])
+ * @method \Aws\Result modifyClusterIamRoles(array $args = [])
+ * @method \GuzzleHttp\Promise\Promise modifyClusterIamRolesAsync(array $args = [])
+ * @method \Aws\Result modifyClusterMaintenance(array $args = [])
+ * @method \GuzzleHttp\Promise\Promise modifyClusterMaintenanceAsync(array $args = [])
+ * @method \Aws\Result modifyClusterParameterGroup(array $args = [])
+ * @method \GuzzleHttp\Promise\Promise modifyClusterParameterGroupAsync(array $args = [])
+ * @method \Aws\Result modifyClusterSnapshot(array $args = [])
+ * @method \GuzzleHttp\Promise\Promise modifyClusterSnapshotAsync(array $args = [])
+ * @method \Aws\Result modifyClusterSnapshotSchedule(array $args = [])
+ * @method \GuzzleHttp\Promise\Promise modifyClusterSnapshotScheduleAsync(array $args = [])
+ * @method \Aws\Result modifyClusterSubnetGroup(array $args = [])
+ * @method \GuzzleHttp\Promise\Promise modifyClusterSubnetGroupAsync(array $args = [])
+ * @method \Aws\Result modifyEventSubscription(array $args = [])
+ * @method \GuzzleHttp\Promise\Promise modifyEventSubscriptionAsync(array $args = [])
+ * @method \Aws\Result modifySnapshotCopyRetentionPeriod(array $args = [])
+ * @method \GuzzleHttp\Promise\Promise modifySnapshotCopyRetentionPeriodAsync(array $args = [])
+ * @method \Aws\Result modifySnapshotSchedule(array $args = [])
+ * @method \GuzzleHttp\Promise\Promise modifySnapshotScheduleAsync(array $args = [])
+ * @method \Aws\Result purchaseReservedNodeOffering(array $args = [])
+ * @method \GuzzleHttp\Promise\Promise purchaseReservedNodeOfferingAsync(array $args = [])
+ * @method \Aws\Result rebootCluster(array $args = [])
+ * @method \GuzzleHttp\Promise\Promise rebootClusterAsync(array $args = [])
+ * @method \Aws\Result resetClusterParameterGroup(array $args = [])
+ * @method \GuzzleHttp\Promise\Promise resetClusterParameterGroupAsync(array $args = [])
+ * @method \Aws\Result resizeCluster(array $args = [])
+ * @method \GuzzleHttp\Promise\Promise resizeClusterAsync(array $args = [])
+ * @method \Aws\Result restoreFromClusterSnapshot(array $args = [])
+ * @method \GuzzleHttp\Promise\Promise restoreFromClusterSnapshotAsync(array $args = [])
+ * @method \Aws\Result restoreTableFromClusterSnapshot(array $args = [])
+ * @method \GuzzleHttp\Promise\Promise restoreTableFromClusterSnapshotAsync(array $args = [])
+ * @method \Aws\Result revokeClusterSecurityGroupIngress(array $args = [])
+ * @method \GuzzleHttp\Promise\Promise revokeClusterSecurityGroupIngressAsync(array $args = [])
+ * @method \Aws\Result revokeSnapshotAccess(array $args = [])
+ * @method \GuzzleHttp\Promise\Promise revokeSnapshotAccessAsync(array $args = [])
+ * @method \Aws\Result rotateEncryptionKey(array $args = [])
+ * @method \GuzzleHttp\Promise\Promise rotateEncryptionKeyAsync(array $args = [])
  */
-class RedshiftClient extends AbstractClient
-{
-    const LATEST_API_VERSION = '2012-12-01';
-
-    /**
-     * Factory method to create a new Amazon Redshift client using an array of configuration options.
-     *
-     * @param array|Collection $config Client configuration data
-     *
-     * @return self
-     * @see \Aws\Common\Client\DefaultClient for a list of available configuration options
-     */
-    public static function factory($config = array())
-    {
-        return ClientBuilder::factory(__NAMESPACE__)
-            ->setConfig($config)
-            ->setConfigDefaults(array(
-                Options::VERSION             => self::LATEST_API_VERSION,
-                Options::SERVICE_DESCRIPTION => __DIR__ . '/Resources/redshift-%s.php'
-            ))
-            ->build();
-    }
-}
+class RedshiftClient extends AwsClient {}
