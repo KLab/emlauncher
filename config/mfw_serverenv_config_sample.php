@@ -41,6 +41,21 @@ $serverenv_config = array(
 			),
 		),
 
+	/**
+	 * Docker用の設定
+	 */
+	'docker' => array(
+		'database' => array(
+			'authfile' => '/dbauth',
+			'default_master' => 'mysql:dbname=emlauncher;host=db',
+			),
+		'memcache' => array(
+			'host' => 'memcached',
+			'port' => 11211,
+			),
+		'http_proxy' => array(
+			),
+		),
 	);
 
 $serverenv_config['local'] = $serverenv_config['ec2'];

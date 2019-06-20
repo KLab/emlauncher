@@ -11,8 +11,8 @@ git submodule update
 
 2. Modify configs
 ```sh
-cp config/{emlauncher_config_sample.php,emlauncher_config.php}
-cp config/{mfw_serverenv_config_docker.php,mfw_serverenv_config.php}
+cp config/emlauncher_config{_sample,}.php
+cp config/mfw_serverenv_config{_sample,}.php
 
 # set your aws keys and s3 bucket name.
 vim config/emlauncher_config.php
@@ -42,8 +42,8 @@ git submodule update
 
 2. Modify configs
 ```sh
-cp config/{emlauncher_config_sample.php,emlauncher_config.php}
-cp config/{mfw_serverenv_config_docker.php,mfw_serverenv_config.php}
+cp config/emlauncher_config{_sample,}.php
+cp config/mfw_serverenv_config{_sample,}.php
 
 # set your aws keys and s3 bucket name, **s3 mock url**, and change storage_class to 'S3'.
 vim config/emlauncher_config.php
