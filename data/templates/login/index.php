@@ -23,7 +23,7 @@
         </div>
         <div class="col-sm-9 col-sm-offset-3">
           <input type="submit" class="btn btn-primary" value="Login">
-          <a class="btn btn-link" href="<?=url('/login/password_reminder')?>">forget password</a>
+          <a class="btn btn-link" href="<?=url('/login/password_reminder')?>">forgot password</a>
         </div>
       </form>
       <?php endif ?>
