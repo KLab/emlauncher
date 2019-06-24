@@ -4,24 +4,12 @@ ENV APACHE_DOCUMENT_ROOT /repo/web
 RUN set -x \
   && apt-get update \
   && apt-get install -y --no-install-recommends \
-    unzip libssl-dev libpcre3 libpcre3-dev zlib1g-dev libmagickwand-dev sendmail
-
-RUN set -x \
-  && cd /tmp \
-  && curl -sSL -o php7.zip https://github.com/websupport-sk/pecl-memcache/archive/php7.zip \
-  && unzip php7 \
-  && cd pecl-memcache-php7 \
-  && /usr/local/bin/phpize \
-  && ./configure --with-php-config=/usr/local/bin/php-config \
-  && make \
-  && make install \
-  && echo "extension=memcache.so" > /usr/local/etc/php/conf.d/ext-memcache.ini \
-  && rm -rf /tmp/pecl-memcache-php7 php7.zip
+    unzip libssl-dev libpcre3 libpcre3-dev zlib1g-dev libmagickwand-dev sendmail libmemcached-dev
 
 RUN set -x \
   && docker-php-ext-install -j$(nproc) pdo_mysql mysqli mbstring gd \
-  && pecl install imagick-3.4.3 \
-  && docker-php-ext-enable imagick \
+  && pecl install imagick-3.4.3 memcached \
+  && docker-php-ext-enable imagick memcached \
   && a2enmod rewrite
 
 COPY entrypoint.sh /entrypoint.sh
