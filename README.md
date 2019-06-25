@@ -3,7 +3,7 @@ EMLauncher
 
 ## Setup
 
-EC2のAmazonLinuxでEMLauncherを動かす手順です。
+EC2のAmazonLinux2でEMLauncherを動かす手順です。
 
 ### 1. Launch EC2 instance
 
@@ -20,7 +20,9 @@ sudo sh -c "echo '/swapfile swap swap defaults 0 0' >> /etc/fstab"
 ### 2. Install required packages
 
 ```BASH
-sudo yum install php php-pdo php-mysql httpd mysql55-server memcached php-pecl-memcache php-mbstring php-pecl-imagick git
+sudo amazon-linux-extras install lamp-mariadb10.2-php7.2
+sudo amazon-linux-extras install memcached1.5
+sudo yum install mariadb-server httpd php-gd php-mbstring php-xml php-pecl-imagick php-pecl-memcached git
 ```
 
 ### 3. Deploy codes
@@ -46,16 +48,16 @@ SetEnv MFW_ENV 'ec2'
 ```
 
 ```BASH
-sudo /etc/init.d/httpd start
-sudo chkconfig httpd on
+sudo systemctl start httpd
+sudo systemctl enable httpd
 ```
 
 
 ### 5. Database setup
 
 ```BASH
-sudo /etc/init.d/mysqld start
-sudo chkconfig mysqld on
+sudo systemctl start mariadb
+sudo systemctl enable mariadb
 ```
 
 DBのユーザ名、パスワードを書いたファイルを作成します。
@@ -74,8 +76,8 @@ mysql -uroot emlauncher < /path/to/emlauncher/data/sql/tables.sql
 ### 6. Memcache setup
 
 ```BASH
-sudo /etc/init.d/memcached start
-sudo chkconfig memcached on
+sudo systemctl start memcached
+sudo systemctl enable memcached
 ```
 
 ### 7. Configuration
