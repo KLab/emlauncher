@@ -2,6 +2,7 @@
 require_once __DIR__.'/actions.php';
 require_once APP_ROOT.'/model/Package.php';
 require_once APP_ROOT.'/model/IPAFile.php';
+require_once APP_ROOT.'/model/APKFile.php';
 
 class upload_package_temporaryAction extends apiActions
 {
@@ -23,10 +24,14 @@ class upload_package_temporaryAction extends apiActions
 
 			$temp_name = Package::uploadTempFile($file_path,$ext,$mime);
 
-			$ios_identifier = null;
+			$identifier = null;
 			if($platform===Package::PF_IOS){
 				$plist = IPAFile::parseInfoPlist($file_path);
-				$ios_identifier = $plist['CFBundleIdentifier'];
+				$identifier = $plist['CFBundleIdentifier'];
+			}
+			if($platform===Package::PF_ANDROID){
+				$apkfile = $file_path;
+				$identifier = APKFile::getPackageName($apkfile);
 			}
 		}
 		catch(Exception $e){
@@ -41,7 +46,7 @@ class upload_package_temporaryAction extends apiActions
 				'file_name' => $file_name,
 				'temp_name' => $temp_name,
 				'platform' => $platform,
-				'ios_identifier' => $ios_identifier,
+				'identifier' => $identifier,
 				));
 	}
 }
