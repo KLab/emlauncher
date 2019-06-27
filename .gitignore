@@ -4,6 +4,7 @@ web/bootstrap/
 web/font-awesome/
 web/jquery/
 dbauth/
+vendor/
 
 #intelliJ
 .idea/
