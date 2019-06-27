@@ -3,10 +3,11 @@ Develop EMLauncher on docker containers
 
 # How to run (without s3 mock)
 
-1. Checkout submodules
+1. Setup libraries
 ```sh
 git submodule init
 git submodule update
+compose install
 ```
 
 2. Modify configs
@@ -34,10 +35,11 @@ http://localhost:10080
 
 # How to run (with s3 mock)
 
-1. Checkout submodules
+1. Setup libraries
 ```sh
 git submodule init
 git submodule update
+composer install
 ```
 
 2. Modify configs
