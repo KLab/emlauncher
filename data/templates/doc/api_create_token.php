@@ -48,7 +48,7 @@
   "platform": "Android",
   "title": "test upload",
   "description": "upload package via upload api",
-  "ios_identifier": "",
+  "identifier": "org.klab.emlauncher.sample",
   "original_file_name": "emlauncher.apk",
   "file_size": "5776313",
   "created": "2013-11-29 12:26:19",

@@ -64,7 +64,7 @@ class Package extends mfwObject {
 		return $desc;
 	}
 
-	public function getIOSIdentifier(){
+	public function getIdentifier(){
 		return $this->value('identifier');
 	}
 	public function getOriginalFileName(){

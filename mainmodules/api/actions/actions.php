@@ -32,7 +32,7 @@ class apiActions extends MainActions
 			'platform' => $pkg->getPlatform(),
 			'title' => $pkg->getTitle(),
 			'description' => $pkg->getDescription(),
-			'ios_identifier' => $pkg->getIOSIdentifier(),
+			'identifier' => $pkg->getIdentifier(),
 			'original_file_name' => $pkg->getOriginalFileName(),
 			'file_size' => $pkg->getFileSize(),
 			'created' => $pkg->getCreated(),
