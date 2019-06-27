@@ -1,0 +1,5 @@
+{
+    "require": {
+        "tufanbarisyildirim/php-apk-parser":"2.0.1"
+    }
+}

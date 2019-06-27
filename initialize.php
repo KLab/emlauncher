@@ -18,6 +18,8 @@ require_once APP_ROOT.'/mfw/mfwObjectDb.php';
 require_once APP_ROOT.'/mfw/mfwHttp.php';
 //require_once APP_ROOT.'/mfw/mfwOAuth.php';
 
+require_once APP_ROOT."/vendor/autoload.php";
+
 function apache_log($key,$value)
 {
 	static $log = array();
@@ -27,4 +29,3 @@ function apache_log($key,$value)
 		apache_setenv('LOGMSG',json_encode($log));
 	}
 }
-

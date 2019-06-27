@@ -77,7 +77,7 @@ class guestpass_installActions extends packageActions
 
 		$ipa_url = $pkg->getFileUrl('+60 min');
 		$image_url = $app->getIconUrl();
-		$bundle_identifier = $pkg->getIOSIdentifier();
+		$bundle_identifier = $pkg->getIdentifier();
 		$pkg_title = $pkg->getTitle();
 		$app_title = $app->getTitle();
 

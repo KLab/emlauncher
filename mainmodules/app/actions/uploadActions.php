@@ -30,7 +30,7 @@ class uploadActions extends appActions
 		$title = mfwRequest::param('title');
 		$description = mfwRequest::param('description');
 		$tag_names = mfwRequest::param('tags');
-		$ios_identifier = mfwRequest::param('ios_identifier');
+		$identifier = mfwRequest::param('identifier');
 		$notify = mfwRequest::param('notify');
 		$org_filename = mfwRequest::param('file_name');
 		$filesize = mfwRequest::param('file_size');
@@ -49,7 +49,7 @@ class uploadActions extends appActions
 			$tags = $app->getTagsByName($tag_names,$con);
 
 			$pkg = PackageDb::insertNewPackage(
-				$this->app->getId(),$platform,$ext,$title,$description,$ios_identifier,$org_filename,$filesize,$tags,$con);
+				$this->app->getId(),$platform,$ext,$title,$description,$identifier,$org_filename,$filesize,$tags,$con);
 
 			$pkg->renameTempFile($temp_name);
 

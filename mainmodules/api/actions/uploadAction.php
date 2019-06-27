@@ -3,6 +3,7 @@ require_once __DIR__.'/actions.php';
 require_once APP_ROOT.'/model/Application.php';
 require_once APP_ROOT.'/model/Package.php';
 require_once APP_ROOT.'/model/IPAFile.php';
+require_once APP_ROOT.'/model/APKFile.php';
 
 class uploadAction extends apiActions
 {
@@ -55,10 +56,13 @@ class uploadAction extends apiActions
 			// ファイルフォーマット確認, 情報抽出
 			list($platform,$ext,$mime) = PackageDb::getPackageInfo(
 				$file_info['name'],$file_info['tmp_name'],$file_info['type']);
-			$ios_identifier = null;
+			$identifier = null;
 			if($platform===Package::PF_IOS){
 				$plist = IPAFile::parseInfoPlist($file_info['tmp_name']);
-				$ios_identifier = $plist['CFBundleIdentifier'];
+				$identifier = $plist['CFBundleIdentifier'];
+			}
+			if($platform===Package::PF_ANDROID){
+				$identifier = APKFile::getPackageName($file_info['tmp_name']);
 			}
 
 			// DBへ保存
@@ -71,7 +75,7 @@ class uploadAction extends apiActions
 
 			$pkg = PackageDb::insertNewPackage(
 				$app->getId(),$platform,$ext,
-				$title,$description,$ios_identifier,
+				$title,$description,$identifier,
 				$file_info['name'],$file_info['size'],$tags,$con);
 			apache_log('pkg_id',$pkg->getId());
 
