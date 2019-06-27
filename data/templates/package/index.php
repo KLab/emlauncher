@@ -53,6 +53,10 @@
     <dl class="dl-horizontal">
       <dt>Platform</dt>
       <dd><?=block('platform_icon',array('with_name'=>true))?></dd>
+<?php if($package->getIdentifier()): ?>
+      <dt>Bundle ID</dt>
+      <dd><?=$package->getIdentifier()?></dd>
+<?php endif ?>
       <dt>Original name</dt>
       <dd><?=$package->getOriginalFileName()?:'--------.'.pathinfo($package->getBaseFileName(),PATHINFO_EXTENSION)?></dd>
       <dt>File size</dt>

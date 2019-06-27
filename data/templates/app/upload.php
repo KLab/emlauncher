@@ -123,6 +123,8 @@
     $('#platform').val(null);
     $('#temp-name').val(null);
     $('#file-name').val(null);
+    $('#identifier').val(null);
+    $('#file-size').val(null);
     $('#file-name-display').html('<i class="fa fa-spinner fa-spin"></i> uploading...');
     $('#progress-bar').css('width', '0%');
     $('#progress-bar').removeClass('progress-bar-success progress-bar-danger');
