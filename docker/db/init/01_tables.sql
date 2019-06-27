@@ -46,7 +46,7 @@ create table `package` (
   `file_name` varchar(63) not null comment 'ベースファイル名. app_idやidを加えてS3のキーを作る.',
   `title` varchar(255) not null,
   `description` text,
-  `ios_identifier` varchar(255) default null comment 'ipaのCFBundleIdentifier',
+  `identifier` varchar(255) default null comment 'CFBundleIdentifier/PackageName',
   `original_file_name` varchar(255) default null,
   `file_size` integer default null,
   `created` datetime not null,

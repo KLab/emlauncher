@@ -7,7 +7,7 @@ RUN set -x \
     unzip libssl-dev libpcre3 libpcre3-dev zlib1g-dev libmagickwand-dev sendmail libmemcached-dev
 
 RUN set -x \
-  && docker-php-ext-install -j$(nproc) pdo_mysql mysqli mbstring gd \
+  && docker-php-ext-install -j$(nproc) pdo_mysql mysqli mbstring gd zip \
   && pecl install imagick-3.4.3 memcached \
   && docker-php-ext-enable imagick memcached \
   && a2enmod rewrite
