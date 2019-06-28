@@ -26,3 +26,9 @@ RUN set -x \
 
 ENTRYPOINT /entrypoint.sh
 ENV MFW_ENV docker
+
+RUN set -x \
+  && mkdir -p /usr/share/man/man1 \
+  && apt-get install -y --no-install-recommends default-jre-headless \
+  && curl -sL -o/bundletool.jar https://github.com/google/bundletool/releases/download/0.10.0/bundletool-all-0.10.0.jar \
+  && echo -e 'EMLauncher\n\nKLab Inc.\n\nTokyo\nJP\nyes' | keytool -genkeypair -keystore /emlauncher.keystore -alias emlauncher -storepass emlauncher -keypass emlauncher -keyalg RSA -keysize 2048 -validity 36524

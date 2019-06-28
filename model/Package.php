@@ -14,7 +14,8 @@ class Package extends mfwObject {
 	const PF_ANDROID = 'Android';
 	const PF_IOS = 'iOS';
 	const PF_UNKNOWN = 'unknown';
-	const MIME_ANDROID = 'application/vnd.android.package-archive';
+	const MIME_ANDROID_APK = 'application/vnd.android.package-archive';
+	const MIME_ANDROID_AAB = 'application/octet-stream';
 	const MIME_IOS = 'application/octet-stream';
 
 	const FILE_DIR = 'package/';
@@ -222,7 +223,11 @@ class PackageDb extends mfwObjectDb {
 		$is_zip = file_get_contents($filepath,false,null,0,4)==="PK\x03\x04";
 		if($is_zip && $ext==='apk'){
 			$platform = Package::PF_ANDROID;
-			$mime = Package::MIME_ANDROID;
+			$mime = Package::MIME_ANDROID_APK;
+		}
+		if($is_zip && $ext=='aab'){
+			$platform = Package::PF_ANDROID;
+			$mime = Package::MIME_ANDROID_AAB;
 		}
 		if($is_zip && $ext==='ipa'){
 			$platform = Package::PF_IOS;
