@@ -130,3 +130,17 @@ CREATE TABLE guestpass_log
   KEY `idx_guest_pass_id` (`guest_pass_id`)
 )Engine=InnoDB default charset=utf8;
 
+drop table if exists `attached_file`;
+create table `attached_file` (
+  `id` integer not null auto_increment,
+  `app_id` integer not null,
+  `package_id` integer not null,
+  `file_name` varchar(255) not null,
+  `original_file_name` varchar(255) not null,
+  `file_size` integer not null,
+  `file_type` varchar(5) not null,
+  `created` datetime not null,
+  KEY `idx_app` (`app_id`),
+  KEY `idx_package` (`package_id`),
+  PRIMARY KEY (`id`)
+)Engine=InnoDB default charset=utf8 comment 'パッケージの添付ファイル';
