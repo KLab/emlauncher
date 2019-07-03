@@ -42,11 +42,9 @@ class upload_package_temporaryAction extends apiActions
 							'type' => 'apk',
 							'size' => filesize($apkfile),
 							);
-						unlink($apkfile);
 					}
-					catch(Exception $e){
+					finally{
 						unlink($apkfile);
-						throw $e;
 					}
 				}
 				else{

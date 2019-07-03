@@ -26,6 +26,7 @@
         <input type="hidden" id="file-name" name="file_name" value="">
         <input type="hidden" id="identifier" name="identifier" value="">
         <input type="hidden" id="file-size" name="file_size" value="">
+        <span id="attached-files" class="hidden"></span>
         <div class="well well-lg droparea text-center hidden-xs">
           Drop your apk/ipa file here.
         </div>
@@ -125,6 +126,7 @@
     $('#file-name').val(null);
     $('#identifier').val(null);
     $('#file-size').val(null);
+    $('#attached-files').empty();
     $('#file-name-display').html('<i class="fa fa-spinner fa-spin"></i> uploading...');
     $('#progress-bar').css('width', '0%');
     $('#progress-bar').removeClass('progress-bar-success progress-bar-danger');
@@ -163,6 +165,17 @@
         $('#file-name-display').html('<i class="fa fa-check success"></i> '+file.name);
         $('#file-info').text(data.platform+', size: '+file.size.toLocaleString()+' bytes');
         $('#file-size').val(file.size);
+        console.log(data.attached_files);
+        for(let i=0; i<data.attached_files.length; i++){
+            let tag = '<input type="hidden" name="attached_files['+i+']';
+            console.log(tag);
+            console.log($('#attached-files'));
+            $('#attached-files')
+                 .append(tag+'[file_name]" value="'+data.attached_files[i].file_name+'">')
+                 .append(tag+'[temp_name]" value="'+data.attached_files[i].temp_name+'">')
+                 .append(tag+'[size]" value="'+data.attached_files[i].size+'">')
+                 .append(tag+'[type]" value="'+data.attached_files[i].type+'">');
+        }
         $('#submit').removeAttr('disabled');
         $('#progress-bar').parent().removeClass('progress-striped active');
         $('#progress-bar').css('width','100%');
