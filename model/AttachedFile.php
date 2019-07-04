@@ -69,6 +69,18 @@ class AttachedFileSet extends mfwObjectSet {
 	{
 		parent::unsetCache($id);
 	}
+
+	public function delete($con){
+		if($this->count()==0){
+			return;
+		}
+		AttachedFileDb::deleteSet($this->getColumnArray('id'),$con);
+	}
+	public function deleteFiles(){
+		foreach($this as $file){
+			$file->deleteFile();
+		}
+	}
 }
 
 /**
@@ -95,10 +107,18 @@ class AttachedFileDb extends mfwObjectDb {
 		return $attached;
 	}
 
-	public static function selectByPackageId($pakckage_id)
+	public static function selectByPackageId($package_id)
 	{
 		$query = 'WHERE package_id = :package_id ORDER BY id ASC';
 		$bind = array(':package_id' => $package_id);
 		return static::selectSet($query,$bind);
+	}
+
+	public static function deleteSet($ids,$con)
+	{
+		$table = static::TABLE_NAME;
+		$bind = array();
+		$query = "DELETE FROM `$table` WHERE `id` IN (".static::makeInPlaceHolder($ids,$bind).')';
+		return mfwDBIBase::query($query,$bind,$con);
 	}
 }

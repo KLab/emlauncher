@@ -3,6 +3,7 @@ require_once APP_ROOT.'/model/Application.php';
 require_once APP_ROOT.'/model/Tag.php';
 require_once APP_ROOT.'/model/Random.php';
 require_once APP_ROOT.'/model/Storage.php';
+require_once APP_ROOT.'/model/AttachedFile.php';
 
 /**
  * Row object for 'package' table.
@@ -31,6 +32,7 @@ class Package extends mfwObject {
 	protected $tags = null;
 	protected $guest_passes = null;
 	protected $install_users = null;
+	protected $attached_files = null;
 
 	public function getId(){
 		return $this->value('id');
@@ -180,6 +182,7 @@ class Package extends mfwObject {
 	public function delete($con=null)
 	{
 		TagDb::removeFromPackage($this,$con);
+		$this->getAttachedFiles()->delete($con);
 		return parent::delete($con);
 	}
 
@@ -192,6 +195,14 @@ class Package extends mfwObject {
 			$this->guest_passes = GuestPassDb::selectByPackageId($this->getId());
 		}
 		return $this->guest_passes;
+	}
+
+	public function getAttachedFiles()
+	{
+		if($this->attached_files===null){
+			$this->attached_files = AttachedFileDb::selectByPackageId($this->getId());
+		}
+		return $this->attached_files;
 	}
 }
 

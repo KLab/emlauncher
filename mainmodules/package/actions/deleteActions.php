@@ -66,9 +66,11 @@ class deleteActions extends packageActions
 		apache_log('app_id',$this->app->getId());
 		apache_log('pkg_id',$this->package->getId());
 		apache_log('platform',$this->package->getPlatform());
+		apache_log('attached_ids',$this->package->getAttachedFiles()->getColumnArray('id'));
 
 		try{
 			$this->package->deleteFile();
+			$this->package->getAttachedFiles()->deleteFiles();
 		}
 		catch(Exception $e){
 			// S3から削除出来なくてもDBからは消えているので許容する
