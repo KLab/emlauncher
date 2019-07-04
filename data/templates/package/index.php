@@ -60,7 +60,15 @@
       <dt>Original name</dt>
       <dd><?=$package->getOriginalFileName()?:'--------.'.pathinfo($package->getBaseFileName(),PATHINFO_EXTENSION)?></dd>
       <dt>File size</dt>
-      <dd><?=$package->getFileSize()?number_format($package->getFileSize()):'-'?> bytes</dd>
+<?php
+    $units = array('B','KB','MB','GB');
+    $size = $package->getFileSize();
+    for($i=0;$i<count($units);$i++){
+        if($size<1024) break;
+        $size = round($size/1024, 1);
+    }
+?>
+      <dd><?=$size?"{$size} {$units[$i]}":'-'?></dd>
       <dt>Install user</dt>
 <?php if($app->isOwner($login_user)): ?>
       <dd>
@@ -85,6 +93,16 @@
         <dd><a href="mailto:<?=$owner->getOwnerMail()?>"><?=$owner->getOwnerMail()?></a></dd>
 <?php endforeach ?>
     </dl>
+
+    <div class="col-xs-12 col-sm-9">
+      <p class="text-center">
+        <a class="btn btn-default" href="<?=url("/package/create_token?id={$package->getId()}")?>"><i class="fa fa-bolt"></i> Create Install Token</a>&nbsp;
+<?php if ($app->isOwner($login_user)):?>
+        <a class="btn btn-default" href="<?=url("/package/create_guestpass?id={$package->getId()}")?>"><i class="fa fa-users"></i> Create GuestPass</a>
+<?php endif; ?>
+      </p>
+    </div>
+
 <?php if ($app->isOwner($login_user)):?>
       <div class="col-xs-12 col-sm-9">
           <h3>GuestPass</h3>
@@ -107,15 +125,47 @@
             </tbody>
           </table>
       </div>
-<?php endif; ?>
+<?php endif;// end of guest pass ?>
+
+<?php if($package->getAttachedFiles()->count()>0):?>
     <div class="col-xs-12 col-sm-9">
-      <p class="text-center">
-        <a class="btn btn-default" href="<?=url("/package/create_token?id={$package->getId()}")?>"><i class="fa fa-bolt"></i> Create Install Token</a>&nbsp;
-<?php if ($app->isOwner($login_user)):?>
-        <a class="btn btn-default" href="<?=url("/package/create_guestpass?id={$package->getId()}")?>"><i class="fa fa-users"></i> Create GuestPass</a>
-<?php endif; ?>
-      </p>
+      <h3>Attached Files</h3>
+      <table id="attached-files" class="table table-hover">
+<?php foreach($package->getAttachedFiles() as $afile):
+    $units = array('B','KB','MB','GB');
+    $size = $afile->getFileSize();
+    for($i=0;$i<count($units);$i++){
+        if($size<1024) break;
+        $size = round($size/1024, 1);
+    }
+?>
+        <tr>
+          <td>
+            <div class="col-xs-12 col-md-8"><?=htmlspecialchars($afile->getOriginalFileName())?></div>
+            <div class="col-xs-12 col-md-4 text-center"><?=$size?> <?=$units[$i]?></div>
+          </td>
+          <td class="text-center col-xs-1">
+            <a class="btn btn-default" href=""><i class="fa fa-download"></i> Download</a>
+          </td>
+<?php if($app->isOwner($login_user)):?>
+          <td class="text-center col-xs-1">
+            <a class="btn btn-danger" href=""><i class="fa fa-trash-o"></i></a>
+          </td>
+<?php endif;?>
+        </tr>
+<?php endforeach;?>
+      </table>
+<?php if($app->isOwner($login_user)):?>
+        <button id="attached-file-upload" class="btn btn-default">
+          <i class="fa fa-upload"></i> Attache a File
+        </button>
+        <form id="attached-file-upload" action="">
+          <input type="hidden" name="package_id" value="<?=$package->getId()?>">
+          <input type="file" class="hidden" name="attached_file">
+        </form>
+<?php endif;?>
     </div>
+<?php endif; // end of attached files ?>
 
   </div>
 </div>
