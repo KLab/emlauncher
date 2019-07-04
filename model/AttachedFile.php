@@ -1,4 +1,6 @@
 <?php
+require_once APP_ROOT.'/model/Package.php';
+require_once APP_ROOT.'/model/Storage.php';
 
 /**
  * Row object for 'attached_file' table.
@@ -38,6 +40,21 @@ class AttachedFile extends mfwObject {
 		}
 		return $created;
 	}
+
+	protected function getFileKey(){
+		$key = "{$this->getAppId()}/{$this->getPackageId()}_{$this->getId()}_{$this->getBaseFileName()}";
+		return Package::FILE_DIR.$key;
+	}
+
+	public function renameTempFile($temp_name){
+		$tempkey = Package::TEMP_DIR.$temp_name;
+		$newkey = $this->getFileKey();
+		Storage::rename($tempkey,$newkey);
+	}
+	public function deleteFile(){
+		$key = $this->getFileKey();
+		Storage::delete($key);
+	}
 }
 
 /**
@@ -67,7 +84,7 @@ class AttachedFileDb extends mfwObjectDb {
 		$row  = array(
 			'app_id' => $package->getAppId(),
 			'package_id' => $package->getId(),
-			'file_name' => Random::string(16).".$ext",
+			'file_name' => Random::string(16).$ext,
 			'original_file_name' => $file_name,
 			'file_size' => $file_size,
 			'file_type' => $file_type,
