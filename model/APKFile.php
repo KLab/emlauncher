@@ -1,6 +1,16 @@
 <?php
+require_once APP_ROOT.'/model/Config.php';
 
 class APKFile {
+
+	protected static $config = null;
+
+	public static function getConfig(){
+		if(static::$config===null){
+			static::$config = Config::get('apkfile');
+		}
+		return static::$config;
+	}
 
 	public static function getPackageName($apkname)
 	{
@@ -28,19 +38,15 @@ class APKFile {
 
 	private static function buildApks($aabname, $apksname)
 	{
-		$bundletool = "/bundletool.jar";
-		$keystore = "/emlauncher.keystore";
-		$kspass = "pass:emlauncher";
-		$ksalias = "emlauncher";
-		$keypass = "pass:emlauncher";
+		$conf = self::getConfig();
 
-		$cmd = "java -jar \"{$bundletool}\" build-apks --mode=universal".
+		$cmd = "java -jar \"{$conf['bundletool']}\" build-apks --mode=universal".
 			" --bundle=\"{$aabname}\"".
 			" --output=\"{$apksname}\"".
-			" --ks=\"{$keystore}\"".
-			" --ks-pass=\"{$kspass}\"".
-			" --ks-key-alias=\"{$ksalias}\"".
-			" --key-pass=\"{$keypass}\"";
+			" --ks=\"{$conf['keystore']}\"".
+			" --ks-pass=\"{$conf['kspass']}\"".
+			" --ks-key-alias=\"{$conf['keyalias']}\"".
+			" --key-pass=\"{$conf['keypass']}\"";
 		exec($cmd, $out, $ret);
 		if($ret!=0){
 			throw new RuntimeException("bundletool error: ".implode("\n", $out));

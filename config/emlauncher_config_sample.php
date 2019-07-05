@@ -85,6 +85,24 @@ $emlauncher_config = array(
 			/** ブラウザからアクセスするときのURLに使われるprefix. */
 			'url_prefix' => '/path/for/url',
 			),
+
+		/** APKファイルの設定 */
+		'apkfile' => array(
+			/** BundleToolのパス */
+			'bundletool' => '/path/to/bundletool.jar',
+
+			/** 再署名用のKeyStoreのパス */
+			'keystore' => '/path/to/keystore',
+
+			/** キーストアのパスワード */
+			'kspass' => 'pass:xxxxxxxx',
+
+			/** 使用するキーペア */
+			'keyalias' => 'emlauncherkey',
+
+			/** キーのパスワード */
+			'keypass' => 'pass:xxxxxxxx',
+			),
 		),
 
 	/**
@@ -111,6 +129,13 @@ $emlauncher_config = array(
 			// LocalStackの設定は docker-compose.s3-localstack.yml を参照
 			'base_url' => 'http://localstack:4572', // webコンテナから見えるs3コンテナのエンドポイント
 			'external_url' => 'http://localhost:4572', // ブラウザからアクセスするときのURL
+			),
+		'apkfile' => array(
+			'bundletool' => '/bundletool.jar',
+			'keystore' => '/emlauncher.keystore',
+			'keyalias' => 'emlauncher',
+			'kspass' => 'pass:emlauncher',
+			'keypass' => 'pass:emlauncher',
 			),
 		),
 	);
