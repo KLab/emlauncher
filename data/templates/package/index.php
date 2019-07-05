@@ -144,25 +144,28 @@
             <div class="col-xs-12 col-md-8"><?=htmlspecialchars($afile->getOriginalFileName())?></div>
             <div class="col-xs-12 col-md-4 text-center"><?=$size?> <?=$units[$i]?></div>
           </td>
-          <td class="text-center col-xs-1">
-            <a class="btn btn-default" href="<?=url("/package/attach_download?id={$package->getId()}&attached_id={$afile->getId()}")?>"><i class="fa fa-download"></i> Download</a>
-          </td>
+          <td class="text-center">
+            <a class="btn btn-default" href="<?=url("/package/attach_download?id={$package->getId()}&attached_id={$afile->getId()}")?>">
+              <span class="hidden-xs"><i class="fa fa-download"></i> Download</span>
+              <span class="visible-xs"><i class="fa fa-download"></i> DL</span>
+            </a>
 <?php if($app->isOwner($login_user)):?>
-          <td class="text-center col-xs-1">
             <a class="btn btn-danger" href="<?=url("/package/attach_delete_confirm?id={$package->getId()}&attached_id={$afile->getId()}")?>"><i class="fa fa-trash-o"></i></a>
-          </td>
 <?php endif;?>
+          </td>
         </tr>
 <?php endforeach;?>
       </table>
 <?php if($app->isOwner($login_user)):?>
+      <p>
         <button id="attach-button" class="btn btn-default">
           <i id="attach-icon" class="fa fa-upload"></i> Attache a File
         </button>
-        <form id="attach-form" enctype="multipart/form-data" method="post" action="<?=url("/package/attach")?>">
-          <input type="hidden" name="id" value="<?=$package->getId()?>">
-          <input type="file" class="hidden" id="attach-file" name="file">
-        </form>
+      </p>
+      <form id="attach-form" enctype="multipart/form-data" method="post" action="<?=url("/package/attach")?>">
+        <input type="hidden" name="id" value="<?=$package->getId()?>">
+        <input type="file" class="hidden" id="attach-file" name="file">
+      </form>
 <?php endif;?>
     </div>
 <?php endif; // end of attached files ?>
