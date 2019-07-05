@@ -149,7 +149,7 @@
           </td>
 <?php if($app->isOwner($login_user)):?>
           <td class="text-center col-xs-1">
-            <a class="btn btn-danger" href=""><i class="fa fa-trash-o"></i></a>
+            <a class="btn btn-danger" href="<?=url("/package/attach_delete_confirm?id={$package->getId()}&attached_id={$afile->getId()}")?>"><i class="fa fa-trash-o"></i></a>
           </td>
 <?php endif;?>
         </tr>

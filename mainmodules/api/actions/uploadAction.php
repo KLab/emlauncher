@@ -69,7 +69,7 @@ class uploadAction extends apiActions
 			$con = mfwDBConnection::getPDO();
 			$con->beginTransaction();
 
-			$app = ApplicationDb::retrieveByPKForUpdate($app->getId());
+			$app = ApplicationDb::retrieveByPKForUpdate($app->getId(),$con);
 
 			$tags = $app->getTagsByName($tag_names,$con);
 
