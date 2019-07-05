@@ -3,6 +3,7 @@ require_once __DIR__.'/actions.php';
 require_once APP_ROOT.'/model/Package.php';
 require_once APP_ROOT.'/model/IPAFile.php';
 require_once APP_ROOT.'/model/APKFile.php';
+require_once APP_ROOT.'/model/AttachedFile.php';
 
 class upload_package_temporaryAction extends apiActions
 {
@@ -39,7 +40,7 @@ class upload_package_temporaryAction extends apiActions
 						$attached_files[] = array(
 							'file_name' => substr($file_name,0,-3).'apk',
 							'temp_name' => $keyname,
-							'type' => 'apk',
+							'type' => AttachedFile::TYPE_APK,
 							'size' => filesize($apkfile),
 							);
 					}

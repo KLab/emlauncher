@@ -10,7 +10,16 @@ class AttachedFile extends mfwObject {
 	const SET_CLASS = 'AttachedFileSet';
 
 	const TYPE_UNKNOWN = '';
-	const TYPE_AAB = 'aab';
+	const TYPE_APK = 'apk';
+
+	static function getTypeFromExt($ext){
+		switch($ext){
+		case 'apk':
+			return self::TYPE_APK;
+		default:
+			return self::TYPE_UNKNOWN;
+		}
+	}
 
 	public function getId(){
 		return $this->value('id');
@@ -40,10 +49,24 @@ class AttachedFile extends mfwObject {
 		}
 		return $created;
 	}
+	public function getMime(){
+		switch($this->getFileType()){
+		case self::TYPE_APK:
+			return Package::MIME_ANDROID_APK;
+		default:
+			return null;
+		}
+	}
 
 	protected function getFileKey(){
 		$key = "{$this->getAppId()}/{$this->getPackageId()}_{$this->getId()}_{$this->getBaseFileName()}";
 		return Package::FILE_DIR.$key;
+	}
+
+	public function uploadFile($file_path,$default_mime){
+		$key = $this->getFileKey();
+		$mime = $this->getMime() ?: $default_mime;
+		Storage::saveFile($key,$file_path,$mime);
 	}
 
 	public function renameTempFile($temp_name){

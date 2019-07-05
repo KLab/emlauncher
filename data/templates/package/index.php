@@ -156,12 +156,12 @@
 <?php endforeach;?>
       </table>
 <?php if($app->isOwner($login_user)):?>
-        <button id="attached-file-upload" class="btn btn-default">
-          <i class="fa fa-upload"></i> Attache a File
+        <button id="attach-button" class="btn btn-default">
+          <i id="attach-icon" class="fa fa-upload"></i> Attache a File
         </button>
-        <form id="attached-file-upload" action="">
-          <input type="hidden" name="package_id" value="<?=$package->getId()?>">
-          <input type="file" class="hidden" name="attached_file">
+        <form id="attach-form" enctype="multipart/form-data" method="post" action="<?=url("/package/attach")?>">
+          <input type="hidden" name="id" value="<?=$package->getId()?>">
+          <input type="file" class="hidden" id="attach-file" name="file">
         </form>
 <?php endif;?>
     </div>
@@ -174,3 +174,16 @@
   <?=block('pkg_infopanel')?>
 </div>
 
+<script type="text/javascript">
+$('#attach-button').on('click',function(event){
+  $('#attach-file').click();
+  return false;
+});
+
+$('#attach-file').on('change',function(event){
+  $('#attach-icon').removeClass('fa-upload').addClass('fa-spinner fa-pulse');
+  $('#attach-button').attr('disabled', true);
+  $('#attach-form').submit();
+  return false;
+});
+</script>
