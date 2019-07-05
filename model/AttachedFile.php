@@ -112,7 +112,7 @@ class AttachedFileSet extends mfwObjectSet {
 
 	public function pickupByType($type){
 		foreach($this as $file){
-			if($file->getType()===$type){
+			if($file->getFileType()===$type){
 				return $file;
 			}
 		}
