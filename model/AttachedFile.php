@@ -109,6 +109,15 @@ class AttachedFileSet extends mfwObjectSet {
 			$file->deleteFile();
 		}
 	}
+
+	public function pickupByType($type){
+		foreach($this as $file){
+			if($file->getType()===$type){
+				return $file;
+			}
+		}
+		return null;
+	}
 }
 
 /**

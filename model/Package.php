@@ -204,6 +204,12 @@ class Package extends mfwObject {
 		}
 		return $this->attached_files;
 	}
+
+	public function isAndroidAppBundle()
+	{
+		return $this->getPlatform()===self::PF_ANDROID
+			&& pathinfo($this->getOriginalFileName(),PATHINFO_EXTENSION)==='aab';
+	}
 }
 
 /**
