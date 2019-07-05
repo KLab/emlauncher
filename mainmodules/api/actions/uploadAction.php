@@ -4,12 +4,14 @@ require_once APP_ROOT.'/model/Application.php';
 require_once APP_ROOT.'/model/Package.php';
 require_once APP_ROOT.'/model/IPAFile.php';
 require_once APP_ROOT.'/model/APKFile.php';
+require_once APP_ROOT.'/model/AttachedFile.php';
 
 class uploadAction extends apiActions
 {
 	public function executeUpload()
 	{
 		$con = null;
+		$apkfile = null;
 		try{
 			if(mfwRequest::method()!=='POST'){
 				return $this->jsonResponse(
@@ -53,6 +55,8 @@ class uploadAction extends apiActions
 			}
 			apache_log('app_id',$app->getId());
 
+			$attached_files = array();
+
 			// ファイルフォーマット確認, 情報抽出
 			list($platform,$ext,$mime) = PackageDb::getPackageInfo(
 				$file_info['name'],$file_info['tmp_name'],$file_info['type']);
@@ -62,7 +66,19 @@ class uploadAction extends apiActions
 				$identifier = $plist['CFBundleIdentifier'];
 			}
 			if($platform===Package::PF_ANDROID){
-				$identifier = APKFile::getPackageName($file_info['tmp_name']);
+				if($ext==="aab"){
+					$apkfile = APKFile::extractFromAppBundle($file_info['tmp_name']);
+					$identifier = APKFile::getPackageName($apkfile);
+					$attached_files[] = array(
+						'filepath' => $apkfile,
+						'original_name' => substr($file_info['name'], 0, -3).'apk',
+						'type' => AttachedFile::TYPE_APK,
+						'mime' => Package::MIME_ANDROID_APK,
+						);
+				}
+				else{
+					$identifier = APKFile::getPackageName($file_info['tmp_name']);
+				}
 			}
 
 			// DBへ保存
@@ -79,8 +95,17 @@ class uploadAction extends apiActions
 				$file_info['name'],$file_info['size'],$tags,$con);
 			apache_log('pkg_id',$pkg->getId());
 
+			foreach($attached_files as $k => $afile){
+				$attached_files[$k]['obj'] = AttachedFileDb::insertNewAttachedFile(
+					$pkg,$afile['original_name'],filesize($afile['filepath']),$afile['type'],$con);
+			}
+
 			// S3へアップロード
 			$pkg->uploadFile($file_info['tmp_name'],$mime);
+
+			foreach($attached_files as $afile){
+				$afile['obj']->uploadFile($afile['filepath'],$afile['mime']);
+			}
 
 			$app->updateLastUpload($pkg->getCreated(),$con);
 
@@ -92,6 +117,11 @@ class uploadAction extends apiActions
 			return $this->jsonResponse(
 				self::HTTP_500_INTERNALSERVERERROR,
 				array('error'=>$e->getMessage(),'exception'=>get_class($e)));
+		}
+		finally{
+			if($apkfile){
+				unlink($apkfile);
+			}
 		}
 
 		if($notify){
