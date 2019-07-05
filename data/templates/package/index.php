@@ -145,7 +145,7 @@
             <div class="col-xs-12 col-md-4 text-center"><?=$size?> <?=$units[$i]?></div>
           </td>
           <td class="text-center col-xs-1">
-            <a class="btn btn-default" href=""><i class="fa fa-download"></i> Download</a>
+            <a class="btn btn-default" href="<?=url("/package/attach_download?id={$package->getId()}&attached_id={$afile->getId()}")?>"><i class="fa fa-download"></i> Download</a>
           </td>
 <?php if($app->isOwner($login_user)):?>
           <td class="text-center col-xs-1">

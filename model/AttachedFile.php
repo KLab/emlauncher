@@ -74,9 +74,14 @@ class AttachedFile extends mfwObject {
 		$newkey = $this->getFileKey();
 		Storage::rename($tempkey,$newkey);
 	}
+
 	public function deleteFile(){
 		$key = $this->getFileKey();
 		Storage::delete($key);
+	}
+
+	public function getFileUrl($expire=null){
+		return Storage::url($this->getFileKey(),$expire);
 	}
 }
 
