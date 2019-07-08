@@ -21,6 +21,9 @@
         <?=block('platform_icon')?>
         <?=htmlspecialchars($package->getTitle())?>
       </a>
+<?php if($package->isProtected()): ?>
+      <i class="fa fa-lock"></i>
+<?php endif ?>
     </h3>
 
     <h4>Direct Install URL</h4>
@@ -41,5 +44,3 @@
 <div class="visible-xs">
   <?=block('pkg_infopanel')?>
 </div>
-
-
