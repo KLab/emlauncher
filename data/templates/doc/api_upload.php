@@ -28,6 +28,7 @@
             <li><code>title</code> - Required, title of the package</li>
             <li><code>description</code> - Optional, description of the package</li>
             <li><code>tags</code> - Optional, comma separated tag names</li>
+            <li><code>protect</code> - Optional, protect from auto delete (default to False)</li>
             <li><code>notify</code> - Optional, notify application-installed users (defaults to False)</li>
           </ul>
         </dd>
@@ -44,22 +45,31 @@
         <dt>Sample response:</dt>
         <dd>
           <pre><code>{
-  "package_url": "http://localhost/emlauncher/package?id=3",
-  "application_url": "http://localhost/emlauncher/app?id=1",
-  "id": "3",
+  "package_url": "<?=url("/package?id=17")?>",
+  "application_url": "<?=url("/app?id=2")?>",
+  "id": "17",
   "platform": "Android",
-  "title": "test upload",
-  "description": "upload package via upload api",
-  "identifier": "org.klab.emlauncher.sample",
-  "original_file_name": "emlauncher.apk",
-  "file_size": "5776313",
-  "created": "2013-11-29 12:26:19",
+  "title": "aab upload",
+  "description": "upload aab package via upload api",
+  "identifier": "com.example.android.basicaccessibility",
+  "original_file_name": "Application.aab",
+  "file_size": 1339565,
+  "protect": true,
+  "created": "2019-07-08 03:22:00",
   "tags": [
     "test",
     "upload-api",
-    "android"
+    "aab"
   ],
-  "install_count": 0
+  "install_count": 0,
+  "attached_files": [
+    {
+      "id": "28",
+      "original_file_name": "Application.apk",
+      "file_size": "1452918",
+      "created": "2019-07-08 03:22:00"
+    }
+  ]
 }</code></pre>
         </dd>
       </dl>
@@ -70,13 +80,14 @@
   <div>
     <h3 class="subheader">Sample Curl</h3>
     <div class="container">
-      <pre><code>curl <?=url('/api/upload')."\n"?>
-  -F api_key='{application_api_key}'
-  -F file=@emlauncher.apk
-  -F title='test upload'
-  -F description='upload package via upload api'
-  -F tags='test,upload-api,android'
-  -F notify=True</code></pre>
+      <pre><code>curl <?=url('/api/upload')?> \
+  -F api_key='{application_api_key}' \
+  -F file=@Application.aab \
+  -F title='aab upload' \
+  -F description='upload aab package via upload api' \
+  -F tags='test,upload-api,aab' \
+  -F protect=True \
+  -F notify=False</code></pre>
     </div>
   </div>
 
