@@ -1,6 +1,4 @@
 <?php
-require_once APP_ROOT.'/libs/CFPropertyList/classes/CFPropertyList/CFPropertyList.php';
-
 class IPAFile {
 
 	protected function unzipInfoPlistFileName($ipafile)

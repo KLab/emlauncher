@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "content-hash": "df691135c28c3a1797d90469d5dc8d82",
+    "content-hash": "b9167d1b00aa81a3e59655595fb07f23",
     "packages": [
         {
             "name": "aws/aws-sdk-php",
@@ -420,6 +420,50 @@
             ],
             "description": "A polyfill for getallheaders.",
             "time": "2019-03-08T08:55:37+00:00"
+        },
+        {
+            "name": "rodneyrehm/plist",
+            "version": "v2.0.1",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/rodneyrehm/CFPropertyList.git",
+                "reference": "2ea0483806c989eb0518a767fa29a111bb29cb67"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/rodneyrehm/CFPropertyList/zipball/2ea0483806c989eb0518a767fa29a111bb29cb67",
+                "reference": "2ea0483806c989eb0518a767fa29a111bb29cb67",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=5.3"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-0": {
+                    "CFPropertyList": "classes/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Christian Kruse",
+                    "email": "cjk@wwwtech.de"
+                },
+                {
+                    "name": "Rodney Rehm",
+                    "email": "mail+github@rodneyrehm.de"
+                }
+            ],
+            "description": "Library for reading and writing Apple's CFPropertyList (plist) files in XML as well as binary format.",
+            "homepage": "https://github.com/rodneyrehm/CFPropertyList",
+            "keywords": [
+                "plist"
+            ],
+            "time": "2015-01-28T23:18:19+00:00"
         },
         {
             "name": "tufanbarisyildirim/php-apk-parser",
