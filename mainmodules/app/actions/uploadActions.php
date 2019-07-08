@@ -1,6 +1,7 @@
 <?php
 require_once __DIR__.'/actions.php';
 require_once APP_ROOT.'/model/Package.php';
+require_once APP_ROOT.'/model/AttachedFile.php';
 
 class uploadActions extends appActions
 {
@@ -30,10 +31,11 @@ class uploadActions extends appActions
 		$title = mfwRequest::param('title');
 		$description = mfwRequest::param('description');
 		$tag_names = mfwRequest::param('tags');
-		$ios_identifier = mfwRequest::param('ios_identifier');
+		$identifier = mfwRequest::param('identifier');
 		$notify = mfwRequest::param('notify');
 		$org_filename = mfwRequest::param('file_name');
 		$filesize = mfwRequest::param('file_size');
+		$attached_files = mfwRequest::param('attached_files');
 
 		if(!$temp_name || !$title){
 			error_log(__METHOD__.'('.__LINE__."): bad request: $temp_name, $title");
@@ -41,6 +43,7 @@ class uploadActions extends appActions
 		}
 		$ext = pathinfo($temp_name,PATHINFO_EXTENSION);
 
+		$renamed = array();
 		$con = mfwDBConnection::getPDO();
 		$con->beginTransaction();
 		try{
@@ -49,9 +52,19 @@ class uploadActions extends appActions
 			$tags = $app->getTagsByName($tag_names,$con);
 
 			$pkg = PackageDb::insertNewPackage(
-				$this->app->getId(),$platform,$ext,$title,$description,$ios_identifier,$org_filename,$filesize,$tags,$con);
+				$this->app->getId(),$platform,$ext,$title,$description,$identifier,$org_filename,$filesize,$tags,$con);
+			$attached = array();
+			foreach($attached_files as $file){
+				$attached[$file['temp_name']] = AttachedFileDb::insertNewAttachedFile(
+					$pkg,$file['file_name'],$file['size'],$file['type'],$con);
+			}
 
 			$pkg->renameTempFile($temp_name);
+			$renamed[] = $pkg;
+			foreach($attached as $temp => $file){
+				$file->renameTempFile($temp);
+				$renamed[] = $file;
+			}
 
 			$app->updateLastUpload($pkg->getCreated(),$con);
 
@@ -60,6 +73,9 @@ class uploadActions extends appActions
 		catch(Exception $e){
 			error_log(__METHOD__.'('.__LINE__.'): '.get_class($e).":{$e->getMessage()}");
 			$con->rollback();
+			foreach($renamed as $o){
+				$o->deleteFile();
+			}
 			throw $e;
 		}
 

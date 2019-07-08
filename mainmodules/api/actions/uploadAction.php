@@ -3,12 +3,15 @@ require_once __DIR__.'/actions.php';
 require_once APP_ROOT.'/model/Application.php';
 require_once APP_ROOT.'/model/Package.php';
 require_once APP_ROOT.'/model/IPAFile.php';
+require_once APP_ROOT.'/model/APKFile.php';
+require_once APP_ROOT.'/model/AttachedFile.php';
 
 class uploadAction extends apiActions
 {
 	public function executeUpload()
 	{
 		$con = null;
+		$apkfile = null;
 		try{
 			if(mfwRequest::method()!=='POST'){
 				return $this->jsonResponse(
@@ -22,10 +25,21 @@ class uploadAction extends apiActions
 			$description = mfwRequest::param('description');
 			$notify = mfwRequest::param('notify');
 			$tag_names = explode(',',mfwRequest::param('tags'));
+			$dsymfile = mfwRequest::param('dsym');
 			if(!$api_key||!$file_info||!$title){
+				$fields = array();
+				if(!$apk_key){
+					$fields[] = 'api_key';
+				}
+				if(!$file_info){
+					$fields[] = 'file';
+				}
+				if(!$title){
+					$fields[] = 'title';
+				}
 				return $this->jsonResponse(
 					self::HTTP_400_BADREQUEST,
-					array('error'=>'A required field is not present.'));
+					array('error'=>'A required field ('.implode(',',$fields).') is not present.'));
 			}
 			if(!isset($file_info['error'])||$file_info['error']!==UPLOAD_ERR_OK){
 				error_log(__METHOD__.'('.__LINE__.'): upload file error: $_FILES[file]='.json_encode($file_info));
@@ -40,31 +54,68 @@ class uploadAction extends apiActions
 					self::HTTP_400_BADREQUEST,
 					array('error'=>'Invalid api_key'));
 			}
+			apache_log('app_id',$app->getId());
+
+			$attached_files = array();
 
 			// ファイルフォーマット確認, 情報抽出
 			list($platform,$ext,$mime) = PackageDb::getPackageInfo(
 				$file_info['name'],$file_info['tmp_name'],$file_info['type']);
-			$ios_identifier = null;
+			$identifier = null;
 			if($platform===Package::PF_IOS){
 				$plist = IPAFile::parseInfoPlist($file_info['tmp_name']);
-				$ios_identifier = $plist['CFBundleIdentifier'];
+				$identifier = $plist['CFBundleIdentifier'];
+			}
+			if($platform===Package::PF_ANDROID){
+				if($ext==="aab"){
+					$apkfile = APKFile::extractFromAppBundle($file_info['tmp_name']);
+					$identifier = APKFile::getPackageName($apkfile);
+					$attached_files[] = array(
+						'filepath' => $apkfile,
+						'original_name' => substr($file_info['name'], 0, -3).'apk',
+						'type' => AttachedFile::TYPE_APK,
+						'mime' => Package::MIME_ANDROID_APK,
+						);
+				}
+				else{
+					$identifier = APKFile::getPackageName($file_info['tmp_name']);
+				}
+			}
+
+			if($dsymfile){
+				$attached_files[] = array(
+					'filepath' => $dsymfile['tmp_name'],
+					'original_name' => $dsymfile['name'],
+					'type' => AttachedFile::TYPE_DSYM,
+					'mime' => $dsymfile['type'],
+					);
 			}
 
 			// DBへ保存
 			$con = mfwDBConnection::getPDO();
 			$con->beginTransaction();
 
-			$app = ApplicationDb::retrieveByPKForUpdate($app->getId());
+			$app = ApplicationDb::retrieveByPKForUpdate($app->getId(),$con);
 
 			$tags = $app->getTagsByName($tag_names,$con);
 
 			$pkg = PackageDb::insertNewPackage(
 				$app->getId(),$platform,$ext,
-				$title,$description,$ios_identifier,
+				$title,$description,$identifier,
 				$file_info['name'],$file_info['size'],$tags,$con);
+			apache_log('pkg_id',$pkg->getId());
+
+			foreach($attached_files as $k => $afile){
+				$attached_files[$k]['obj'] = AttachedFileDb::insertNewAttachedFile(
+					$pkg,$afile['original_name'],filesize($afile['filepath']),$afile['type'],$con);
+			}
 
 			// S3へアップロード
 			$pkg->uploadFile($file_info['tmp_name'],$mime);
+
+			foreach($attached_files as $afile){
+				$afile['obj']->uploadFile($afile['filepath'],$afile['mime']);
+			}
 
 			$app->updateLastUpload($pkg->getCreated(),$con);
 
@@ -77,9 +128,11 @@ class uploadAction extends apiActions
 				self::HTTP_500_INTERNALSERVERERROR,
 				array('error'=>$e->getMessage(),'exception'=>get_class($e)));
 		}
-
-		apache_log('app_id',$app->getId());
-		apache_log('pkg_id',$pkg->getId());
+		finally{
+			if($apkfile){
+				unlink($apkfile);
+			}
+		}
 
 		if($notify){
 			try{

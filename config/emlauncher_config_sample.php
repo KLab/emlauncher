@@ -3,12 +3,10 @@
  * EMLauncher設定.
  * emlauncher_config.phpにリネームする.
  */
-require_once APP_ROOT.'/libs/aws/aws-autoloader.php';
 
 $emlauncher_config = array(
 	/** EC2環境用の設定 (httpd.confでSetEnv MFW_ENV 'ec2') */
 	'ec2' => array(
-
 		/**
 		 * アップデート通知やパスワードリセットのメールの送信元アドレス.
 		 */
@@ -49,7 +47,14 @@ $emlauncher_config = array(
 			'allowed_mailaddr_pattern' => '/@klab\.com$/',
 			),
 
-		/** AWSの設定 */
+		/**
+		 * Storage指定
+		 * - S3
+		 * - LocalFile
+		 */
+		'storage_class' => 'S3',
+
+		/** AWSの設定 (storage_class='S3'の場合）*/
 		'aws' => array(
 			/**
 			 * APIアクセスのためのKeyとSecret.
@@ -58,10 +63,79 @@ $emlauncher_config = array(
 			'secret' => 'xxxxxxxx',
 
 			/** S3のRegion. */
-			'region' => Aws\Common\Enum\Region::TOKYO,
+			'region' => 'ap-northeast-1',
 
 			/** S3のbucket名. 予め作成しておく. */
 			'bucket_name' => 'emlauncher',
+
+			/** S3互換ストレージを利用する場合のURL（LocalSackなど）
+			 *  AWSのS3を利用するときは指定しない
+			 *  base_url: EMLauncherからアクセスするときのAPIエンドポイント
+			 *  external_url: ブラウザからアクセスするときのURL (base_urlと同じ場合は省略可)
+			 */
+			// 'base_url => 'http://localstack:4572',
+			// 'external_url => 'http://localhost:4572',
+			),
+
+		/** LocalFileの設定 (storage_class='LocalFile'の場合) */
+		'local_file' => array(
+			/** 保存先ディレクトリ. 予め作成してApacheに書き込み権限を与えておく. */
+			'path' => '/path/to/directory',
+
+			/** ブラウザからアクセスするときのURLに使われるprefix. */
+			'url_prefix' => '/path/for/url',
+			),
+
+		/** APKファイルの設定 */
+		'apkfile' => array(
+			/** BundleToolのパス */
+			'bundletool' => '/path/to/bundletool.jar',
+
+			/** 再署名用のKeyStoreのパス */
+			'keystore' => '/path/to/keystore',
+
+			/** キーストアのパスワード */
+			'kspass' => 'pass:xxxxxxxx',
+
+			/** 使用するキーペア */
+			'keyalias' => 'emlauncherkey',
+
+			/** キーのパスワード */
+			'keypass' => 'pass:xxxxxxxx',
+			),
+		),
+
+	/**
+	 * Docker開発環境用 (MFS_ENV=docker)
+	 */
+	'docker' => array(
+		'mail_sender' => 'EMLauncher <no-reply@example.com>',
+		'title_prefix' => '[Docker] ',
+		'enable_https' => false,
+		'login' => array(
+			'enable_password' => true,
+			'enable_google_auth' => false,
+			),
+		'storage_class' => 'LocalFile', // LocalStackを利用する場合は'S3'を指定する
+		'local_file' => array(
+			'path' => '/var/www/emlauncher',
+			'url_prefix' => '/files',
+			),
+		'aws' => array(
+			'bucket_name' => 'emlauncher-dev',
+			'key' => 'mykey',
+			'secret' => 'mysecret',
+			'region' => 'ap-northeast-1',
+			// LocalStackの設定は docker-compose.s3-localstack.yml を参照
+			'base_url' => 'http://localstack:4572', // webコンテナから見えるs3コンテナのエンドポイント
+			'external_url' => 'http://localhost:4572', // ブラウザからアクセスするときのURL
+			),
+		'apkfile' => array(
+			'bundletool' => '/bundletool.jar',
+			'keystore' => '/emlauncher.keystore',
+			'keyalias' => 'emlauncher',
+			'kspass' => 'pass:emlauncher',
+			'keypass' => 'pass:emlauncher',
 			),
 		),
 	);
@@ -73,4 +147,3 @@ $emlauncher_config = array(
 $emlauncher_config['local'] = $emlauncher_config['ec2'];
 $emlauncher_config['local']['login']['enable_google_auth'] = false;
 $emlauncher_config['local']['aws']['bucket_name'] = 'emlauncher-dev';
-

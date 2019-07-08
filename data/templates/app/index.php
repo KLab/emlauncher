@@ -95,7 +95,15 @@ foreach($top_comments as $c):
 <?php if($pkg->getDescription()):?>
               <p class="text-muted description"><?=$pkg->getShortDescription()?></p>
 <?php endif?>
-              <span class="info hidden-xs hidden-sm"><?=$pkg->getFileSize()?round($pkg->getFileSize()/1024/1024,1):'--'?> MB, <?=$pkg->getCreated('Y-m-d H:i')?></span>
+<?php
+    $units = array('B','KB','MB','GB');
+    $size = $pkg->getFileSize();
+    for($i=0;$i<count($units);$i++){
+        if($size<1024) break;
+        $size = round($size/1024, 1);
+    }
+?>
+              <span class="info hidden-xs hidden-sm"><?=$pkg->getFileSize()?"{$size} {$units[$i]}":'--'?>, <?=$pkg->getCreated('Y-m-d H:i')?></span>
             </div>
             <div class="col-xs-12 col-md-5">
 <?php if($pkg->isFileSizeWarned()): ?>
@@ -106,7 +114,7 @@ foreach($top_comments as $c):
 <?php endforeach ?>
             </div>
           </div>
-          <span class="info visible-xs visible-sm"><?=$pkg->getFileSize()?round($pkg->getFileSize()/1024/1024,1):'--'?> MB</span>
+          <span class="info visible-xs visible-sm"><?=$pkg->getFileSize()?"{$size} {$units[$i]}":'--'?></span>
           <span class="info visible-xs visible-sm"><?=$pkg->getCreated('Y-m-d H:i')?></span>
         </td>
         <td class="text-center">

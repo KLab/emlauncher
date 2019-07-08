@@ -9,6 +9,13 @@ class package_listAction extends apiActions
 	{
 		try{
 			$api_key = mfwRequest::param('api_key');
+			$limit = (int)mfwRequest::param('limit', 20);
+			$platform = mfwRequest::param('platform');
+			$tags = mfwRequest::param('tags') ? explode(',', mfwRequest::param('tags')) : array();
+
+			if (100 < $limit) {
+				$limit = 100;
+			}
 
 			$app = ApplicationDb::selectByApiKey($api_key);
 			if(!$app){
@@ -17,7 +24,16 @@ class package_listAction extends apiActions
 					array('error'=>'Invalid api_key'));
 			}
 
-			$pkgs = PackageDb::selectByAppId($app->getId());
+			$tags = array_unique(array_filter($tags));
+			$tag_set = $app->getTagsByNameEx($tags);
+			$tag_ids = $tag_set->getColumnArray('id');
+
+			// 存在しないタグが指定された場合空を返す.
+			if (count($tags) != count($tag_ids)) {
+				return $this->jsonResponse(self::HTTP_200_OK,array());
+			}
+
+			$pkgs = PackageDb::selectByAppIdPfTagsWithLimit($app->getId(), $platform, $tag_ids, 0, $limit);
 
 			$ret = array();
 			foreach($pkgs as $pkg){

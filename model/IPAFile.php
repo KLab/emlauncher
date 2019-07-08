@@ -30,6 +30,9 @@ class IPAFile {
 	public static function parseInfoPlist($ipafile)
 	{
 		$plist_name = self::unzipInfoPlistFileName($ipafile);
+		if(!$plist_name){
+			throw new UnexpectedValueException(__METHOD__.": Info.plist file not found.");
+		}
 		$info_plist = self::unzipFile($ipafile,$plist_name);
 
 		$plutil = new CFPropertyList\CFPropertyList();

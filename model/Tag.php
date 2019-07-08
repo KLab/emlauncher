@@ -67,14 +67,11 @@ class TagDb extends mfwObjectDb {
 		return $tag;
 	}
 
-	public static function updatePackageTags($package_id,TagSet $tags,$con=null)
+	public static function insertPackageTags(Package $pkg,TagSet $tags,$con=null)
 	{
-		$sql = 'DELETE FROM package_tag WHERE package_id = :package_id';
 		$bind = array(
-			':package_id' => $package_id,
+			':package_id' => $pkg->getId(),
 			);
-		mfwDBIBase::query($sql,$bind,$con);
-
 		if($tags->count()){
 			$bulk = array();
 			foreach($tags as $tag){
@@ -83,7 +80,6 @@ class TagDb extends mfwObjectDb {
 			$sql = 'INSERT INTO package_tag (package_id,tag_id) VALUES '.implode(',',$bulk);
 			mfwDBIBase::query($sql,$bind,$con);
 		}
-		return $tags;
 	}
 
 	public static function deleteByIds($ids,$con=null)

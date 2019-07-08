@@ -20,10 +20,13 @@
         <dd><a href="#"><?=url('/api/package_list')?></a></dd>
         <dt>Response format:</dt>
         <dd>json</dd>
-        <dt>Fiels:</dt>
+        <dt>Fields:</dt>
         <dd>
           <ul>
             <li><code>api_key</code> - Required (See the application preferences)</li>
+            <li><code>limit</code> - Optional, The limit length of package list. (default = 20, max = 100)</li>
+            <li><code>platform</code> - Optional, The platform type string, e.g. "Android" and "iOS".</li>
+            <li><code>tags</code> - Optional, The comma separated tag names to filter package list. These are treated as AND condition.</li>
           </ul>
         </dd>
       </dl>
@@ -46,7 +49,7 @@
     "platform": "Android",
     "title": "test upload",
     "description": "upload package via upload api",
-    "ios_identifier": "",
+    "identifier": "org.klab.emlauncher.sample",
     "original_file_name": "emlauncher.apk",
     "file_size": "5776313",
     "created": "2013-11-29 12:26:19",
@@ -64,7 +67,7 @@
     "platform": "iOS",
     "title": "ipa file test",
     "description": "test package for iPhone",
-    "ios_identifier": "com.klab.playground-sandboxes.test6",
+    "identifier": "com.klab.playground-sandboxes.test6",
     "original_file_name": "emlauncher.ipa",
     "file_size": "4845763",
     "created": "2013-11-29 09:03:01",

@@ -2,7 +2,8 @@
 require_once APP_ROOT.'/model/Application.php';
 require_once APP_ROOT.'/model/Tag.php';
 require_once APP_ROOT.'/model/Random.php';
-require_once APP_ROOT.'/model/S3.php';
+require_once APP_ROOT.'/model/Storage.php';
+require_once APP_ROOT.'/model/AttachedFile.php';
 
 /**
  * Row object for 'package' table.
@@ -14,7 +15,8 @@ class Package extends mfwObject {
 	const PF_ANDROID = 'Android';
 	const PF_IOS = 'iOS';
 	const PF_UNKNOWN = 'unknown';
-	const MIME_ANDROID = 'application/vnd.android.package-archive';
+	const MIME_ANDROID_APK = 'application/vnd.android.package-archive';
+	const MIME_ANDROID_AAB = 'application/octet-stream';
 	const MIME_IOS = 'application/octet-stream';
 
 	const FILE_DIR = 'package/';
@@ -28,7 +30,9 @@ class Package extends mfwObject {
 
 	protected $app = null;
 	protected $tags = null;
+	protected $guest_passes = null;
 	protected $install_users = null;
+	protected $attached_files = null;
 
 	public function getId(){
 		return $this->value('id');
@@ -63,8 +67,8 @@ class Package extends mfwObject {
 		return $desc;
 	}
 
-	public function getIOSIdentifier(){
-		return $this->value('ios_identifier');
+	public function getIdentifier(){
+		return $this->value('identifier');
 	}
 	public function getOriginalFileName(){
 		return $this->value('original_file_name');
@@ -111,9 +115,10 @@ class Package extends mfwObject {
 		}
 		return $this->tags;
 	}
-	public function applyTags(TagSet $tags,$con=null)
+	public function initTags(TagSet $tags,$con=null)
 	{
-		$this->tags = TagDb::updatePackageTags($this->getId(),$tags,$con);
+		TagDb::insertPackageTags($this,$tags,$con);
+		$this->tags = $tags;
 	}
 
 	protected function getFileKey()
@@ -124,28 +129,28 @@ class Package extends mfwObject {
 	public function uploadFile($file_path,$mime)
 	{
 		$key = $this->getFileKey();
-		S3::uploadFile($key,$file_path,$mime,'private');
+		Storage::saveFile($key,$file_path,$mime);
 	}
 	public static function uploadTempFile($file_path,$ext,$mime)
 	{
 		$tmp_name = Random::string(16).".$ext";
-		S3::uploadFile(static::TEMP_DIR.$tmp_name,$file_path,$mime,'private');
+		Storage::saveFile(static::TEMP_DIR.$tmp_name,$file_path,$mime);
 		return $tmp_name;
 	}
 	public function renameTempFile($temp_name)
 	{
 		$tempkey = static::TEMP_DIR.$temp_name;
 		$newkey = $this->getFileKey();
-		S3::rename($tempkey,$newkey,'private');
+		Storage::rename($tempkey,$newkey);
 	}
 	public function deleteFile()
 	{
 		$key = $this->getFileKey();
-		S3::delete($key);
+		Storage::delete($key);
 	}
 	public function getFileUrl($expire=null)
 	{
-		return S3::url($this->getFileKey(),$expire);
+		return Storage::url($this->getFileKey(),$expire);
 	}
 
 	public function getInstallUrl()
@@ -173,13 +178,41 @@ class Package extends mfwObject {
 		$this->row['description'] = $description;
 		$this->row['protect'] = $protect? 1: 0;
 		$this->update($con);
-		$this->applyTags($tags,$con);
+		TagDb::removeFromPackage($this,$con);
+		TagDb::insertPackageTags($this,$tags,$con);
+		$this->tags = $tags;
 	}
 
 	public function delete($con=null)
 	{
 		TagDb::removeFromPackage($this,$con);
+		$this->getAttachedFiles()->delete($con);
 		return parent::delete($con);
+	}
+
+	/**
+	 * packageに紐付くguestpass一覧を取得する
+	 */
+	public function getGuestPasses()
+	{
+		if($this->guest_passes===null){
+			$this->guest_passes = GuestPassDb::selectByPackageId($this->getId());
+		}
+		return $this->guest_passes;
+	}
+
+	public function getAttachedFiles()
+	{
+		if($this->attached_files===null){
+			$this->attached_files = AttachedFileDb::selectByPackageId($this->getId());
+		}
+		return $this->attached_files;
+	}
+
+	public function isAndroidAppBundle()
+	{
+		return $this->getPlatform()===self::PF_ANDROID
+			&& pathinfo($this->getOriginalFileName(),PATHINFO_EXTENSION)==='aab';
 	}
 }
 
@@ -211,7 +244,11 @@ class PackageDb extends mfwObjectDb {
 		$is_zip = file_get_contents($filepath,false,null,0,4)==="PK\x03\x04";
 		if($is_zip && $ext==='apk'){
 			$platform = Package::PF_ANDROID;
-			$mime = Package::MIME_ANDROID;
+			$mime = Package::MIME_ANDROID_APK;
+		}
+		if($is_zip && $ext=='aab'){
+			$platform = Package::PF_ANDROID;
+			$mime = Package::MIME_ANDROID_AAB;
 		}
 		if($is_zip && $ext==='ipa'){
 			$platform = Package::PF_IOS;
@@ -220,7 +257,7 @@ class PackageDb extends mfwObjectDb {
 		return array($platform,$ext,$mime);
 	}
 
-	public static function insertNewPackage($app_id,$platform,$ext,$title,$description,$ios_identifier,$org_file_name,$file_size,TagSet $tags,$con)
+	public static function insertNewPackage($app_id,$platform,$ext,$title,$description,$identifier,$org_file_name,$file_size,TagSet $tags,$con)
 	{
 		$row = array(
 			'app_id' => $app_id,
@@ -228,14 +265,14 @@ class PackageDb extends mfwObjectDb {
 			'file_name' => Random::string(16).".$ext",
 			'title' => $title,
 			'description' => $description,
-			'ios_identifier' => $ios_identifier,
+			'identifier' => $identifier,
 			'original_file_name' => $org_file_name,
 			'file_size' => $file_size,
 			'created' => date('Y-m-d H:i:s'),
 			);
 		$pkg = new Package($row);
 		$pkg->insert($con);
-		$pkg->applyTags($tags,$con);
+		$pkg->initTags($tags,$con);
 		return $pkg;
 	}
 
@@ -277,6 +314,8 @@ class PackageDb extends mfwObjectDb {
 			$ph = static::makeInPlaceHolder($tags,$bind,'tag');
 			$c = count($tags);
 			$sql .= " AND t.tag_id in ($ph) GROUP BY p.id HAVING COUNT(p.id) = $c";
+		} else {
+			$sql .= " GROUP BY p.id";
 		}
 
 		$sql .= sprintf(' ORDER BY p.id DESC LIMIT %d, %d', $offset, $count);
@@ -306,4 +345,3 @@ class PackageDb extends mfwObjectDb {
 		return $deletable;
 	}
 }
-
