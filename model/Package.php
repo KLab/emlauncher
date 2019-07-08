@@ -4,6 +4,7 @@ require_once APP_ROOT.'/model/Tag.php';
 require_once APP_ROOT.'/model/Random.php';
 require_once APP_ROOT.'/model/Storage.php';
 require_once APP_ROOT.'/model/AttachedFile.php';
+require_once APP_ROOT.'/model/Config.php';
 
 /**
  * Row object for 'package' table.
@@ -22,10 +23,6 @@ class Package extends mfwObject {
 	const FILE_DIR = 'package/';
 	const TEMP_DIR = 'temp-data/';
 
-	// AppStore, GooglePlayでの制限ファイルサイズ(MB)
-	const IOS_FILE_SIZE_LIMIT_MB = 100;
-	const ANDROID_FILE_SIZE_LIMIT_MB = 50;
-
 	const SHORT_DESCRIPTION_LENGTH = 100;
 
 	protected $app = null;
@@ -33,6 +30,14 @@ class Package extends mfwObject {
 	protected $guest_passes = null;
 	protected $install_users = null;
 	protected $attached_files = null;
+	protected $config = null;
+
+	protected function getConfig(){
+		if($this->config===null){
+			$this->config = Config::get('package');
+		}
+		return $this->config;
+	}
 
 	public function getId(){
 		return $this->value('id');
@@ -89,11 +94,12 @@ class Package extends mfwObject {
 
 	public function getFileSizeLimitMB()
 	{
+		$conf = $this->getConfig();
 		switch($this->getPlatform()){
 		case self::PF_IOS:
-			return self::IOS_FILE_SIZE_LIMIT_MB;
+			return (int)$conf['file_size_warning_ios'];
 		case self::PF_ANDROID:
-			return self::ANDROID_FILE_SIZE_LIMIT_MB;
+			return (int)$conf['file_size_warning_android'];
 		default:
 			return 0;
 		}

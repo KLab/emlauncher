@@ -47,6 +47,12 @@ $emlauncher_config = array(
 			'allowed_mailaddr_pattern' => '/@klab\.com$/',
 			),
 
+		/** AppStore, GooglePlayでの制限ファイルサイズ(MB) */
+		'package' => array(
+			'file_size_warning_ios' => 150,
+			'file_size_warning_android' => 100,
+			),
+
 		/**
 		 * Storage指定
 		 * - S3
@@ -115,6 +121,10 @@ $emlauncher_config = array(
 		'login' => array(
 			'enable_password' => true,
 			'enable_google_auth' => false,
+			),
+		'package' => array(
+			'file_size_warning_ios' => 150,
+			'file_size_warning_android' => 100,
 			),
 		'storage_class' => 'LocalFile', // LocalStackを利用する場合は'S3'を指定する
 		'local_file' => array(
