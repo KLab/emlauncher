@@ -35,6 +35,7 @@ class uploadActions extends appActions
 		$notify = mfwRequest::param('notify');
 		$org_filename = mfwRequest::param('file_name');
 		$filesize = mfwRequest::param('file_size');
+		$protect = mfwRequest::param('protect');
 		$attached_files = mfwRequest::param('attached_files');
 
 		if(!$temp_name || !$title){
@@ -52,7 +53,7 @@ class uploadActions extends appActions
 			$tags = $app->getTagsByName($tag_names,$con);
 
 			$pkg = PackageDb::insertNewPackage(
-				$this->app->getId(),$platform,$ext,$title,$description,$identifier,$org_filename,$filesize,$tags,$con);
+				$this->app->getId(),$platform,$ext,$title,$description,$identifier,$org_filename,$filesize,$tags,$protect,$con);
 			$attached = array();
 			foreach($attached_files as $file){
 				$attached[$file['temp_name']] = AttachedFileDb::insertNewAttachedFile(

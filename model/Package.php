@@ -257,7 +257,7 @@ class PackageDb extends mfwObjectDb {
 		return array($platform,$ext,$mime);
 	}
 
-	public static function insertNewPackage($app_id,$platform,$ext,$title,$description,$identifier,$org_file_name,$file_size,TagSet $tags,$con)
+	public static function insertNewPackage($app_id,$platform,$ext,$title,$description,$identifier,$org_file_name,$file_size,TagSet $tags,$protect,$con)
 	{
 		$row = array(
 			'app_id' => $app_id,
@@ -268,6 +268,7 @@ class PackageDb extends mfwObjectDb {
 			'identifier' => $identifier,
 			'original_file_name' => $org_file_name,
 			'file_size' => $file_size,
+			'protect' => $protect? 1: 0,
 			'created' => date('Y-m-d H:i:s'),
 			);
 		$pkg = new Package($row);

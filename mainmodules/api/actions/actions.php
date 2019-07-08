@@ -45,6 +45,7 @@ class apiActions extends MainActions
 			'identifier' => $pkg->getIdentifier(),
 			'original_file_name' => $pkg->getOriginalFileName(),
 			'file_size' => $pkg->getFileSize(),
+			'protect' => $pkg->isProtected(),
 			'created' => $pkg->getCreated(),
 			'tags' => $tags,
 			'install_count' => $pkg->getInstallCount(),

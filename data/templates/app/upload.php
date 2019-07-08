@@ -91,6 +91,14 @@
       </div>
 
       <div class="form-group">
+        <label for="protect" class="control-label col-md-2">Protection</label>
+        <div class="col-md-10">
+          <input type="checkbox" class="hidden" id="protect" name="protect" value="1">
+          <button class="btn btn-default lock-toggle" data-toggle="button"><i class="fa"></i></button>
+        </div>
+      </div>
+
+      <div class="form-group">
         <label for="notify" class="control-label col-md-2">Notification</label>
         <div class="col-md-10">
           <input type="checkbox" class="hidden" id="notify" name="notify" value="1">
@@ -289,6 +297,14 @@ $('#notify+button.checkbox').on('click',function(event){
   $(this).prev().prop('checked',!$(this).hasClass('active'));
 });
 
+// initialize protect button state
+if($('#protect').prop('checked')){
+    $('#protect').next().addClass('active');
+};
+// toggle lock-toggle
+$('#protect+button.lock-toggle').on('click',function(event){
+  $(this).prev().prop('checked',!$(this).hasClass('active'));
+});
 
 // form validation
 $('form').submit(function(){

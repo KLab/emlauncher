@@ -25,6 +25,7 @@ class uploadAction extends apiActions
 			$description = mfwRequest::param('description');
 			$notify = mfwRequest::param('notify');
 			$tag_names = explode(',',mfwRequest::param('tags'));
+			$protect = mfwRequest::param('protect');
 			$dsymfile = mfwRequest::param('dsym');
 			if(!$api_key||!$file_info||!$title){
 				$fields = array();
@@ -102,7 +103,7 @@ class uploadAction extends apiActions
 			$pkg = PackageDb::insertNewPackage(
 				$app->getId(),$platform,$ext,
 				$title,$description,$identifier,
-				$file_info['name'],$file_info['size'],$tags,$con);
+				$file_info['name'],$file_info['size'],$tags,$protect,$con);
 			apache_log('pkg_id',$pkg->getId());
 
 			foreach($attached_files as $k => $afile){
