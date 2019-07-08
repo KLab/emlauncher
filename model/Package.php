@@ -332,14 +332,15 @@ class PackageDb extends mfwObjectDb {
 		$deletable = new PackageSet;
 		$pkgs = static::selectByAppId($app->getId());
 		foreach($pkgs as $pkg){
+			if($pkg->isProtected()){
+				continue;
+			}
 			if($keepcount>0){
 				--$keepcount;
 				continue;
 			}
 
-			if(!$pkg->isProtected()){
-				$deletable[] = $pkg;
-			}
+			$deletable[] = $pkg;
 		}
 
 		return $deletable;
