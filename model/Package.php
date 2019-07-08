@@ -76,6 +76,9 @@ class Package extends mfwObject {
 	public function getFileSize(){
 		return $this->value('file_size');
 	}
+	public function isProtected(){
+		return (bool)$this->value('protect');
+	}
 	public function getCreated($format=null){
 		$created = $this->value('created');
 		if($created && $format){
@@ -169,10 +172,11 @@ class Package extends mfwObject {
 		return count($users);
 	}
 
-	public function updateInfo($title,$description,TagSet $tags,$con=null)
+	public function updateInfo($title,$description,$protect,TagSet $tags,$con=null)
 	{
 		$this->row['title'] = $title;
 		$this->row['description'] = $description;
+		$this->row['protect'] = $protect? 1: 0;
 		$this->update($con);
 		TagDb::removeFromPackage($this,$con);
 		TagDb::insertPackageTags($this,$tags,$con);
@@ -253,7 +257,7 @@ class PackageDb extends mfwObjectDb {
 		return array($platform,$ext,$mime);
 	}
 
-	public static function insertNewPackage($app_id,$platform,$ext,$title,$description,$identifier,$org_file_name,$file_size,TagSet $tags,$con)
+	public static function insertNewPackage($app_id,$platform,$ext,$title,$description,$identifier,$org_file_name,$file_size,TagSet $tags,$protect,$con)
 	{
 		$row = array(
 			'app_id' => $app_id,
@@ -264,6 +268,7 @@ class PackageDb extends mfwObjectDb {
 			'identifier' => $identifier,
 			'original_file_name' => $org_file_name,
 			'file_size' => $file_size,
+			'protect' => $protect? 1: 0,
 			'created' => date('Y-m-d H:i:s'),
 			);
 		$pkg = new Package($row);
@@ -316,5 +321,29 @@ class PackageDb extends mfwObjectDb {
 
 		$sql .= sprintf(' ORDER BY p.id DESC LIMIT %d, %d', $offset, $count);
 		return new PackageSet(mfwDBIBase::getAll($sql, $bind));
+	}
+
+	/**
+	 * 削除すべきパッケージを取得.
+	 * @param[in] Application $app 対象アプリ
+	 * @param[in] int $keep 削除ぜず保持する上限数
+	 */
+	public function selectDeletablePackages(Application $app,$keepcount=100)
+	{
+		$deletable = new PackageSet;
+		$pkgs = static::selectByAppId($app->getId());
+		foreach($pkgs as $pkg){
+			if($pkg->isProtected()){
+				continue;
+			}
+			if($keepcount>0){
+				--$keepcount;
+				continue;
+			}
+
+			$deletable[] = $pkg;
+		}
+
+		return $deletable;
 	}
 }

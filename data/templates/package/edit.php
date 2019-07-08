@@ -21,6 +21,9 @@
         <?=block('platform_icon')?>
         <?=htmlspecialchars($package->getTitle())?>
       </a>
+<?php if($package->isProtected()): ?>
+      <i class="fa fa-lock"></i>
+<?php endif ?>
     </h3>
 
     <form class="form-horizontal" method="post" action="<?=url("/package/edit_commit?id={$package->getId()}")?>">
@@ -68,6 +71,14 @@ foreach($app->getTags() as $tag):
               </div>
             </div>
           </div>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="protect" class="control-label col-md-2">Protect</label>
+        <div class="col-md-10">
+          <input type="checkbox" class="hidden" id="protect" name="protect" value="1"<?=$package->isProtected()?' checked="checked"':''?>>
+          <button class="btn btn-default lock-toggle" data-toggle="button"><i class="fa"></i></button>
         </div>
       </div>
 
@@ -150,6 +161,16 @@ $('#title').keydown(function(event){
   }
   return true;
 });
+
+// initialize protect button state
+if($('#protect').prop('checked')){
+    $('#protect').next().addClass('active');
+};
+// toggle lock-toggle
+$('#protect+button.lock-toggle').on('click',function(event){
+  $(this).prev().prop('checked',!$(this).hasClass('active'));
+});
+
 
 // form validation
 $('form').submit(function(){

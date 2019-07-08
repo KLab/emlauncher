@@ -59,6 +59,12 @@ button.checkbox i:before{
 button.checkbox.active i:before{
   content: "\f046";
 }
+button.lock-toggle i:before{
+  content: "\f09c";
+}
+button.lock-toggle.active i:before{
+  content: "\f023";
+}
 
 
 h2.media-hedding {
