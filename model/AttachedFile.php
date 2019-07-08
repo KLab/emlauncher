@@ -11,6 +11,7 @@ class AttachedFile extends mfwObject {
 
 	const TYPE_UNKNOWN = '';
 	const TYPE_APK = 'apk';
+	const TYPE_DSYM = 'dSYM';
 
 	static function getTypeFromExt($ext){
 		switch($ext){

@@ -25,6 +25,7 @@ class uploadAction extends apiActions
 			$description = mfwRequest::param('description');
 			$notify = mfwRequest::param('notify');
 			$tag_names = explode(',',mfwRequest::param('tags'));
+			$dsymfile = mfwRequest::param('dsym');
 			if(!$api_key||!$file_info||!$title){
 				$fields = array();
 				if(!$apk_key){
@@ -79,6 +80,15 @@ class uploadAction extends apiActions
 				else{
 					$identifier = APKFile::getPackageName($file_info['tmp_name']);
 				}
+			}
+
+			if($dsymfile){
+				$attached_files[] = array(
+					'filepath' => $dsymfile['tmp_name'],
+					'original_name' => $dsymfile['name'],
+					'type' => AttachedFile::TYPE_DSYM,
+					'mime' => $dsymfile['type'],
+					);
 			}
 
 			// DBへ保存
