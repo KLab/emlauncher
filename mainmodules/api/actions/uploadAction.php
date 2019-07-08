@@ -23,9 +23,9 @@ class uploadAction extends apiActions
 			$file_info = mfwRequest::param('file');
 			$title = mfwRequest::param('title');
 			$description = mfwRequest::param('description');
-			$notify = mfwRequest::param('notify');
+			$notify = self::parseBool(mfwRequest::param('notify'));
 			$tag_names = explode(',',mfwRequest::param('tags'));
-			$protect = mfwRequest::param('protect');
+			$protect = self::parseBool(mfwRequest::param('protect'));
 			$dsymfile = mfwRequest::param('dsym');
 			if(!$api_key||!$file_info||!$title){
 				$fields = array();

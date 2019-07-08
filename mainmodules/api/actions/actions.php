@@ -9,6 +9,16 @@ class apiActions extends MainActions
 			array('error'=>'404 Not Found'));
 	}
 
+	public function parseBool($param){
+		if(!$param){
+			return false;
+		}
+		if(in_array($param, array("False","false","F","f","No","no","Null","null"))){
+			return false;
+		}
+		return true;
+	}
+
 	public function jsonResponse($status,$contents)
 	{
 		$header = array(
