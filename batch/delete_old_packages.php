@@ -89,6 +89,8 @@ foreach($apps as $app){
 				echo ".";
 				if(!$dryrun) $p->deleteFile();
 				echo ".";
+				if(!$dryrun) $p->getAttachedFiles()->deleteFiles();
+				echo ".";
 			}
 			$con->commit();
 		}
