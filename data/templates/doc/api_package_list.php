@@ -43,8 +43,8 @@
         <dd>
           <pre><code>[
   {
-    "package_url": "http://localhost/emlauncher/package?id=3",
-    "application_url": "http://localhost/emlauncher/app?id=1",
+    "package_url": "<?=url("/package?id=3")?>",
+    "application_url": "<?=url("/app?id=1")?>",
     "id": "3",
     "platform": "Android",
     "title": "test upload",
@@ -61,8 +61,8 @@
     "install_count": 1
   },
   {
-    "package_url": "http://localhost/emlauncher/package?id=1",
-    "application_url": "http://localhost/emlauncher/app?id=1",
+    "package_url": "<?=url("/package?id=1")?>",
+    "application_url": "<?=url("/app?id=1")?>",
     "id": "1",
     "platform": "iOS",
     "title": "ipa file test",

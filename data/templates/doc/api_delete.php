@@ -40,8 +40,8 @@
         <dt>Sample response:</dt>
         <dd>
           <pre><code>{
-  "package_url": "http://localhost/emlauncher/package?id=3",
-  "application_url": "http://localhost/emlauncher/app?id=1",
+  "package_url": "<?=url("/package?id=3")?>",
+  "application_url": "<?=url("/app?id=1")?>",
   "id": "3",
   "platform": "Android",
   "title": "test upload",
