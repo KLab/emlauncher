@@ -150,7 +150,7 @@ class Package extends mfwObject {
 	}
 	public function getFileUrl($expire=null)
 	{
-		return Storage::url($this->getFileKey(),$expire);
+		return Storage::url($this->getFileKey(),$expire,$this->getOriginalFileName());
 	}
 
 	public function getInstallUrl()

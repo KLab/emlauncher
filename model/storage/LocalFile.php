@@ -52,7 +52,7 @@ class LocalFile implements StorageImpl {
 		unlink($this->genPath($key));
 	}
 
-	public function url($key, $expire=null)
+	public function url($key, $expire=null, $filename=null)
 	{
 		return implode('/', array($this->urlprefix, trim($key, '/')));
 	}

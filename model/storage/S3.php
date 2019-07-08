@@ -100,15 +100,18 @@ class S3 implements StorageImpl {
 				));
 	}
 
-	public function url($key,$expires=null)
+	public function url($key,$expires=null,$filename=null)
 	{
 		$bucket = $this->bucket;
 		if($expires===null){
 			return $this->client->getObjectUrl($this->bucket, $key);
 		}
 
-		$cmd = $this->client->getCommand(
-			'GetObject', array('Bucket' => $this->bucket, 'Key' => $key));
+		$param = array('Bucket' => $this->bucket,'Key' => $key);
+		if($filename!==null){
+			$param['ResponseContentDisposition'] = "attachment; filename={$filename}";
+		}
+		$cmd = $this->client->getCommand('GetObject', $param);
 		$obj_url = $this->client->createPresignedRequest($cmd, $expires)->getUri();
 		if($this->external_url){
 			$obj_url = str_replace($this->base_url, $this->external_url, $obj_url);

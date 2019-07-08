@@ -48,9 +48,9 @@ class Storage {
 		return $storage->delete($name);
 	}
 
-	public static function url($name, $expire=null)
+	public static function url($name, $expire=null, $filename=null)
 	{
 		$storage = static::singleton();
-		return $storage->url($name, $expire);
+		return $storage->url($name, $expire, $filename);
 	}
 }
