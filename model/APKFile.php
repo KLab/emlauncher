@@ -20,7 +20,7 @@ class APKFile {
 
 	public static function extractFromAppBundle($aabname)
 	{
-		$apkname = tempnam("/tmp","");
+		$apkname = tempnam("/tmp","apk");
 		$apksname = "{$apkname}.apks";
 		try{
 			self::buildApks($aabname, $apksname);
@@ -75,6 +75,9 @@ class APKFile {
 		}
 		if(fclose($apk)===FALSE){
 			throw new RuntimeException("fclose failed");
+		}
+		if($zip->close()===FALSE){
+			throw new RuntimeException("zip close failed");
 		}
 	}
 }
