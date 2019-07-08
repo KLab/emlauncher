@@ -1,5 +1,4 @@
 <?php
-require_once APP_ROOT.'/libs/aws/aws-autoloader.php';
 require_once APP_ROOT.'/model/Config.php';
 require_once APP_ROOT.'/model/Storage.php';
 

@@ -1,5 +1,6 @@
 {
     "require": {
-        "tufanbarisyildirim/php-apk-parser":"2.0.1"
+        "tufanbarisyildirim/php-apk-parser":"2.0.1",
+        "aws/aws-sdk-php": "^3.104"
     }
 }
