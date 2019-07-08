@@ -26,14 +26,18 @@
     <div class="col-md-8 col-md-offset-1">
       <div class="panel panel-danger">
         <div class="panel-heading">
-          <h2 class="panel-title">Delete Package</h2>
+          <h2 class="panel-title">Delete Attached File</h2>
         </div>
         <div class="panel-body">
-          <p>インストールパッケージを削除します。この操作は取り消せません。</p>
+          <p>次の添付ファイルを削除します。この操作は取り消せません。</p>
+          <ul>
+            <li><?=htmlspecialchars($attached->getOriginalFileName())?></li>
+          </ul>
           <p>本当に削除しますか？</p>
           <div class="text-center">
-            <form method="post" action="<?=url('/package/delete')?>">
+            <form method="post" action="<?=url('/package/attach_delete')?>">
               <input type="hidden" name="id" value="<?=$package->getId()?>">
+              <input type="hidden" name="attached_id" value="<?=$attached->getId()?>">
               <input type="hidden" name="token" value="<?=$token?>">
               <button class="btn btn-danger"><i class="fa fa-trash-o"></i> Delete</button>
               <a class="btn btn-default" href="<?=url("/package?id={$package->getId()}")?>"><i class="fa fa-times"></i> Cancel</a>

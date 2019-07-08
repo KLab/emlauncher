@@ -353,3 +353,7 @@ h3 {
   display: inline-block;
   width: 100%;
 }
+
+#attached-files td {
+  vertical-align: middle;
+}

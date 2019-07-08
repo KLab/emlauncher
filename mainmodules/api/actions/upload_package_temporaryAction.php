@@ -3,6 +3,7 @@ require_once __DIR__.'/actions.php';
 require_once APP_ROOT.'/model/Package.php';
 require_once APP_ROOT.'/model/IPAFile.php';
 require_once APP_ROOT.'/model/APKFile.php';
+require_once APP_ROOT.'/model/AttachedFile.php';
 
 class upload_package_temporaryAction extends apiActions
 {
@@ -19,6 +20,7 @@ class upload_package_temporaryAction extends apiActions
 			$file_name = $file_info['name'];
 			$file_path = $file_info['tmp_name'];
 			$file_type = $file_info['type'];
+			$attached_files = array();
 
 			list($platform,$ext,$mime) = PackageDb::getPackageInfo($file_name,$file_path,$file_type);
 
@@ -30,8 +32,25 @@ class upload_package_temporaryAction extends apiActions
 				$identifier = $plist['CFBundleIdentifier'];
 			}
 			if($platform===Package::PF_ANDROID){
-				$apkfile = $file_path;
-				$identifier = APKFile::getPackageName($apkfile);
+				if($ext==="aab"){
+					$apkfile = APKFile::extractFromAppBundle($file_path);
+					try{
+						$identifier = APKFile::getPackageName($apkfile);
+						$keyname = Package::uploadTempFile($apkfile,'apk',Package::MIME_ANDROID_APK);
+						$attached_files[] = array(
+							'file_name' => substr($file_name,0,-3).'apk',
+							'temp_name' => $keyname,
+							'type' => AttachedFile::TYPE_APK,
+							'size' => filesize($apkfile),
+							);
+					}
+					finally{
+						unlink($apkfile);
+					}
+				}
+				else{
+					$identifier = APKFile::getPackageName($file_path);
+				}
 			}
 		}
 		catch(Exception $e){
@@ -47,6 +66,7 @@ class upload_package_temporaryAction extends apiActions
 				'temp_name' => $temp_name,
 				'platform' => $platform,
 				'identifier' => $identifier,
+				'attached_files' => $attached_files,
 				));
 	}
 }

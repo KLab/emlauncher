@@ -60,7 +60,15 @@
       <dt>Original name</dt>
       <dd><?=$package->getOriginalFileName()?:'--------.'.pathinfo($package->getBaseFileName(),PATHINFO_EXTENSION)?></dd>
       <dt>File size</dt>
-      <dd><?=$package->getFileSize()?number_format($package->getFileSize()):'-'?> bytes</dd>
+<?php
+    $units = array('B','KB','MB','GB');
+    $size = $package->getFileSize();
+    for($i=0;$i<count($units);$i++){
+        if($size<1024) break;
+        $size = round($size/1024, 1);
+    }
+?>
+      <dd><?=$size?"{$size} {$units[$i]}":'-'?></dd>
       <dt>Install user</dt>
 <?php if($app->isOwner($login_user)): ?>
       <dd>
@@ -85,6 +93,16 @@
         <dd><a href="mailto:<?=$owner->getOwnerMail()?>"><?=$owner->getOwnerMail()?></a></dd>
 <?php endforeach ?>
     </dl>
+
+    <div class="col-xs-12 col-sm-9">
+      <p class="text-center">
+        <a class="btn btn-default" href="<?=url("/package/create_token?id={$package->getId()}")?>"><i class="fa fa-bolt"></i> Create Install Token</a>&nbsp;
+<?php if ($app->isOwner($login_user)):?>
+        <a class="btn btn-default" href="<?=url("/package/create_guestpass?id={$package->getId()}")?>"><i class="fa fa-users"></i> Create GuestPass</a>
+<?php endif; ?>
+      </p>
+    </div>
+
 <?php if ($app->isOwner($login_user)):?>
       <div class="col-xs-12 col-sm-9">
           <h3>GuestPass</h3>
@@ -107,15 +125,50 @@
             </tbody>
           </table>
       </div>
-<?php endif; ?>
+<?php endif;// end of guest pass ?>
+
+<?php if($package->getAttachedFiles()->count()>0):?>
     <div class="col-xs-12 col-sm-9">
-      <p class="text-center">
-        <a class="btn btn-default" href="<?=url("/package/create_token?id={$package->getId()}")?>"><i class="fa fa-bolt"></i> Create Install Token</a>&nbsp;
-<?php if ($app->isOwner($login_user)):?>
-        <a class="btn btn-default" href="<?=url("/package/create_guestpass?id={$package->getId()}")?>"><i class="fa fa-users"></i> Create GuestPass</a>
-<?php endif; ?>
+      <h3>Attached Files</h3>
+      <table id="attached-files" class="table table-hover">
+<?php foreach($package->getAttachedFiles() as $afile):
+    $units = array('B','KB','MB','GB');
+    $size = $afile->getFileSize();
+    for($i=0;$i<count($units);$i++){
+        if($size<1024) break;
+        $size = round($size/1024, 1);
+    }
+?>
+        <tr>
+          <td>
+            <div class="col-xs-12 col-md-8"><?=htmlspecialchars($afile->getOriginalFileName())?></div>
+            <div class="col-xs-12 col-md-4 text-center"><?=$size?> <?=$units[$i]?></div>
+          </td>
+          <td class="text-center">
+            <a class="btn btn-default" href="<?=url("/package/attach_download?id={$package->getId()}&attached_id={$afile->getId()}")?>">
+              <span class="hidden-xs"><i class="fa fa-download"></i> Download</span>
+              <span class="visible-xs"><i class="fa fa-download"></i> DL</span>
+            </a>
+<?php if($app->isOwner($login_user)):?>
+            <a class="btn btn-danger" href="<?=url("/package/attach_delete_confirm?id={$package->getId()}&attached_id={$afile->getId()}")?>"><i class="fa fa-trash-o"></i></a>
+<?php endif;?>
+          </td>
+        </tr>
+<?php endforeach;?>
+      </table>
+<?php if($app->isOwner($login_user)):?>
+      <p>
+        <button id="attach-button" class="btn btn-default">
+          <i id="attach-icon" class="fa fa-upload"></i> Attache a File
+        </button>
       </p>
+      <form id="attach-form" enctype="multipart/form-data" method="post" action="<?=url("/package/attach")?>">
+        <input type="hidden" name="id" value="<?=$package->getId()?>">
+        <input type="file" class="hidden" id="attach-file" name="file">
+      </form>
+<?php endif;?>
     </div>
+<?php endif; // end of attached files ?>
 
   </div>
 </div>
@@ -124,3 +177,16 @@
   <?=block('pkg_infopanel')?>
 </div>
 
+<script type="text/javascript">
+$('#attach-button').on('click',function(event){
+  $('#attach-file').click();
+  return false;
+});
+
+$('#attach-file').on('change',function(event){
+  $('#attach-icon').removeClass('fa-upload').addClass('fa-spinner fa-pulse');
+  $('#attach-button').attr('disabled', true);
+  $('#attach-form').submit();
+  return false;
+});
+</script>

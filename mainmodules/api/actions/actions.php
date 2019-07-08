@@ -25,6 +25,16 @@ class apiActions extends MainActions
 			$tags[] = $t->getName();
 		}
 
+		$attached_files = array();
+		foreach($pkg->getAttachedFiles() as $afile){
+			$attached_files[] = array(
+				'id' => $afile->getId(),
+				'original_file_name' => $afile->getOriginalFileName(),
+				'file_size' => $afile->getFileSize(),
+				'created' => $afile->getCreated(),
+				);
+		}
+
 		return array(
 			'package_url' => mfwRequest::makeUrl("/package?id={$pkg->getId()}"),
 			'application_url' => mfwRequest::makeUrl("/app?id={$pkg->getAppId()}"),
@@ -38,7 +48,7 @@ class apiActions extends MainActions
 			'created' => $pkg->getCreated(),
 			'tags' => $tags,
 			'install_count' => $pkg->getInstallCount(),
+			'attached_files' => $attached_files,
 			);
 	}
 }
-
