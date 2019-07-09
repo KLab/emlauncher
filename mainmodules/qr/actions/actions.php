@@ -1,5 +1,4 @@
 <?php
-require_once (APP_ROOT.'/libs/QrCode/src/QrCode.php');
 use Endroid\QrCode\QrCode;
 
 class qrActions extends MainActions

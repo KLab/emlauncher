@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "content-hash": "b9167d1b00aa81a3e59655595fb07f23",
+    "content-hash": "862287775fef2a68a63e940165a91eb7",
     "packages": [
         {
             "name": "aws/aws-sdk-php",
@@ -88,6 +88,56 @@
                 "sdk"
             ],
             "time": "2019-07-03T18:08:50+00:00"
+        },
+        {
+            "name": "endroid/qr-code",
+            "version": "1.6.6",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/endroid/qr-code.git",
+                "reference": "cef5d5b7b904d7bb0708eb744c35316364b65fa0"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/endroid/qr-code/zipball/cef5d5b7b904d7bb0708eb744c35316364b65fa0",
+                "reference": "cef5d5b7b904d7bb0708eb744c35316364b65fa0",
+                "shasum": ""
+            },
+            "require": {
+                "ext-gd": "*",
+                "php": ">=5.3.0"
+            },
+            "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "1.x-dev"
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Endroid\\QrCode\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Jeroen van den Enden",
+                    "email": "info@endroid.nl",
+                    "homepage": "http://endroid.nl/"
+                }
+            ],
+            "description": "Endroid QR Code",
+            "homepage": "https://github.com/endroid/QrCode",
+            "keywords": [
+                "code",
+                "endroid",
+                "qr",
+                "qrcode"
+            ],
+            "time": "2016-05-29T07:37:18+00:00"
         },
         {
             "name": "guzzlehttp/guzzle",
