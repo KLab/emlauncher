@@ -1,37 +1,38 @@
 <?php
 class IPAFile {
 
-	protected function unzipInfoPlistFileName($ipafile)
+	const PLIST_NAME = '/Info.plist';
+
+	protected static function unzipInfoPlist($ipafile)
 	{
-		$p = popen("unzip -l \"$ipafile\" \"Payload/*/Info.plist\" 2>/dev/null",'r');
-		$fname = null;
-		while(($l=fgets($p))){
-			if(preg_match('/ +(Payload\/[^\/]+\.app\/Info.plist)\n$/',$l,$m)){
-				$fname = $m[1];
-				break;
+		$zip = new ZipArchive();
+		$r = $zip->open($ipafile);
+		if($r!==TRUE){
+			throw new RuntimeException(__METHOD__.": ZipArchive::open failed: ".$r);
+		}
+
+		try{
+			for($i=0;$i<$zip->numFiles;++$i){
+				$name = $zip->getNameIndex($i);
+				$pos = strrpos($name, self::PLIST_NAME);
+				if($pos+strlen(self::PLIST_NAME)===strlen($name)){
+					return $zip->getFromIndex($i);
+				}
 			}
 		}
-		pclose($p);
+		finally{
+			$zip->close();
+		}
 
-		return $fname;
-	}
-
-	protected function unzipFile($ipafile,$filename)
-	{
-		$p = popen("unzip -cq \"$ipafile\" \"$filename\" 2>/dev/null",'r');
-		$ret = stream_get_contents($p);
-		pclose($p);
-
-		return $ret;
+		throw new RuntimeException(__METHOD__.": Info.plist file not found.");
 	}
 
 	public static function parseInfoPlist($ipafile)
 	{
-		$plist_name = self::unzipInfoPlistFileName($ipafile);
-		if(!$plist_name){
-			throw new UnexpectedValueException(__METHOD__.": Info.plist file not found.");
+		$info_plist = self::unzipInfoPlist($ipafile);
+		if($info_plist===FALSE){
+			throw new RuntimeException(__METHOD__.": unzipInfoPlist failed.");
 		}
-		$info_plist = self::unzipFile($ipafile,$plist_name);
 
 		$plutil = new CFPropertyList\CFPropertyList();
 		$plutil->parse($info_plist);
