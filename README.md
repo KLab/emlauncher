@@ -83,7 +83,20 @@ sudo systemctl start memcached
 sudo systemctl enable memcached
 ```
 
-### 7. Configuration
+### 7. Setup bundletool for Android App Bundle
+
+```BASH
+sudo yum install java-1.8.0-openjdk-headless
+curl -sLO https://github.com/google/bundletool/releases/download/0.10.0/bundletool-all-0.10.0.jar
+```
+
+APKを再署名するためのキーストアも用意します。
+ここで設定するパスワード、キーストアファイル名、エイリアス名はこの後設定ファイル`emlauncher_config.php`に記載します。
+```BASH
+keytool -genkey -keystore {emlauncher-keystore.jks} -keyalg RSA -keysize 2048 -validity 10000 -alias {key-alias}
+```
+
+### 8. Configuration
 
 #### mfw_serverevn_config.php
 ``config/mfw_serverenv_config_sample.php``をコピーし、``$serverenv_config['ec2']['database']['authfile']``を
@@ -94,7 +107,7 @@ sudo systemctl enable memcached
 
 S3のbucket名に指定するbucketは予め作成しておきます。
 
-### 8. Complete
+### 9. Complete
 
 ブラウザでインスタンスにHTTPでアクセスします。
 EMLauncherのログインページが表示されたら完了です。

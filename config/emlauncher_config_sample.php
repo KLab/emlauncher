@@ -98,15 +98,15 @@ $emlauncher_config = array(
 			'bundletool' => '/path/to/bundletool.jar',
 
 			/** 再署名用のKeyStoreのパス */
-			'keystore' => '/path/to/keystore',
+			'keystore' => '/path/to/keystore.jks',
 
-			/** キーストアのパスワード */
+			/** キーストアのパスワード. 書式はbundletoolのks-passオプションと同じ. */
 			'kspass' => 'pass:xxxxxxxx',
 
 			/** 使用するキーペア */
 			'keyalias' => 'emlauncherkey',
 
-			/** キーのパスワード */
+			/** キーのパスワード 書式はbundletoolのkey-passオプションと同じ. */
 			'keypass' => 'pass:xxxxxxxx',
 			),
 		),
