@@ -15,7 +15,7 @@
     <script src="//netdna.bootstrapcdn.com/bootstrap/3.0.0/js/bootstrap.min.js"></script>
     <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css">
 <?php endif ?>
-    <link rel="stylesheet" href="<?=url('/css/customize.css')?>" type="text/css">
+    <link rel="stylesheet" href="<?=url('/css/customize.1.css')?>" type="text/css">
     <link rel="apple-touch-icon" href="<?=url('/apple-touch-icon.png')?>">
     <link rel="shortcut icon" href="<?=url('/favicon.ico')?>">
   </head>
