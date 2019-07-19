@@ -8,16 +8,16 @@
     "packages": [
         {
             "name": "aws/aws-sdk-php",
-            "version": "3.106.0",
+            "version": "3.107.3",
             "source": {
                 "type": "git",
                 "url": "https://github.com/aws/aws-sdk-php.git",
-                "reference": "9baaba0eef80774ba18a13666e735c84b9e32b9a"
+                "reference": "2ea91e93b9b1d9b01055896ac5e4f2e8448d141f"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/aws/aws-sdk-php/zipball/9baaba0eef80774ba18a13666e735c84b9e32b9a",
-                "reference": "9baaba0eef80774ba18a13666e735c84b9e32b9a",
+                "url": "https://api.github.com/repos/aws/aws-sdk-php/zipball/2ea91e93b9b1d9b01055896ac5e4f2e8448d141f",
+                "reference": "2ea91e93b9b1d9b01055896ac5e4f2e8448d141f",
                 "shasum": ""
             },
             "require": {
@@ -87,7 +87,7 @@
                 "s3",
                 "sdk"
             ],
-            "time": "2019-07-09T18:24:12+00:00"
+            "time": "2019-07-18T19:28:55+00:00"
         },
         {
             "name": "endroid/qr-code",
