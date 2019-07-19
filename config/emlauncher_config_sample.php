@@ -64,6 +64,7 @@ $emlauncher_config = array(
 		'aws' => array(
 			/**
 			 * APIアクセスのためのKeyとSecret.
+			 * null にすることでIAMロールを利用できる.
 			 */
 			'key' => 'xxxxxxxx',
 			'secret' => 'xxxxxxxx',

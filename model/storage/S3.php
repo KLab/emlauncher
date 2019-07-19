@@ -28,12 +28,17 @@ class S3 implements StorageImpl {
 			$this->external_url = NULL;
 		}
 
+		$credentials = null;
+		if($config['key']!==null){
+			$credentials = new Credentials($config['key'],$config['secret']);
+		}
+
 		$this->client = new S3Client(
 			array(
 				'region' => $config['region'],
 				'version' => '2006-03-01',
 				'signature_version' => 'v4',
-				'credentials' => new Credentials($config['key'],$config['secret']),
+				'credentials' => $credentials,
 				'endpoint' => $this->base_url,
 				'use_path_style_endpoint' => ($this->base_url != NULL),
 				));
