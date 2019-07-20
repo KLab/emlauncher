@@ -40,7 +40,7 @@ class installActions extends packageActions
 					));
 			$url = 'itms-services://?action=download-manifest&url='.urlencode($plist_url);
 		}
-		if($ua->isAndroid() && $this->package->isAndroidAppBundle()){
+		else if($ua->isAndroid() && $this->package->isAndroidAppBundle()){
 			$target = $this->package->getAttachedFiles()->pickupByType(AttachedFile::TYPE_APK);
 			if(!$target){
 				$target = $this->package;
