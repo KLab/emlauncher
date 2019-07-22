@@ -36,7 +36,7 @@ class uploadActions extends appActions
 		$org_filename = mfwRequest::param('file_name');
 		$filesize = mfwRequest::param('file_size');
 		$protect = mfwRequest::param('protect');
-		$attached_files = mfwRequest::param('attached_files');
+		$attached_files = mfwRequest::param('attached_files',array());
 
 		if(!$temp_name || !$title){
 			error_log(__METHOD__.'('.__LINE__."): bad request: $temp_name, $title");
