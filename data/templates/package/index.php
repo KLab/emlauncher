@@ -130,8 +130,8 @@
       </div>
 <?php endif;// end of guest pass ?>
 
-<?php if($package->getAttachedFiles()->count()>0):?>
     <div class="col-xs-12 col-sm-9">
+<?php if($package->getAttachedFiles()->count()>0):?>
       <h3>Attached Files</h3>
       <table id="attached-files" class="table table-hover">
 <?php foreach($package->getAttachedFiles() as $afile):
@@ -159,6 +159,7 @@
         </tr>
 <?php endforeach;?>
       </table>
+<?php endif;?>
 <?php if($app->isOwner($login_user)):?>
       <p>
         <button id="attach-button" class="btn btn-default">
@@ -171,7 +172,6 @@
       </form>
 <?php endif;?>
     </div>
-<?php endif; // end of attached files ?>
 
   </div>
 </div>

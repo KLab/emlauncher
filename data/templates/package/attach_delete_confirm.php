@@ -21,6 +21,9 @@
         <?=block('platform_icon')?>
         <?=htmlspecialchars($package->getTitle())?>
       </a>
+<?php if($package->isProtected()): ?>
+      <i class="fa fa-lock"></i>
+<?php endif ?>
     </h3>
 
     <div class="col-md-8 col-md-offset-1">
