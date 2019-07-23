@@ -30,6 +30,7 @@
             <li><code>tags</code> - Optional, comma separated tag names</li>
             <li><code>protect</code> - Optional, protect from auto delete (default to False)</li>
             <li><code>notify</code> - Optional, notify application-installed users (defaults to False)</li>
+            <li><code>dsym</code> - Optional, attach dSYM file</li>
           </ul>
         </dd>
       </dl>
