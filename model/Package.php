@@ -333,23 +333,15 @@ class PackageDb extends mfwObjectDb {
 	 * 削除すべきパッケージを取得.
 	 * @param[in] Application $app 対象アプリ
 	 * @param[in] int $keep 削除ぜず保持する上限数
+     * @param[in] int $limit 取得する上限数
 	 */
-	public function selectDeletablePackages(Application $app,$keepcount=100)
+	public function selectDeletablePackages(Application $app,$keep=1000,$limit=100,$con=null)
 	{
-		$deletable = new PackageSet;
-		$pkgs = static::selectByAppId($app->getId());
-		foreach($pkgs as $pkg){
-			if($pkg->isProtected()){
-				continue;
-			}
-			if($keepcount>0){
-				--$keepcount;
-				continue;
-			}
-
-			$deletable[] = $pkg;
-		}
-
-		return $deletable;
+		$sql = sprintf(
+			'WHERE app_id=:app_id AND protect=0 AND id not in '
+			. '(select * from (select id from package '
+			.	'WHERE app_id=:app_id AND protect=0 ORDER BY id DESC LIMIT %d) t'
+			. ') ORDER BY id LIMIT %d', $keep, $limit);
+		return self::selectSet($sql,array(':app_id' => $app->getId()),$con);
 	}
 }

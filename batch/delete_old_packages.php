@@ -56,21 +56,19 @@ $dryrun = $options['dryrun'];
 
 // -----------------------------------------------------------------------------
 
-echo "[START] ($env, keep=$keep) ".date('Y-m-d H:i:s')."\n";
-
 mfwServerEnv::setEnv($env);
-if($dryrun) echo "--DRYRUN--\n";
 
 $apps = ApplicationDb::selectAll();
 
 foreach($apps as $app){
-    $packages = PackageDb::selectDeletablePackages($app,$keep);
-
-	echo "Application {$app->getId()}: {$packages->count()} packages\n";
+	$packages = PackageDb::selectDeletablePackages($app,$keep,100);
+	if($packages->count() > 0){
+		echo date('Y-m-d H:i:s')." Application {$app->getId()}: {$packages->count()} packages".($dryrun?" (DRYRUN)":"")."\n";
+	}
 
 	foreach($packages as $pkg){
 
-		echo "  delete package {$pkg->getId()} ";
+		echo  date('Y-m-d H:i:s')." Delete package {$pkg->getId()} ";
 
 		// パッケージ単位でトランザクションを組み、S3からも一つ一つ消していく
 		$con = mfwDBConnection::getPDO();
@@ -103,6 +101,3 @@ foreach($apps as $app){
 		echo " OK\n";
 	}
 }
-
-echo "[END] ".date('Y-m-d H:i:s')."\n";
-
