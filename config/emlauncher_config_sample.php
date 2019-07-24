@@ -13,6 +13,12 @@ $emlauncher_config = array(
 		'mail_sender' => 'EMLauncher <no-reply@example.com>',
 
 		/**
+		 * メールをBCCで送信するときのTOに入れるアドレス.
+		 * 設定しない場合は`mail_sender`が使われる.
+		 */
+		'mail_bcc_to' => 'EMLauncher <bcc@example.com>',
+
+		/**
 		 * タイトル等につけるprefix
 		 */
 		'title_prefix' => '',

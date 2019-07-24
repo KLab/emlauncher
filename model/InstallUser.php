@@ -62,7 +62,7 @@ class InstallUserSet extends mfwObjectSet {
 
 		$subject = "New Package Uploaded to {$app->getTitle()}";
 		$sender = Config::get('mail_sender');
-		$to = $sender;
+		$to = Config::get('mail_bcc_to') ?: $sender;
 		$header = "From: $sender"
 			. "\nBcc: " . implode(', ',$addresses);
 
