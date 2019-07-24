@@ -1,7 +1,7 @@
 <?php
 class IPAFile {
 
-	const PLIST_NAME = '/Info.plist';
+	const PLIST_NAME = '.app/Info.plist';
 
 	protected static function unzipInfoPlist($ipafile)
 	{
