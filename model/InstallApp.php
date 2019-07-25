@@ -43,7 +43,7 @@ class InstallApp extends mfwObject {
 		$bind = array(
 			':app_id' => $this->getAppId(),
 			':mail' => $this->getMail(),
-			':notify' => $this->getNotifySetting(),
+			':notify' => $this->getNotifySetting()? 1: 0,
 			);
 		return mfwDBIBase::query($sql,$bind,$con);
 	}
