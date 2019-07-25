@@ -15,5 +15,6 @@ catch(Exception $e){
 	header(mfwActions::HTTP_500_INTERNALSERVERERROR);
 	echo "<h1>500 Internal Server Error</h1>\n";
 	echo $e->getMessage();
+	apache_log('exception',$e->getMessage());
 }
 
