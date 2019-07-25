@@ -15,7 +15,7 @@ class IPAFile {
 			for($i=0;$i<$zip->numFiles;++$i){
 				$name = $zip->getNameIndex($i);
 				$pos = strrpos($name, self::PLIST_NAME);
-				if($pos+strlen(self::PLIST_NAME)===strlen($name)){
+				if($pos===strlen($name)-strlen(self::PLIST_NAME)){
 					return $zip->getFromIndex($i);
 				}
 			}
