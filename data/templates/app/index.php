@@ -103,6 +103,9 @@ foreach($top_comments as $c):
         $size = round($size/1024, 1);
     }
 ?>
+<?php if($pkg->getIdentifier()): ?>
+              <span class="info hidden-xs hidden-sm"><?=$pkg->getIdentifier()?></span>
+<?php endif?>
               <span class="info hidden-xs hidden-sm"><?=$pkg->getFileSize()?"{$size} {$units[$i]}":'--'?>, <?=$pkg->getCreated('Y-m-d H:i')?></span>
             </div>
             <div class="col-xs-12 col-md-5">
@@ -114,6 +117,9 @@ foreach($top_comments as $c):
 <?php endforeach ?>
             </div>
           </div>
+<?php if($pkg->getIdentifier()): ?>
+          <span class="info visible-xs visible-sm"><?=$pkg->getIdentifier()?></span>
+<?php endif?>
           <span class="info visible-xs visible-sm"><?=$pkg->getFileSize()?"{$size} {$units[$i]}":'--'?></span>
           <span class="info visible-xs visible-sm"><?=$pkg->getCreated('Y-m-d H:i')?></span>
         </td>
