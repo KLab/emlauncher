@@ -27,9 +27,14 @@
           <i class="fa fa-lock"></i>
 <?php endif ?>
         </h3>
-        <p>
-          <?=nl2br(htmlspecialchars($package->getDescription()))?>
-        </p>
+        <div id="description">
+          <div class="read-more">
+            <a class="badge">more...</a>
+          </div>
+          <p>
+            <?=nl2br(htmlspecialchars($package->getDescription()))?>
+          </p>
+        </div>
       </div>
       <div class="col-xs-5">
 <?php if($login_user->getPackageInstalledDate($package)): ?>
@@ -192,4 +197,11 @@ $('#attach-file').on('change',function(event){
   $('#attach-form').submit();
   return false;
 });
+
+if($('#description').height()>200){
+  $('#description>.read-more').addClass('active');
+  $('#description>.read-more>a').on('click',function(event){
+    $('#description>.read-more').removeClass('active');
+  });
+}
 </script>

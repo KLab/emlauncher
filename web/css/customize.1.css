@@ -363,3 +363,28 @@ h3 {
 #attached-files td {
   vertical-align: middle;
 }
+
+.read-more {
+	display: none;
+}
+
+.read-more.active {
+	display:block;
+	height:200px;
+	margin-bottom:-200px;
+	position:relative;
+	z-index:2;
+	text-align: center;
+	background: -webkit-linear-gradient(top, rgba(255,255,255,0) 0%, rgba(255,255,255,0) 30%, white 100%);
+	background: linear-gradient(top, rgba(255,255,255,0) 0%, rgba(255,255,255,0) 30%, white 100%);
+}
+
+.read-more > a.badge {
+	position: absolute;
+	bottom: 0;
+}
+
+.read-more.active + p {
+	height: 200px;
+	overflow: hidden;
+}
