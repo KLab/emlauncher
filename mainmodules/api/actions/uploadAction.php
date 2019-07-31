@@ -29,7 +29,7 @@ class uploadAction extends apiActions
 			$dsymfile = mfwRequest::param('dsym');
 			if(!$api_key||!$file_info||!$title){
 				$fields = array();
-				if(!$apk_key){
+				if(!$api_key){
 					$fields[] = 'api_key';
 				}
 				if(!$file_info){
