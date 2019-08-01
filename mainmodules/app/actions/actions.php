@@ -93,7 +93,10 @@ class appActions extends MainActions
 		}
 
 		$tags = mfwRequest::param('tags') ? explode(' ', mfwRequest::param('tags')) : array();
-		$current_page = mfwRequest::param('page', 1);
+		$current_page = (int)mfwRequest::param('page', 1);
+		if($current_page<1){
+			$current_page = 1;
+		}
 
 		$offset = ($current_page - 1) * self::LINE_IN_PAGE;
 		$pkgs = PackageDb::selectByAppIdPfTagsWithLimit(
