@@ -27,6 +27,7 @@ class guestpass_installActions extends packageActions
 	{
 		$pf = $this->package->getPlatform();
 		$ua = mfwRequest::userAgent();
+		$remote_ip = mfwRequest::remoteHost();
 
 		if($pf===Package::PF_IOS && $ua->isIOS()){
 			// itms-service での接続はセッションを引き継げない
@@ -48,7 +49,7 @@ class guestpass_installActions extends packageActions
 		$con = mfwDBConnection::getPDO();
 		$con->beginTransaction();
 		try{
-			GuestPassLog::Logging($this->guest_pass ,$ua, $_SERVER['REMOTE_ADDR'],$con);
+			GuestPassLog::Logging($this->guest_pass ,$ua, $remote_ip, $con);
 			$con->commit();
 		}
 		catch(Exception $e){
