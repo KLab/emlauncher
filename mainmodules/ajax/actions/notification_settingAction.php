@@ -1,14 +1,15 @@
 <?php
 require_once __DIR__.'/actions.php';
 
-
-class notification_settingAction extends apiActions
+class notification_settingAction extends ajaxActions
 {
 	public function executeNotification_setting()
 	{
 		try{
-			$app_id = mfwRequest::param('id');
-			$notify = mfwRequest::param('value',false);
+			$app_id = (int)mfwRequest::param('id');
+			$notify = (bool)mfwRequest::param('value',false);
+			apache_log('app_id',$app_id);
+			apache_log('value',$notify);
 
 			$instapp = InstallLog::getInstallApp($this->login_user,$app_id);
 			if(!$instapp){

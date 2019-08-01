@@ -150,7 +150,7 @@
     fd.append('file',file);
 
     current_xhr = $.ajax({
-      url: "<?=url('/api/upload_package_temporary?name=')?>"+file.name,
+      url: "<?=url('/ajax/upload_package_temporary?name=')?>"+file.name,
       type: "POST",
       contentType: false,
       data: fd,

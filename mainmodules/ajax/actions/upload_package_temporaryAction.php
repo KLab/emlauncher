@@ -5,7 +5,7 @@ require_once APP_ROOT.'/model/IPAFile.php';
 require_once APP_ROOT.'/model/APKFile.php';
 require_once APP_ROOT.'/model/AttachedFile.php';
 
-class upload_package_temporaryAction extends apiActions
+class upload_package_temporaryAction extends ajaxActions
 {
 	public function executeUpload_package_temporary()
 	{

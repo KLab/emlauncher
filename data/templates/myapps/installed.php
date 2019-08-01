@@ -71,7 +71,7 @@ $('.notification-toggle button').on('click',function(event){
   var id = $(this).parent().attr('data-app-id');
   var value = $(this).attr('value');
   $.ajax({
-    url: "<?=url('/api/notification_setting?id=')?>"+id+"&value="+value,
+    url: "<?=url('/ajax/notification_setting?id=')?>"+id+"&value="+value,
     type: "POST",
     success: function(data){
       if(data.notify){

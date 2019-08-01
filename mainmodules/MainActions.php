@@ -20,11 +20,9 @@ class MainActions extends mfwActions
 			return $err;
 		}
 
-		// いくつかのapiはAPI Key認証なのでログイン不要
-		if($this->module==='api'){
-			if(in_array($this->action,array('upload','package_list','delete', 'create_token'))){
-				return null;
-			}
+		// API,Ajaxは認証を派生クラスに任せる
+		if(in_array($this->module,array('api','ajax'))){
+			return null;
 		}
 
 		// package/install_plist はセッションが使えないため別途認証する.
@@ -72,6 +70,15 @@ class MainActions extends mfwActions
 	protected function response($status,$message=null)
 	{
 		return array(array($status),$message);
+	}
+
+	protected function jsonResponse($status,$contents)
+	{
+		$header = array(
+			$status,
+			'Content-type: application/json',
+			);
+		return array($header,json_encode($contents));
 	}
 
 	protected function saveUrlBeforeLogin()
