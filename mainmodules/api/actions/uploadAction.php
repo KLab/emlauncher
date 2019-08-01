@@ -19,7 +19,6 @@ class uploadAction extends apiActions
 					array('error'=>'Method Not Allowed'));
 			}
 
-			$api_key = mfwRequest::param('api_key');
 			$file_info = mfwRequest::param('file');
 			$title = mfwRequest::param('title');
 			$description = mfwRequest::param('description');
@@ -27,11 +26,8 @@ class uploadAction extends apiActions
 			$tag_names = explode(',',mfwRequest::param('tags'));
 			$protect = self::parseBool(mfwRequest::param('protect'));
 			$dsymfile = mfwRequest::param('dsym');
-			if(!$api_key||!$file_info||!$title){
+			if(!$file_info||!$title){
 				$fields = array();
-				if(!$api_key){
-					$fields[] = 'api_key';
-				}
 				if(!$file_info){
 					$fields[] = 'file';
 				}
@@ -48,14 +44,6 @@ class uploadAction extends apiActions
 					self::HTTP_400_BADREQUEST,
 					array('error'=>'upload file error: $_FILES[file]='.json_encode($file_info)));
 			}
-
-			$app = ApplicationDb::selectByApiKey($api_key);
-			if(!$app){
-				return $this->jsonResponse(
-					self::HTTP_400_BADREQUEST,
-					array('error'=>'Invalid api_key'));
-			}
-			apache_log('app_id',$app->getId());
 
 			$attached_files = array();
 
@@ -96,7 +84,7 @@ class uploadAction extends apiActions
 			$con = mfwDBConnection::getPDO();
 			$con->beginTransaction();
 
-			$app = ApplicationDb::retrieveByPKForUpdate($app->getId(),$con);
+			$app = ApplicationDb::retrieveByPKForUpdate($this->app->getId(),$con);
 
 			$tags = $app->getTagsByName($tag_names,$con);
 

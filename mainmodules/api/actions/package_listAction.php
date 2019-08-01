@@ -8,7 +8,6 @@ class package_listAction extends apiActions
 	public function executePackage_list()
 	{
 		try{
-			$api_key = mfwRequest::param('api_key');
 			$limit = (int)mfwRequest::param('limit', 20);
 			$platform = mfwRequest::param('platform');
 			$tags = mfwRequest::param('tags') ? explode(',', mfwRequest::param('tags')) : array();
@@ -17,12 +16,7 @@ class package_listAction extends apiActions
 				$limit = 100;
 			}
 
-			$app = ApplicationDb::selectByApiKey($api_key);
-			if(!$app){
-				return $this->jsonResponse(
-					self::HTTP_400_BADREQUEST,
-					array('error'=>'Invalid api_key'));
-			}
+			$app = $this->app;
 
 			$tags = array_unique(array_filter($tags));
 			$tag_set = $app->getTagsByNameEx($tags);

@@ -10,18 +10,11 @@ class create_tokenAction extends apiActions
     public function executeCreate_token()
     {
         try{
-            $api_key     = mfwRequest::param('api_key');
             $pkg_id      = mfwRequest::param('id');
             $mail        = mfwRequest::param('mail');
             $expire_hour = mfwRequest::param('expire_hour');
 
-            // api_key check
-            $app = ApplicationDb::selectByApiKey($api_key);
-            if(!$app){
-                return $this->jsonResponse(
-                    self::HTTP_400_BADREQUEST,
-                    array('error'=>'Invalid api_key'));
-            }
+            $app = $this->app;
 
             // id check
             $pkg = PackageDb::retrieveByPK($pkg_id);

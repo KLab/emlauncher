@@ -9,15 +9,9 @@ class deleteAction extends apiActions
 	{
 		$con = null;
 		try{
-			$api_key = mfwRequest::param('api_key');
 			$pkg_id = mfwRequest::param('id');
 
-			$app = ApplicationDb::selectByApiKey($api_key);
-			if(!$app){
-				return $this->jsonResponse(
-					self::HTTP_400_BADREQUEST,
-					array('error'=>'Invalid api_key'));
-			}
+			$app = $this->app;
 
 			$pkg = PackageDb::retrieveByPK($pkg_id);
 			if(!$pkg || $app->getId()!==$pkg->getAppId()){

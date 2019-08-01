@@ -1,7 +1,29 @@
 <?php
+require_once APP_ROOT.'/model/Application.php';
 
 class apiActions extends MainActions
 {
+	protected $app = null;
+
+	public function initialize()
+	{
+		if(($err=parent::initialize())){
+			return $err;
+		}
+
+		// API Keyによる認証
+		$api_key = mfwRequest::param('api_key');
+		$this->app = ApplicationDb::selectByApiKey($api_key);
+		if(!$this->app){
+			return $this->jsonResponse(
+				self::HTTP_400_BADREQUEST,
+				array('error'=>'Invalid api_key'));
+		}
+
+		apache_log('app_id',$this->app->getId());
+		return null;
+	}
+
 	public function executeDefaultAction()
 	{
 		return $this->jsonResponse(
@@ -17,15 +39,6 @@ class apiActions extends MainActions
 			return false;
 		}
 		return true;
-	}
-
-	public function jsonResponse($status,$contents)
-	{
-		$header = array(
-			$status,
-			'Content-type: application/json',
-			);
-		return array($header,json_encode($contents));
 	}
 
 	protected function makePackageArray(Package $pkg)
