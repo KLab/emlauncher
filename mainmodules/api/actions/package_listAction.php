@@ -9,6 +9,7 @@ class package_listAction extends apiActions
 	{
 		try{
 			$limit = (int)mfwRequest::param('limit', 20);
+			$offset = (int)mfwRequest::param('offset', 0);
 			$platform = mfwRequest::param('platform');
 			$tags = mfwRequest::param('tags') ? explode(',', mfwRequest::param('tags')) : array();
 
@@ -27,7 +28,14 @@ class package_listAction extends apiActions
 				return $this->jsonResponse(self::HTTP_200_OK,array());
 			}
 
-			$pkgs = PackageDb::selectByAppIdPfTagsWithLimit($app->getId(), $platform, $tag_ids, 0, $limit);
+			apache_log('app_id',$app->getId());
+			apache_log('limit',$offset);
+			apache_log('offset',$offset);
+			apache_log('tag_ids',$tag_ids);
+			apache_log('tags',$tags);
+			apache_log('platform',$platform);
+
+			$pkgs = PackageDb::selectByAppIdPfTagsWithLimit($app->getId(), $platform, $tag_ids, $offset, $limit);
 
 			$ret = array();
 			foreach($pkgs as $pkg){
@@ -40,8 +48,6 @@ class package_listAction extends apiActions
 				self::HTTP_500_INTERNALSERVERERROR,
 				array('error'=>$e->getMessage(),'exception'=>get_class($e)));
 		}
-
-		apache_log('app_id',$app->getId());
 
 		return $this->jsonResponse(self::HTTP_200_OK,$ret);
 	}
