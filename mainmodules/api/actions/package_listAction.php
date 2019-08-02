@@ -20,7 +20,7 @@ class package_listAction extends apiActions
 			$app = $this->app;
 
 			$tags = array_unique(array_filter($tags));
-			$tag_set = $app->getTagsByNameEx($tags);
+			$tag_set = $app->getTagsByName($tags);
 			$tag_ids = $tag_set->getColumnArray('id');
 
 			// 存在しないタグが指定された場合空を返す.
