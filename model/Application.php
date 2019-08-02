@@ -169,7 +169,7 @@ class Application extends mfwObject {
 	 * タグ名からTagSetを取得.
 	 * 新しいtag_nameがあったら登録もする.
 	 */
-	public function getTagsByName($tag_names,PDO $con=null)
+	public function getOrInsertTagsByName($tag_names,PDO $con=null)
 	{
 		if(empty($tag_names)){
 			return new TagSet();

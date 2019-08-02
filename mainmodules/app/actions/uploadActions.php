@@ -50,7 +50,7 @@ class uploadActions extends appActions
 		try{
 			$app = ApplicationDb::retrieveByPKForUpdate($this->app->getId(),$con);
 
-			$tags = $app->getTagsByName($tag_names,$con);
+			$tags = $app->getOrInsertTagsByName($tag_names,$con);
 
 			$pkg = PackageDb::insertNewPackage(
 				$this->app->getId(),$platform,$ext,$title,$description,$identifier,$org_filename,$filesize,$tags,$protect,$con);

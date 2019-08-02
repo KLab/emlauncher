@@ -38,7 +38,7 @@ class editActions extends packageActions
 		$con->beginTransaction();
 		try{
 			$app = ApplicationDb::retrieveByPKForUpdate($this->app->getId(),$con);
-			$tags = $app->getTagsByName($tag_names,$con);
+			$tags = $app->getOrInsertTagsByName($tag_names,$con);
 
 			$pkg = PackageDb::retrieveByPKForUpdate($this->package->getId(),$con);
 			$pkg->updateInfo($title,$description,$protect,$tags);

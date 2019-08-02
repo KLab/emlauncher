@@ -86,7 +86,7 @@ class uploadAction extends apiActions
 
 			$app = ApplicationDb::retrieveByPKForUpdate($this->app->getId(),$con);
 
-			$tags = $app->getTagsByName($tag_names,$con);
+			$tags = $app->getOrInsertTagsByName($tag_names,$con);
 
 			$pkg = PackageDb::insertNewPackage(
 				$app->getId(),$platform,$ext,
