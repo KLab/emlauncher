@@ -49,7 +49,7 @@ class create_tokenAction extends apiActions
             apache_log('token',$token);
             apache_log('token_data',$tokendata);
 
-            $ret = $this->makePackageArray($pkg);
+            $ret = self::makePackageArray($pkg);
             $ret['install_url'] = mfwRequest::makeURL("/package/install?token={$token}");
 
         }

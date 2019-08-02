@@ -31,7 +31,7 @@ class apiActions extends MainActions
 			array('error'=>'404 Not Found'));
 	}
 
-	public function parseBool($param){
+	protected static function parseBool($param){
 		if(!$param){
 			return false;
 		}
@@ -41,7 +41,7 @@ class apiActions extends MainActions
 		return true;
 	}
 
-	protected function makePackageArray(Package $pkg)
+	protected static function makePackageArray(Package $pkg)
 	{
 		$tags = array();
 		foreach($pkg->getTags() as $t){

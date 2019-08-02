@@ -56,7 +56,7 @@ class deleteAction extends apiActions
 
 		return $this->jsonResponse(
 			self::HTTP_200_OK,
-			$this->makePackageArray($pkg));
+			self::makePackageArray($pkg));
 	}
 
 }

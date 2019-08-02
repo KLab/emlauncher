@@ -39,7 +39,7 @@ class package_listAction extends apiActions
 
 			$ret = array();
 			foreach($pkgs as $pkg){
-				$ret[] = $this->makePackageArray($pkg);
+				$ret[] = self::makePackageArray($pkg);
 			}
 		}
 		catch(Exception $e){
