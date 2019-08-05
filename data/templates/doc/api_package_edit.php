@@ -7,7 +7,7 @@
   </ol>
 
   <div class="page-header">
-    <h2><i class="fa fa-list-ul"></i> Package Edit API</h2>
+    <h2><i class="fa fa-edit"></i> Package Edit API</h2>
   </div>
 
   <div>
@@ -44,8 +44,8 @@
         <dt>Sample response:</dt>
         <dd>
           <pre><code>{
-  "package_url": "https://emlauncher.klab.org/package?id=176825",
-  "application_url": "https://emlauncher.klab.org/app?id=1",
+  "package_url": "<?=url("/package?id=176825")?>",
+  "application_url": "<?=url("/app?id=1")?>",
   "id": "176825",
   "platform": "Android",
   "title": "aab test",

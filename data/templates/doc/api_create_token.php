@@ -7,7 +7,7 @@
   </ol>
 
   <div class="page-header">
-    <h2><i class="fa fa-list-ul"></i> Create Token API</h2>
+    <h2><i class="fa fa-qrcode"></i> Create Token API</h2>
   </div>
 
   <div>
