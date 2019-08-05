@@ -18,6 +18,10 @@
       <h3 class="list-group-item-heading">Package List API</h3>
       <p class="list-gorup-item-text">Get package list.</p>
     </a>
+    <a href="<?=url('/doc/api_package_edit')?>" class="list-group-item">
+      <h3 class="list-group-item-heading">Package Edit API</h3>
+      <p class="list-gorup-item-text">Edit package information.</p>
+    </a>
     <a href="<?=url('/doc/api_delete')?>" class="list-group-item">
       <h3 class="list-group-item-heading">Delete API</h3>
       <p class="list-gorup-item-text">Delete a package.</p>
