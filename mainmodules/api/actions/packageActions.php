@@ -55,11 +55,6 @@ class packageActions extends apiActions
 				self::HTTP_400_BADREQUEST,
 				array('error'=>'title must not empty'));
 		}
-		if($has_description && !$description){
-			return $this->jsonResponse(
-				self::HTTP_400_BADREQUEST,
-				array('error'=>'description must not empty'));
-		}
 
 		if(!($has_title||$has_description||$has_protect||$has_tags)){
 			return $this->jsonResponse(

@@ -78,7 +78,7 @@
  <div>
     <h3 class="subheader">Sample Curl</h3>
     <div class="container">
-      <pre><code>curl <?=url('/api/package_edit')?>
+      <pre><code>curl <?=url('/api/package_edit')?> \
   -F api_key='{application_api_key}' \
   -F id=176825 \
   -F tags=Android,aab,test \
