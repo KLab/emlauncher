@@ -98,4 +98,75 @@ class packageActions extends apiActions
 			self::makePackageArray($pkg));
 	}
 
+	public function executePackage_attach()
+	{
+		$file = mfwRequest::param('file');
+		if(!$file){
+			return $this->jsonResponse(
+				self::HTTP_400_BADREQUEST,
+				array('error'=>'file required'));
+		}
+
+		$type = AttachedFile::getTypeFromExt(pathinfo($file['name'],PATHINFO_EXTENSION));
+
+		$con = mfwDBConnection::getPDO();
+		$con->beginTransaction();
+		try{
+			$app = ApplicationDb::retrieveByPKForUpdate($this->app->getId(),$con);
+
+			$attached = AttachedFileDb::insertNewAttachedFile(
+				$this->pkg,$file['name'],$file['size'],$type,$con);
+
+			$attached->uploadFile($file['tmp_name'],$file['type']);
+
+			$con->commit();
+		}
+		catch(Exception $e){
+			$con->rollback();
+			throw $e;
+		}
+
+		return $this->jsonResponse(
+			self::HTTP_200_OK,
+			self::makeAttachedFileArray($attached));
+	}
+
+	public function executePackage_detach()
+	{
+		if(!mfwRequest::has('attached_file_id')){
+			return $this->jsonResponse(
+				self::HTTP_400_BADREQUEST,
+				array('error'=>'attached_file_id required'));
+		}
+
+		$id = (int)mfwRequest::param('attached_file_id');
+		$attached = AttachedFileDb::retrieveByPK($id);
+
+		if(!$attached || $attached->getPackageId()!=$this->pkg->getId()){
+			return $this->jsonResponse(
+				self::HTTP_404_NOTFOUND,
+				array(
+					'error'=>
+					"the attached file (id=$id) not found in the package (id={$this->pkg->getId()})"));
+		}
+
+		$con = mfwDBConnection::getPDO();
+		$con->beginTransaction();
+		try{
+			$app = ApplicationDb::retrieveByPKForUpdate($this->app->getId(),$con);
+
+			$attached->delete($con);
+			$attached->deleteFile();
+
+			$con->commit();
+		}
+		catch(Exception $e){
+			$con->rollback();
+			throw $e;
+		}
+
+		return $this->jsonResponse(
+			self::HTTP_200_OK,
+			self::makeAttachedFileArray($attached));
+	}
 }

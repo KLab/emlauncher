@@ -50,12 +50,7 @@ class apiActions extends MainActions
 
 		$attached_files = array();
 		foreach($pkg->getAttachedFiles() as $afile){
-			$attached_files[] = array(
-				'id' => $afile->getId(),
-				'original_file_name' => $afile->getOriginalFileName(),
-				'file_size' => $afile->getFileSize(),
-				'created' => $afile->getCreated(),
-				);
+			$attached_files[] = self::makeAttachedFileArray($afile);
 		}
 
 		return array(
@@ -73,6 +68,16 @@ class apiActions extends MainActions
 			'tags' => $tags,
 			'install_count' => $pkg->getInstallCount(),
 			'attached_files' => $attached_files,
+			);
+	}
+
+	protected static function makeAttachedFileArray(AttachedFile $attached)
+	{
+		return array(
+			'id' => $attached->getId(),
+			'original_file_name' => $attached->getOriginalFileName(),
+			'file_size' => $attached->getFileSize(),
+			'created' => $attached->getCreated(),
 			);
 	}
 }
