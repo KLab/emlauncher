@@ -114,7 +114,7 @@
           <div class="col-xs-12">
 <?php foreach($app->getTags() as $tag): ?>
             <input type="checkbox" class="hidden" name="tags[]" value="<?=$tag->getId()?>">
-            <button class="btn btn-default delete-tags" data-toggle="button"><?=htmlspecialchars($tag->getName())?></button>
+            <button class="btn btn-default delete-tags<?=(isset($unused_tags[$tag->getId()]))?' unused':''?>" data-toggle="button"><?=htmlspecialchars($tag->getName())?></button>
 <?php endforeach ?>
           </div>
         </div>
@@ -122,6 +122,7 @@
         <div class="form-group">
           <div class="col-xs-12">
           <button class="btn btn-danger"><i class="fa fa-trash-o"></i> Delete</button>
+          <button id="select-unused-tags" class="btn btn-default<?=($unused_tags->count()==0)?' disabled':''?>"><i class="fa fa-check"></i> Select Unused Tags</button>
           </div>
         </div>
 
@@ -306,6 +307,11 @@ $('#add-owner button').on('click',function(event){
   $clone.removeAttr('id');
   $template.before($clone);
   $(this).next().val(null);
+  return false;
+});
+
+$('#select-unused-tags').on('click',function(event){
+  $('#delete-tags button.unused').addClass('active').prev().prop('checked',true);
   return false;
 });
 

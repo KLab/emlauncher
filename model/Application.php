@@ -151,6 +151,14 @@ class Application extends mfwObject {
 		return $this->tags;
 	}
 
+	public function getUnusedTags()
+	{
+		if($this->unused_tags===null){
+			$this->unused_tags = TagDb::selectUnusedTagsByAppId($this->getId());
+		}
+		return $this->unused_tags;
+	}
+
 	public function getInstallUsers()
 	{
 		if($this->install_users===null){

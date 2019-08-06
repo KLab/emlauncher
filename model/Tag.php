@@ -44,6 +44,12 @@ class TagDb extends mfwObjectDb {
 		$query = 'WHERE app_id = ?';
 		return static::selectSet($query,array($app_id));
 	}
+	public static function selectUnusedTagsByAppId($app_id)
+	{
+		$query = 'WHERE app_id = ? AND id NOT IN (SELECT tag_id FROM package_tag)';
+		return self::selectSet($query,array($app_id));
+	}
+
 	public static function selectByAppIdForUpdate($app_id,PDO $con=null)
 	{
 		$query = 'WHERE app_id = ? FOR UPDATE';
@@ -99,6 +105,4 @@ class TagDb extends mfwObjectDb {
 		$sql = 'DELETE FROM package_tag WHERE package_id = ?';
 		mfwDBIBase::query($sql,array($pkg->getId()),$con);
 	}
-
 }
-

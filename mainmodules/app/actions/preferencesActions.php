@@ -18,6 +18,7 @@ class preferencesActions extends appActions
 	public function executePreferences()
 	{
 		$params = array(
+			'unused_tags' => $this->app->getUnusedTags(),
 			);
 		return $this->build($params);
 	}
