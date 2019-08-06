@@ -30,6 +30,14 @@
       <h3 class="list-group-item-heading">Create Token API</h3>
       <p class="list-gorup-item-text">Create Token and return install url.</p>
     </a>
+    <a href="<?=url('/doc/api_package_attach')?>" class="list-group-item">
+      <h3 class="list-group-item-heading">Attach File API</h3>
+      <p class="list-gorup-item-text">Attach a file to the package.</p>
+    </a>
+    <a href="<?=url('/doc/api_package_detach')?>" class="list-group-item">
+      <h3 class="list-group-item-heading">Detach File API</h3>
+      <p class="list-gorup-item-text">Delete the attached file from the package.</p>
+    </a>
   </div>
 
 
