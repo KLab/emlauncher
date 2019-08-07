@@ -14,6 +14,7 @@ class Application extends mfwObject {
 
 	protected $owners = null;
 	protected $tags = null;
+	protected $unused_tags = null;
 	protected $install_users = null;
 
 	public function getId(){
