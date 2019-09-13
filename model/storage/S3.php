@@ -113,7 +113,8 @@ class S3 implements StorageImpl {
 
 		$param = array('Bucket' => $this->bucket,'Key' => $key);
 		if($filename!==null){
-			$param['ResponseContentDisposition'] = "attachment; filename={$filename}";
+			$name = urlencode($filename);
+			$param['ResponseContentDisposition'] = "attachment; filename*=UTF-8''{$name}";
 		}
 		$cmd = $this->client->getCommand('GetObject', $param);
 		$obj_url = $this->client->createPresignedRequest($cmd, $expires)->getUri();
