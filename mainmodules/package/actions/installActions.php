@@ -7,7 +7,6 @@ require_once APP_ROOT.'/model/AttachedFile.php';
 class installActions extends packageActions
 {
 	const TOKEN_KEY_PREFIX = 'ios_plist_token_';
-	const TIME_LIMIT = '+60 min';
 
 	protected function makeToken()
 	{
@@ -41,6 +40,7 @@ class installActions extends packageActions
 			$url = 'itms-services://?action=download-manifest&url='.urlencode($plist_url);
 		}
 		else if($ua->isAndroid() && $this->package->isAndroidAppBundle()){
+			// AndroidからのアクセスでAABファイルの時、添付ファイルにAPKがあればそれをDL
 			$target = $this->package->getAttachedFiles()->pickupByType(AttachedFile::TYPE_APK);
 			if(!$target){
 				$target = $this->package;
@@ -48,7 +48,7 @@ class installActions extends packageActions
 			$url = $target->getFileUrl(self::TIME_LIMIT);
 		}
 		else{
-			// iPhone以外でのアクセスはパッケージを直接DL
+			// それ以外のアクセスはパッケージを直接DL
 			$url = $this->package->getFileUrl(self::TIME_LIMIT);
 		}
 

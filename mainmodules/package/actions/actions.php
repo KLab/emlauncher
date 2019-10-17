@@ -7,6 +7,7 @@ require_once APP_ROOT.'/model/GuestPassLog.php';
 class packageActions extends MainActions
 {
 	const INSTALL_TOKEN_PREFIX = 'pkg_install_token_';
+	const TIME_LIMIT = '+60 min';
 
 	/**
 	 * @var Package
