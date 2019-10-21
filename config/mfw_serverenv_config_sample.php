@@ -22,7 +22,7 @@ $serverenv_config = array(
 			/** DBの ユーザ名:パスワード が書かれたファイル */
 			'authfile' => '/path/to/dbauth-file',
 			/** DBの接続先 */
-			'default_master' => 'mysql:dbname=emlauncher;host=localhost',
+			'default_master' => 'mysql:dbname=emlauncher;host=localhost;charset=utf8mb4',
 			),
 
 		/**

@@ -4,7 +4,7 @@ create table `user_pass` (
   `mail` varchar(255) not null,
   `passhash` varchar(255) default null,
   primary key (`mail`)
-)Engine=InnoDB default charset=utf8;
+)Engine=InnoDB default charset=utf8mb4;
 
 
 drop table if exists `application`;
@@ -22,7 +22,7 @@ create table `application` (
   unique key `idx_api_key` (`api_key`),
   key idx_date_to_sort (`date_to_sort`) comment '新着ソート用',
   primary key (`id`)
-)Engine=InnoDB default charset=utf8;
+)Engine=InnoDB default charset=utf8mb4;
 
 drop table if exists `application_owner`;
 create table `application_owner` (
@@ -32,7 +32,7 @@ create table `application_owner` (
   key `idx_app` (`app_id`),
   unique key `idx_owner_app` (`owner_mail`,`app_id`),
   primary key (`id`)
-)Engine=InnoDB default charset=utf8;
+)Engine=InnoDB default charset=utf8mb4;
 
 drop table if exists `tag`;
 create table `tag` (
@@ -41,7 +41,7 @@ create table `tag` (
   `name` varchar(255) not null,
   key `idx_app` (`app_id`),
   primary key (`id`)
-)Engine=InnoDB default charset=utf8;
+)Engine=InnoDB default charset=utf8mb4;
 
 drop table if exists `package`;
 create table `package` (
@@ -58,7 +58,7 @@ create table `package` (
   `created` datetime not null,
   key `idx_app` (`app_id`),
   primary key (`id`)
-)Engine=InnoDB default charset=utf8 comment 'インストールパッケージ';
+)Engine=InnoDB default charset=utf8mb4 comment 'インストールパッケージ';
 
 drop table if exists `package_tag`;
 create table `package_tag` (
@@ -66,7 +66,7 @@ create table `package_tag` (
   `tag_id` integer not null,
   key `idx_tag` (`tag_id`),
   primary key (`package_id`,`tag_id`)
-)Engine=InnoDB default charset=utf8 comment 'packageとtagのjunction';
+)Engine=InnoDB default charset=utf8mb4 comment 'packageとtagのjunction';
 
 drop table if exists `install_log`;
 create table install_log (
@@ -79,7 +79,7 @@ create table install_log (
   key idx_mail_app (`mail`,`app_id`,`package_id`),
   key idx_package (`package_id`),
   primary key (`id`)
-)Engine=InnoDB default charset=utf8;
+)Engine=InnoDB default charset=utf8mb4;
 
 drop table if exists `app_install_user`;
 create table app_install_user (
@@ -89,7 +89,7 @@ create table app_install_user (
   `last_installed` datetime not null,
   key idx_app (`app_id`),
   primary key (`mail`,`app_id`)
-)Engine=InnoDB default charset=utf8;
+)Engine=InnoDB default charset=utf8mb4;
 
 drop table if exists `comment`;
 create table `comment` (
@@ -103,7 +103,7 @@ create table `comment` (
   key idx_app (`app_id`),
   key idx_pkg (`package_id`),
   primary key (`id`)
-)Engine=InnoDB default charset=utf8;
+)Engine=InnoDB default charset=utf8mb4;
 
 drop table if exists `guest_pass`;
 CREATE TABLE `guest_pass` (
@@ -118,7 +118,7 @@ CREATE TABLE `guest_pass` (
   KEY `idx_mail_app` (`mail`,`app_id`,`package_id`),
   KEY `idx_package` (`package_id`),
   KEY `idx_token` (`token`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT charset=utf8mb4;
 
 drop table if exists `guestpass_log`;
 CREATE TABLE guestpass_log
@@ -129,7 +129,7 @@ CREATE TABLE guestpass_log
   `ip_address` VARCHAR(255) NOT NULL,
   `installed` DATETIME NOT NULL,
   KEY `idx_guest_pass_id` (`guest_pass_id`)
-)Engine=InnoDB default charset=utf8;
+)Engine=InnoDB default charset=utf8mb4;
 
 drop table if exists `attached_file`;
 create table `attached_file` (
@@ -144,4 +144,4 @@ create table `attached_file` (
   KEY `idx_app` (`app_id`),
   KEY `idx_package` (`package_id`),
   PRIMARY KEY (`id`)
-)Engine=InnoDB default charset=utf8 comment 'パッケージの添付ファイル';
+)Engine=InnoDB default charset=utf8mb4 comment 'パッケージの添付ファイル';
