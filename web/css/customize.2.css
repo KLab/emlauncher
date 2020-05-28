@@ -13,7 +13,7 @@
 	color: #fff;
 }
 
-form+.google-login {
+form+.google-login, form+.azuread-login {
 	padding: 1em;
 	margin-top: 1em;
 	border-top: 1px solid #ccc;

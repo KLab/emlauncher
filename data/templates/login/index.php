@@ -33,6 +33,12 @@
         <a class="btn btn-primary col-xs-12" href="<?=url('/login/google')?>">Login with google account</a>
       </div>
       <?php endif ?>
+
+      <?php if($enable_azuread_auth): ?>
+      <div class="azuread-login col-sm-10 col-sm-offset-1">
+        <a class="btn btn-primary col-xs-12" href="<?=url('/login/azuread')?>">Login with AzureAD account</a>
+      </div>
+      <?php endif ?>
     </div>
   </div>
 </div>
