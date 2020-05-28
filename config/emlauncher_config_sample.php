@@ -51,6 +51,17 @@ $emlauncher_config = array(
 			'google_app_id' => 'xxxxxxxx.apps.googleusercontent.com',
 			'google_app_secret' => 'xxxxxxxx',
 			'allowed_mailaddr_pattern' => '/@klab\.com$/',
+
+			/**
+			 * AzureADアカウントでのログインを許可.
+			 * アカウントのメールアドレスが'allowed_mailaddr_pattern'にマッチするか,
+			 * user_passテーブルに存在したらログインを認める.
+			 *
+			 * 利用する場合, 事前にAzureADにアプリを登録してOAuthのID, Secretを発行しておく.
+			 */
+			'enable_azuread_auth' => true,
+			'azuread_app_id' => 'xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx',
+			'azuread_app_secret' => 'xxxxxxxx',
 			),
 
 		/** AppStore, GooglePlayでの制限ファイルサイズ(MB) */
@@ -128,6 +139,7 @@ $emlauncher_config = array(
 		'login' => array(
 			'enable_password' => true,
 			'enable_google_auth' => false,
+			'enable_azuread_auth' => false,
 			),
 		'package' => array(
 			'file_size_warning_ios' => 150,
@@ -163,4 +175,5 @@ $emlauncher_config = array(
  */
 $emlauncher_config['local'] = $emlauncher_config['ec2'];
 $emlauncher_config['local']['login']['enable_google_auth'] = false;
+$emlauncher_config['local']['login']['enable_azuread_auth'] = false;
 $emlauncher_config['local']['aws']['bucket_name'] = 'emlauncher-dev';
