@@ -69,7 +69,7 @@ class googleActions extends loginActions
 			'redirect_uri' => $callback_url,
 			'grant_type' => 'authorization_code',
 			);
-		$response = mfwHttp::post($url_base,$query);
+		$response = mfwHttp::post($url_base,$query,['Except:']);
 		return json_decode($response,true);
 	}
 
