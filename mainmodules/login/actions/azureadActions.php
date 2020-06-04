@@ -69,7 +69,7 @@ class azureadActions extends loginActions
 			'grant_type' => 'authorization_code',
 			'scope' => 'https://graph.microsoft.com/User.Read',
 			);
-		$response = mfwHttp::post($url_base,$query,['Except:']);
+		$response = mfwHttp::post($url_base,$query,['Expect:']);
 		return json_decode($response,true);
 	}
 
