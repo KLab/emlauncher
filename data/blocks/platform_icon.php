@@ -9,7 +9,7 @@ case 'iOS':
 	$name = ' iOS';
 	break;
 default:
-	$icon = 'fa-question';
+	$icon = 'fa-desktop';
 	$name = ' unknown';
 	break;
 }
