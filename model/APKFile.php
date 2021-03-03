@@ -40,7 +40,9 @@ class APKFile {
 	{
 		$conf = self::getConfig();
 
-		$cmd = "java -jar \"{$conf['bundletool']}\" build-apks --mode=universal".
+		$java = $conf['java'] ?? 'java';
+
+		$cmd = "{$java} -jar \"{$conf['bundletool']}\" build-apks --mode=universal".
 			" --bundle=\"{$aabname}\"".
 			" --output=\"{$apksname}\"".
 			" --ks=\"{$conf['keystore']}\"".

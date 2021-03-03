@@ -112,6 +112,9 @@ $emlauncher_config = array(
 
 		/** APKファイルの設定 */
 		'apkfile' => array(
+			/** Javaコマンド 指定しない場合'java' */
+			'java' => 'java -Xmx2048m',
+
 			/** BundleToolのパス */
 			'bundletool' => '/path/to/bundletool.jar',
 
