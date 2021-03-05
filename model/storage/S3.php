@@ -3,6 +3,7 @@ require_once APP_ROOT.'/model/Config.php';
 require_once APP_ROOT.'/model/Storage.php';
 
 use Aws\S3\S3Client;
+use Aws\S3\MultipartUploader;
 use Aws\Credentials\Credentials;
 
 class S3 implements StorageImpl {
@@ -62,17 +63,24 @@ class S3 implements StorageImpl {
 	public function saveFile($key,$filename,$mime)
 	{
 		$acl = 'private';
-		$fp = fopen($filename,'rb');
-		$r = $this->client->putObject(
+		$uploader = new MultipartUploader(
+			$this->client,
+			$filename,
 			array(
 				'Bucket' => $this->bucket,
 				'Key' => $key,
 				'ACL' => $acl,
 				'ContentType' => $mime,
-				'Body' => $fp,
 				));
-		fclose($fp);
-		return $r;
+        try{
+            $result = $uploader->upload();
+        }
+        catch(MultipartUploadException $e){
+            $params = $e->getState()->getId();
+            $result = $s3Client->abortMultipartUpload($params);
+            throw $e;
+        }
+		return $result;
 	}
 
 	public function rename($srckey,$dstkey)
