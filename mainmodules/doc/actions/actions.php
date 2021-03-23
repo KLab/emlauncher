@@ -1,4 +1,5 @@
 <?php
+require_once(APP_ROOT.'/model/APKFile.php');
 
 class docActions extends MainActions
 {
@@ -12,4 +13,11 @@ class docActions extends MainActions
 		return $this->build();
 	}
 
+	public function executeKeystore()
+	{
+		$param = array(
+			'info' => implode(APKFile::getKeystoreInfo(), "\n"),
+			);
+		return $this->build($param);
+	}
 }

@@ -1,7 +1,7 @@
 <div id="documentation">
 
   <ol class="breadcrumb">
-    <li>Documentations</li>
+    <li>Documents</li>
     <li><a href="<?=url('/doc/api')?>">API</a></li>
     <li class="active">Upload</li>
   </ol>

@@ -1,7 +1,7 @@
 <div id="documentation">
 
   <ol class="breadcrumb">
-    <li>Documentations</li>
+    <li>Documents</li>
     <li class="active">API</li>
   </ol>
 

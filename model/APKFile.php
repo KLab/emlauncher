@@ -82,4 +82,28 @@ class APKFile {
 			throw new RuntimeException("zip close failed");
 		}
 	}
+
+	public static function getKeystoreInfo()
+	{
+		$conf = self::getConfig();
+
+		list($passtype, $pass) = explode(':',$conf['kspass'],2);
+		switch($passtype){
+		case 'pass':
+			break;
+		case 'file':
+			$pass = file_get_contents($pass);
+			if($pass===FALSE){
+				throw new RuntimeException("file_get_contents failed");
+			}
+			break;
+		default:
+			throw new RuntimeException("invalid config format: apkfile.keypass");
+		}
+
+		$cmd = "keytool -list -v -keystore {$conf['keystore']} -alias {$conf['keyalias']} -storepass {$pass}";
+		exec($cmd, $info);
+
+		return $info;
+	}
 }

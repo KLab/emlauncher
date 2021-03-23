@@ -42,7 +42,13 @@
               <li><a href="<?=url('/myapps/own')?>">Own Apps</a></li>
             </ul>
           </li>
-          <li><a href="<?=url('/doc/api')?>">API doc</a></li>
+          <li class="dropdown">
+            <a hfer="#" class="dropdown-toggle" data-toggle="dropdown">Documents <b class="caret"></b></a>
+            <ul class="dropdown-menu">
+              <li><a href="<?=url('/doc/api')?>">API</a></li>
+              <li><a href="<?=url('/doc/keystore')?>">Keystore</a></li>
+            </ul>
+          </li>
         </ul>
 
         <ul class="nav navbar-nav navbar-right">
