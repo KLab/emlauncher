@@ -117,7 +117,7 @@
  <div>
     <h3 class="subheader">Sample Curl</h3>
     <div class="container">
-      <pre><code>curl <?=url('/api/package_list?api_key={application_api_key}')?></code></pre>
+      <pre><code>curl "<?=url('/api/package_list?api_key={application_api_key}')?>"</code></pre>
     </div>
  </div>
 

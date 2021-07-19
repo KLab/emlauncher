@@ -54,7 +54,7 @@
  <div>
     <h3 class="subheader">Sample Curl</h3>
     <div class="container">
-      <pre><code>curl <?=url('/api/package_detach?api_key={application_api_key}&id=1&attached_file_id=334')?></code></pre>
+      <pre><code>curl "<?=url('/api/package_detach?api_key={application_api_key}&id=1&attached_file_id=334')?>"</code></pre>
     </div>
  </div>
 
