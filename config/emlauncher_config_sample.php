@@ -129,6 +129,8 @@ $emlauncher_config = array(
 
 			/** キーのパスワード 書式はbundletoolのkey-passオプションと同じ. */
 			'keypass' => 'pass:xxxxxxxx',
+			/** BundleTool内包のaapt2以外を使うなら指定 */
+			'aapt2' = '/path/to/aapt2',
 			),
 		),
 
@@ -168,6 +170,7 @@ $emlauncher_config = array(
 			'keyalias' => 'emlauncher',
 			'kspass' => 'pass:emlauncher',
 			'keypass' => 'pass:emlauncher',
+			'aapt2' => '/aapt2',
 			),
 		),
 	);

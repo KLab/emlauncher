@@ -49,6 +49,9 @@ class APKFile {
 			" --ks-pass=\"{$conf['kspass']}\"".
 			" --ks-key-alias=\"{$conf['keyalias']}\"".
 			" --key-pass=\"{$conf['keypass']}\"";
+		if ( !empty($conf['aapt2']) ) {
+			$cmd .= " --aapt2=\"{$conf['aapt2']}\"";
+		}
 		exec($cmd, $out, $ret);
 		if($ret!=0){
 			throw new RuntimeException("bundletool error: ".implode("\n", $out));

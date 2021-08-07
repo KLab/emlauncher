@@ -96,6 +96,12 @@ APKを再署名するためのキーストアも用意します。
 keytool -genkey -keystore {emlauncher-keystore.jks} -keyalg RSA -keysize 2048 -validity 10000 -alias {key-alias}
 ```
 
+#### AARCH64(ARM64)アーキテクチャのプラットホームで動作させる場合
+AARCH64(ARM64)アーキテクチャのプラットホームで動作させる場合にはbundletoolに内包のaapt2がAMD64(x86_64)アーキテクチャ向けでそのままでは動作しないのでARM64アーキテクチャー用のaapt2をgithubからダウンロードします。
+```BASH
+curl -sLO https://github.com/JonForShort/android-tools/raw/master/build/android-9.0.0_r33/aapt2/arm64-v8a/bin/aapt2
+```
+
 ### 8. Configuration
 
 #### mfw_serverevn_config.php
@@ -106,6 +112,9 @@ keytool -genkey -keystore {emlauncher-keystore.jks} -keyalg RSA -keysize 2048 -v
 ``config/emlauncher_config_sample.php``をコピーし、自身の環境に合わせて書き換えます。
 
 S3のbucket名に指定するbucketは予め作成しておきます。
+
+##### AARCH64(ARM64)アーキテクチャのプラットホームで動作させる場合
+APKファイルの設定のaapt2に(6.)でダウンロードしたARM64向けaapt2実行ファイルのパスを指定します。
 
 ### 9. Complete
 
