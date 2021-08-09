@@ -32,4 +32,5 @@ RUN set -x \
   && apt-get install -y --no-install-recommends default-jre-headless \
   && curl -sL -o/bundletool.jar https://github.com/google/bundletool/releases/download/1.4.0/bundletool-all-1.4.0.jar \
   && curl -sL -o/aapt2 https://github.com/JonForShort/android-tools/raw/master/build/android-9.0.0_r33/aapt2/arm64-v8a/bin/aapt2 \
+  && chmod 755 /aapt2 \
   && echo -e 'EMLauncher\n\nKLab Inc.\n\nTokyo\nJP\nyes' | keytool -genkeypair -keystore /emlauncher.keystore -alias emlauncher -storepass emlauncher -keypass emlauncher -keyalg RSA -keysize 2048 -validity 36524
