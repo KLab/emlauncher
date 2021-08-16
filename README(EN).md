@@ -78,7 +78,27 @@ sudo /etc/init.d/memcached start
 sudo chkconfig memcached on
 ```
 
-### 7. Configuration
+### 7. Setup bundletool for Android App Bundle
+
+```BASH
+sudo yum install java-1.8.0-openjdk-headless
+curl -sLO https://github.com/google/bundletool/releases/download/0.10.0/bundletool-all-0.10.0.jar
+```
+
+Here will also have a keystore for re-signing the generate APK.
+The password, keystore file name, and alias name to be set here will be described later in the configuration file `emlauncher_config.php`.
+```BASH
+keytool -genkey -keystore {emlauncher-keystore.jks} -keyalg RSA -keysize 2048 -validity 10000 -alias {key-alias}
+```
+
+#### When Running on a platform with AARCH64(ARM64) architecture
+When Running on the platform of AARCH64(ARM64) architecture, aapt2 included in bundletool is for AMD64(x86_64) architecture and does not work as it is,
+so download aapt2 for ARM64 architecture from github.
+```BASH
+curl -sLO https://github.com/JonForShort/android-tools/raw/master/build/android-9.0.0_r33/aapt2/arm64-v8a/bin/aapt2
+```
+
+### 8. Configuration
 
 #### mfw_serverevn_config.php
 Copy ``config/mfw_serverenv_config_sample.php``,and rewrite
@@ -89,7 +109,10 @@ Copy ``config/emlauncher_config_sample.php``, and rewrite to match your own envi
 
 Create bucket that will be assigned to bucket name of S3 in advance. 
 
-### 8. Complete
+##### When running on a platform with AARCH64(ARM64) architecture
+Specify the path of the aapt2 executable file for ARM64 downloaded at section (6.) in aapt2 of the APK file settings.
+
+### 9. Complete
 
 Access instance with HTTP in browser.
 When the login page of EMLauncher is displayed, it’s complete.
