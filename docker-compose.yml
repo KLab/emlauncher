@@ -6,7 +6,7 @@ services:
     volumes:
       - ".:/repo"
     ports:
-      - "10080:80"
+      - "8081:80"
   memcached:
     image: memcached:latest
   db:
