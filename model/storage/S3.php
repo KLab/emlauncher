@@ -55,7 +55,7 @@ class S3 implements StorageImpl {
 				'Key' => $key,
 				'ACL' => $acl,
 				'ContentType' => $type,
-				'Body' => GuzzleHttp\Psr7\stream_for($data->getImageBlob()),
+				'Body' => $data->getImageBlob(),
 				));
 		return $r;
 	}
@@ -72,14 +72,14 @@ class S3 implements StorageImpl {
 				'ACL' => $acl,
 				'ContentType' => $mime,
 				));
-        try{
-            $result = $uploader->upload();
-        }
-        catch(MultipartUploadException $e){
-            $params = $e->getState()->getId();
-            $result = $s3Client->abortMultipartUpload($params);
-            throw $e;
-        }
+		try{
+			$result = $uploader->upload();
+		}
+		catch(MultipartUploadException $e){
+			$params = $e->getState()->getId();
+			$result = $s3Client->abortMultipartUpload($params);
+			throw $e;
+		}
 		return $result;
 	}
 
