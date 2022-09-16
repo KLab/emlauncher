@@ -1,14 +1,14 @@
-FROM php:7.2-apache
+FROM php:8.1-apache
 ENV APACHE_DOCUMENT_ROOT /repo/web
 
 RUN set -x \
   && apt-get update \
   && apt-get install -y --no-install-recommends \
-    unzip libssl-dev libpcre3 libpcre3-dev zlib1g-dev libmagickwand-dev sendmail libmemcached-dev
+    unzip libssl-dev libpcre3 libpcre3-dev zlib1g-dev libmagickwand-dev sendmail libmemcached-dev libonig-dev libzip-dev
 
 RUN set -x \
-  && docker-php-ext-install -j$(nproc) pdo_mysql mysqli mbstring gd zip \
-  && pecl install imagick-3.4.3 memcached \
+  && docker-php-ext-install -j$(nproc) pdo_mysql mysqli gd zip \
+  && pecl install imagick-3.5.1 memcached \
   && docker-php-ext-enable imagick memcached \
   && a2enmod rewrite
 

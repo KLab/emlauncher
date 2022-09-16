@@ -31,7 +31,7 @@ docker-compose exec db mysql -uroot -ppassword emlauncher -e 'INSERT INTO user_p
 
 5. Open EMLauncher in a browser
 
-http://localhost:10080
+http://localhost:8081
 
 # How to run (with s3 mock)
 
@@ -70,5 +70,5 @@ aws --endpoint-url=http://localhost:4572 s3 mb s3://emlauncher-dev/
 
 6. Open EMLauncher in a browser
 
-http://localhost:10080
+http://localhost:8081
 
