@@ -23,7 +23,7 @@ sudo sh -c "echo '/swapfile swap swap defaults 0 0' >> /etc/fstab"
 sudo amazon-linux-extras install php8.0
 sudo amazon-linux-extras install mariadb10.5
 sudo amazon-linux-extras install memcached1.5
-sudo yum install mariadb-server httpd php-gd php-mbstring php-xml php-pecl-imagick php-pecl-memcached php-pecl-zip git
+sudo yum install mariadb-server httpd php php-gd php-mbstring php-xml php-pecl-imagick php-pecl-memcached php-pecl-zip git
 curl -sS https://getcomposer.org/installer | php
 sudo cp composer.phar /usr/local/bin/composer
 ```
