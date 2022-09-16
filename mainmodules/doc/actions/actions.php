@@ -16,7 +16,7 @@ class docActions extends MainActions
 	public function executeKeystore()
 	{
 		$param = array(
-			'info' => implode(APKFile::getKeystoreInfo(), "\n"),
+			'info' => implode("\n", APKFile::getKeystoreInfo()),
 			);
 		return $this->build($param);
 	}
