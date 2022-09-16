@@ -20,7 +20,8 @@ sudo sh -c "echo '/swapfile swap swap defaults 0 0' >> /etc/fstab"
 ### 2. Install required packages
 
 ```BASH
-sudo amazon-linux-extras install lamp-mariadb10.2-php7.2
+sudo amazon-linux-extras install php8.0
+sudo amazon-linux-extras install mariadb10.5
 sudo amazon-linux-extras install memcached1.5
 sudo yum install mariadb-server httpd php-gd php-mbstring php-xml php-pecl-imagick php-pecl-memcached php-pecl-zip git
 curl -sS https://getcomposer.org/installer | php
