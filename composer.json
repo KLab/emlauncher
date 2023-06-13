@@ -5,9 +5,9 @@
         "ext-mbstring": "*",
         "ext-memcached": "*",
         "ext-zip": "*",
-        "tufanbarisyildirim/php-apk-parser":"2.0.3",
-        "aws/aws-sdk-php": "^3.104",
-        "rodneyrehm/plist": "^2.0",
-        "endroid/qr-code": "1.6.*"
+        "tufanbarisyildirim/php-apk-parser":"^3.0",
+        "aws/aws-sdk-php": "^3.272.1",
+        "rodneyrehm/plist": "^2.0.3",
+        "endroid/qr-code": "^4.8.2"
     }
 }
