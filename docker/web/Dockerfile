@@ -1,4 +1,4 @@
-FROM php:8.1-apache
+FROM php:8.2-apache
 ENV APACHE_DOCUMENT_ROOT /repo/web
 
 RUN set -x \
