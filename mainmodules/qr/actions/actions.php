@@ -1,5 +1,7 @@
 <?php
 use Endroid\QrCode\QrCode;
+use Endroid\QrCode\Writer\PngWriter;
+use Endroid\QrCode\ErrorCorrectionLevel\ErrorCorrectionLevelHigh;
 
 class qrActions extends MainActions
 {
@@ -21,14 +23,14 @@ class qrActions extends MainActions
         if ($size > 300) {
             $size = 300;
         }
-        $qr_code = new QrCode();
-        $qr_code
-            ->setText($url)
-            ->setSize(self::getRenderSize($size, self::DEFAULT_QR_PADDING_SIZE))
-            ->setPadding(self::DEFAULT_QR_PADDING_SIZE)
-            ->setErrorCorrection('high');
+
+        $writer = new PngWriter();
+        $qr_code = QrCode::create($url)
+            ->setSize($size)
+            ->setMargin(self::DEFAULT_QR_PADDING_SIZE)
+            ->setErrorCorrectionLevel(new ErrorCorrectionLevelHigh());
         return $this->pngResponse(
-            $qr_code->get()
+            $writer->write($qr_code)->getString()
         );
     }
 
