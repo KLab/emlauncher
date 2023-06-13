@@ -13,5 +13,5 @@ services:
       - DATA_DIR=/tmp/localstack/data
     ports:
       - "40080:8080" # dashboard
-      - "4572:4572"  # s3 endpoint
+      - "4566:4566"  # s3 endpoint
 
