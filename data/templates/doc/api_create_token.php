@@ -20,7 +20,7 @@
         <dd><a href="#"><?=url('/api/create_token')?></a></dd>
         <dt>Response format:</dt>
         <dd>json</dd>
-        <dt>Fiels:</dt>
+        <dt>Fields:</dt>
         <dd>
           <ul>
             <li><code>api_key</code> - Required (See the application preferences)</li>
