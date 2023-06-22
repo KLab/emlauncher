@@ -20,10 +20,17 @@ sudo sh -c "echo '/swapfile swap swap defaults 0 0' >> /etc/fstab"
 ### 2. Install required packages
 
 ```BASH
-sudo amazon-linux-extras install php8.0
+sudo amazon-linux-extras install php8.2
 sudo amazon-linux-extras install mariadb10.5
 sudo amazon-linux-extras install memcached1.5
-sudo yum install mariadb-server httpd php php-gd php-mbstring php-xml php-pecl-imagick php-pecl-memcached php-pecl-zip git
+sudo yum groupinstall "Development Tools"
+sudo yum install httpd php php-gd php-mbstring php-xml git php-devel php-pear zlib-devel libmemcached.x86_64 libmemcached-devel.x86_64 ImageMagick.x86_64 ImageMagick-devel.x86_64 libzip-devel.x86_64
+sudo pecl install igbinary
+sudo pecl install msgpack
+sudo pecl install memcached
+sudo pecl install imagick
+sudo sh -c "cat /etc/php.d/20-zip.ini | sed 's/zip/memcached/' > /etc/php.d/30-memcached.ini"
+sudo sh -c "cat /etc/php.d/20-zip.ini | sed 's/zip/imagick/' > /etc/php.d/30-imagick.ini"
 curl -sS https://getcomposer.org/installer | php
 sudo cp composer.phar /usr/local/bin/composer
 ```
@@ -73,8 +80,8 @@ echo 'emlauncher:password' > $HOME/dbauth
 
 data/sql/database.sqlのパスワードを合わせて修正し、MySQLに流します。
 ```BASH
-mysql -uroot < /path/to/emlauncher/data/sql/database.sql
-mysql -uroot emlauncher < /path/to/emlauncher/data/sql/tables.sql
+sudo mysql -uroot < /path/to/emlauncher/data/sql/database.sql
+sudo mysql -uroot emlauncher < /path/to/emlauncher/data/sql/tables.sql
 ```
 
 ### 6. Memcache setup
@@ -88,7 +95,7 @@ sudo systemctl enable memcached
 
 ```BASH
 sudo yum install java-1.8.0-openjdk-headless
-curl -sLO https://github.com/google/bundletool/releases/download/0.10.0/bundletool-all-0.10.0.jar
+curl -sLO https://github.com/google/bundletool/releases/download/1.15.1/bundletool-all-1.15.1.jar
 ```
 
 APKを再署名するためのキーストアも用意します。
@@ -121,4 +128,3 @@ APKファイルの設定のaapt2に(6.)でダウンロードしたARM64向けaap
 
 ブラウザでインスタンスにHTTPでアクセスします。
 EMLauncherのログインページが表示されたら完了です。
-
