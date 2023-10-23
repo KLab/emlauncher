@@ -335,7 +335,7 @@ class PackageDb extends mfwObjectDb {
 	 * @param[in] int $keep 削除ぜず保持する上限数
      * @param[in] int $limit 取得する上限数
 	 */
-	public function selectDeletablePackages(Application $app,$keep=1000,$limit=100,$con=null)
+	public static function selectDeletablePackages(Application $app,$keep=1000,$limit=100,$con=null)
 	{
 		$sql = sprintf(
 			'WHERE app_id=:app_id AND protect=0 AND id not in '
