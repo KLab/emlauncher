@@ -302,12 +302,12 @@ class PackageDb extends mfwObjectDb {
 		return static::selectOne($query,$bind);
 	}
 
-	public static function selectByAppIdPfTagsWithLimit($app_id, $pf_filter, array $tags, $offset, $count)
+	public static function selectByAppIdPfTagsWithLimit($app_id, $pf_filter, array $tags, $offset, $count, $con=null)
 	{
 		if (!$pf_filter && empty($tags)) {
 			$query = 'WHERE app_id = :app_id';
 			$query .= sprintf(' ORDER BY id DESC LIMIT %d, %d', $offset, $count);
-			return static::selectSet($query, array(':app_id' => $app_id));
+			return static::selectSet($query, array(':app_id' => $app_id), $con);
 		}
 		$sql = 'SELECT p.* FROM package AS p LEFT JOIN package_tag AS t ON p.id = t.package_id WHERE p.app_id = :app_id';
 		$bind = array(':app_id' => $app_id);
@@ -326,7 +326,7 @@ class PackageDb extends mfwObjectDb {
 		}
 
 		$sql .= sprintf(' ORDER BY p.id DESC LIMIT %d, %d', $offset, $count);
-		return new PackageSet(mfwDBIBase::getAll($sql, $bind));
+		return new PackageSet(mfwDBIBase::getAll($sql, $bind, $con));
 	}
 
 	/**

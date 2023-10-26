@@ -63,6 +63,7 @@ class packageActions extends apiActions
 		}
 
 		$con = mfwDBConnection::getPDO();
+		$con->setAttribute(PDO::ATTR_STRINGIFY_FETCHES, true);
 		$con->beginTransaction();
 		try{
 			$app = ApplicationDb::retrieveByPKForUpdate($this->app->getId(),$con);
@@ -110,6 +111,7 @@ class packageActions extends apiActions
 		$type = AttachedFile::getTypeFromExt(pathinfo($file['name'],PATHINFO_EXTENSION));
 
 		$con = mfwDBConnection::getPDO();
+		$con->setAttribute(PDO::ATTR_STRINGIFY_FETCHES, true);
 		$con->beginTransaction();
 		try{
 			$app = ApplicationDb::retrieveByPKForUpdate($this->app->getId(),$con);
@@ -140,7 +142,9 @@ class packageActions extends apiActions
 		}
 
 		$id = (int)mfwRequest::param('attached_file_id');
-		$attached = AttachedFileDb::retrieveByPK($id);
+		$con = mfwDBConnection::getPDO();
+		$con->setAttribute(PDO::ATTR_STRINGIFY_FETCHES, true);
+		$attached = AttachedFileDb::retrieveByPK($id, $con);
 
 		if(!$attached || $attached->getPackageId()!=$this->pkg->getId()){
 			return $this->jsonResponse(

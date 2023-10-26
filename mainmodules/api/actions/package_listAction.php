@@ -35,7 +35,9 @@ class package_listAction extends apiActions
 			apache_log('tags',$tags);
 			apache_log('platform',$platform);
 
-			$pkgs = PackageDb::selectByAppIdPfTagsWithLimit($app->getId(), $platform, $tag_ids, $offset, $limit);
+			$con = mfwDBConnection::getPDO();
+			$con->setAttribute(PDO::ATTR_STRINGIFY_FETCHES, true);
+			$pkgs = PackageDb::selectByAppIdPfTagsWithLimit($app->getId(), $platform, $tag_ids, $offset, $limit, $con);
 
 			$ret = array();
 			foreach($pkgs as $pkg){
@@ -53,4 +55,3 @@ class package_listAction extends apiActions
 	}
 
 }
-
