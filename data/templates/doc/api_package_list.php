@@ -121,4 +121,11 @@
     </div>
  </div>
 
+ <div>
+    <h3 class="subheader">Caveats</h3>
+    <div class="container">
+      <p>Its type regarding numeric values such as id, file_size, etc. is indeterminate.</p>
+    </div>
+ </div>
+
 </div>
