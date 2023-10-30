@@ -81,8 +81,7 @@ class uploadAction extends apiActions
 			}
 
 			// DBへ保存
-			$con = mfwDBConnection::getPDO();
-			$con->setAttribute(PDO::ATTR_STRINGIFY_FETCHES, true);
+			$con = $this->getPDO();
 			$con->beginTransaction();
 
 			$app = ApplicationDb::retrieveByPKForUpdate($this->app->getId(),$con);

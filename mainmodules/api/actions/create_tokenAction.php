@@ -16,8 +16,7 @@ class create_tokenAction extends apiActions
 
             $app = $this->app;
 
-            $con = mfwDBConnection::getPDO();
-            $con->setAttribute(PDO::ATTR_STRINGIFY_FETCHES, true);
+            $con = $this->getPDO();
             // id check
             $pkg = PackageDb::retrieveByPK($pkg_id, $con);
             if(!$pkg || $app->getId()!=$pkg->getAppId()){
