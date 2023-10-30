@@ -33,7 +33,7 @@ class attachActions extends packageActions
 
 		$type = AttachedFile::getTypeFromExt(pathinfo($file['name'],PATHINFO_EXTENSION));
 
-		$con = mfwDBConnection::getPDO();
+		$con = $this->getPDO();
 		$con->beginTransaction();
 		try{
 			$app = ApplicationDb::retrieveByPKForUpdate($this->app->getId(),$con);
@@ -86,7 +86,7 @@ class attachActions extends packageActions
 		apache_log('pkg_id',$this->package->getId());
 		apache_log('attached_id',$this->attached->getId());
 
-		$con = mfwDBConnection::getPDO();
+		$con = $this->getPDO();
 		$con->beginTransaction();
 		try{
 			$this->app = ApplicationDb::retrieveByPKForUpdate($this->app->getId(),$con);
