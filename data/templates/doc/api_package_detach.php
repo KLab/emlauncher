@@ -61,7 +61,7 @@
  <div>
     <h3 class="subheader">Caveats</h3>
     <div class="container">
-      <p>Its type regarding numeric values such as id, file_size, etc. is indeterminate.</p>
+      <p>The type of numeric fields (id, file_size, etc.) are indeterminate and can be either string or number.</p>
     </div>
  </div>
 
