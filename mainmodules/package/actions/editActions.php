@@ -34,7 +34,7 @@ class editActions extends packageActions
 			return $this->response(self::HTTP_400_BADREQUEST);
 		}
 
-		$con = mfwDBConnection::getPDO();
+		$con = $this->getPDO();
 		$con->beginTransaction();
 		try{
 			$app = ApplicationDb::retrieveByPKForUpdate($this->app->getId(),$con);
@@ -54,4 +54,3 @@ class editActions extends packageActions
 	}
 
 }
-

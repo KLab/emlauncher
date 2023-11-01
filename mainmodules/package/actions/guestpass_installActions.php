@@ -54,7 +54,7 @@ class guestpass_installActions extends packageActions
 			$url = $this->package->getFileUrl(self::TIME_LIMIT);
 		}
 
-		$con = mfwDBConnection::getPDO();
+		$con = $this->getPDO();
 		$con->beginTransaction();
 		try{
 			GuestPassLog::Logging($this->guest_pass ,$ua, $remote_ip, $con);
@@ -101,4 +101,3 @@ class guestpass_installActions extends packageActions
 	}
 
 }
-

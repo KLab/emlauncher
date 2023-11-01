@@ -45,7 +45,7 @@ class uploadActions extends appActions
 		$ext = pathinfo($temp_name,PATHINFO_EXTENSION);
 
 		$renamed = array();
-		$con = mfwDBConnection::getPDO();
+		$con = $this->getPDO();
 		$con->beginTransaction();
 		try{
 			$app = ApplicationDb::retrieveByPKForUpdate($this->app->getId(),$con);
@@ -98,4 +98,3 @@ class uploadActions extends appActions
 	}
 
 }
-

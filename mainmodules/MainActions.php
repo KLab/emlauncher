@@ -109,4 +109,11 @@ class MainActions extends mfwActions
 		mfwSession::clear(self::SESKEY_URL_BEFORE_LOGIN);
 	}
 
+	protected function getPDO($name=null)
+	{
+		$con = mfwDBConnection::getPDO($name);
+		$con->setAttribute(PDO::ATTR_STRINGIFY_FETCHES, true);
+		return $con;
+	}
+
 }

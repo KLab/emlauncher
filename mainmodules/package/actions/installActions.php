@@ -56,7 +56,7 @@ class installActions extends packageActions
 		apache_log('pkg_id',$this->package->getId());
 		apache_log('platform',$this->package->getPlatform());
 
-		$con = mfwDBConnection::getPDO();
+		$con = $this->getPDO();
 		$con->beginTransaction();
 		try{
 			InstallLog::Logging($this->login_user,$this->package,$ua,$con);
@@ -99,4 +99,3 @@ class installActions extends packageActions
 	}
 
 }
-

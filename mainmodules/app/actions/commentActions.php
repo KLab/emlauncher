@@ -38,7 +38,7 @@ class commentActions extends appActions
 		$message = mfwRequest::param('message');
 		$package_id = mfwRequest::param('package_id');
 
-		$con = mfwDBConnection::getPDO();
+		$con = $this->getPDO();
 		$con->beginTransaction();
 		try{
 			$this->app = ApplicationDb::retrieveByPkForUpdate($this->app->getId());
@@ -62,4 +62,3 @@ class commentActions extends appActions
 	}
 
 }
-
