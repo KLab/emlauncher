@@ -45,7 +45,7 @@ class deleteActions extends packageActions
 		apache_log('platform',$this->package->getPlatform());
 		apache_log('attached_ids',$this->package->getAttachedFiles()->getColumnArray('id'));
 
-		$con = mfwDBConnection::getPDO();
+		$con = $this->getPDO();
 		$con->beginTransaction();
 		try{
 			$this->app = ApplicationDb::retrieveByPKForUpdate($this->app->getId(),$con);
@@ -81,4 +81,3 @@ class deleteActions extends packageActions
 	}
 
 }
-

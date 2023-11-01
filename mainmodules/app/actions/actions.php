@@ -52,7 +52,7 @@ class appActions extends MainActions
 		}
 		$image = base64_decode($match[1]);
 
-		$con = mfwDBConnection::getPDO();
+		$con = $this->getPDO();
 		$con->beginTransaction();
 		try{
 			$app = ApplicationDb::insertNewApp(

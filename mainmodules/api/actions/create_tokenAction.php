@@ -16,9 +16,10 @@ class create_tokenAction extends apiActions
 
             $app = $this->app;
 
+            $con = $this->getPDO();
             // id check
-            $pkg = PackageDb::retrieveByPK($pkg_id);
-            if(!$pkg || $app->getId()!==$pkg->getAppId()){
+            $pkg = PackageDb::retrieveByPK($pkg_id, $con);
+            if(!$pkg || $app->getId()!=$pkg->getAppId()){
                 return $this->jsonResponse(
                     self::HTTP_400_BADREQUEST,
                     array('error'=>'Invalid package id'));
@@ -66,4 +67,3 @@ class create_tokenAction extends apiActions
     }
 
 }
-

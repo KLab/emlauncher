@@ -13,14 +13,14 @@ class deleteAction extends apiActions
 
 			$app = $this->app;
 
-			$pkg = PackageDb::retrieveByPK($pkg_id);
-			if(!$pkg || $app->getId()!==$pkg->getAppId()){
+			$con = $this->getPDO();
+			$pkg = PackageDb::retrieveByPK($pkg_id, $con);
+			if(!$pkg || $app->getId()!=$pkg->getAppId()){
 				return $this->jsonResponse(
 					self::HTTP_400_BADREQUEST,
 					array('error'=>'Invalid package id'));
 			}
 
-			$con = mfwDBConnection::getPDO();
 			$con->beginTransaction();
 
 			$app = ApplicationDb::retrieveByPKForUpdate($app->getId(),$con);

@@ -26,7 +26,7 @@ class preferencesActions extends appActions
 	public function executePreferences_refresh_apikey()
 	{
 		$oldkey = mfwRequest::param('api-key',null,'POST');
-		$con = mfwDBConnection::getPDO();
+		$con = $this->getPDO();
 		$con->beginTransaction();
 		try{
 			$this->app = ApplicationDb::retrieveByPkForUpdate($this->app->getId());
@@ -59,7 +59,7 @@ class preferencesActions extends appActions
 			$image = base64_decode($match[1]);
 		}
 
-		$con = mfwDBConnection::getPDO();
+		$con = $this->getPDO();
 		$con->beginTransaction();
 		try{
 			$this->app = ApplicationDb::retrieveByPkForUpdate($this->app->getId());
@@ -79,7 +79,7 @@ class preferencesActions extends appActions
 	{
 		$tag_ids = mfwRequest::param('tags');
 		if(!empty($tag_ids)){
-			$con = mfwDBConnection::getPDO();
+			$con = $this->getPDO();
 			$con->beginTransaction();
 			try{
 				$this->app = ApplicationDb::retrieveByPkForUpdate($this->app->getId());
@@ -106,7 +106,7 @@ class preferencesActions extends appActions
 		$owners[] = $this->login_user->getMail();
 		$owners = array_unique($owners);
 
-		$con = mfwDBConnection::getPDO();
+		$con = $this->getPDO();
 		$con->beginTransaction();
 		try{
 			$this->app = ApplicationDb::retrieveByPkForUpdate($this->app->getId(),$con);

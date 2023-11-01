@@ -62,7 +62,7 @@ class packageActions extends apiActions
 				array('error'=>'no parameter'));
 		}
 
-		$con = mfwDBConnection::getPDO();
+		$con = $this->getPDO();
 		$con->beginTransaction();
 		try{
 			$app = ApplicationDb::retrieveByPKForUpdate($this->app->getId(),$con);
@@ -109,7 +109,7 @@ class packageActions extends apiActions
 
 		$type = AttachedFile::getTypeFromExt(pathinfo($file['name'],PATHINFO_EXTENSION));
 
-		$con = mfwDBConnection::getPDO();
+		$con = $this->getPDO();
 		$con->beginTransaction();
 		try{
 			$app = ApplicationDb::retrieveByPKForUpdate($this->app->getId(),$con);
@@ -140,7 +140,8 @@ class packageActions extends apiActions
 		}
 
 		$id = (int)mfwRequest::param('attached_file_id');
-		$attached = AttachedFileDb::retrieveByPK($id);
+		$con = $this->getPDO();
+		$attached = AttachedFileDb::retrieveByPK($id, $con);
 
 		if(!$attached || $attached->getPackageId()!=$this->pkg->getId()){
 			return $this->jsonResponse(
@@ -150,7 +151,6 @@ class packageActions extends apiActions
 					"the attached file (id=$id) not found in the package (id={$this->pkg->getId()})"));
 		}
 
-		$con = mfwDBConnection::getPDO();
 		$con->beginTransaction();
 		try{
 			$app = ApplicationDb::retrieveByPKForUpdate($this->app->getId(),$con);
