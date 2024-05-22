@@ -87,14 +87,41 @@ class S3 implements StorageImpl {
 	{
 		$acl = 'private';
 
-		// copy
-		$this->client->copyObject(
+		$object_data = $this->client->headObject(
 			array(
 				'Bucket' => $this->bucket,
-				'Key' => $dstkey,
-				'ACL' => $acl,
-				'CopySource' => "{$this->bucket}/{$srckey}",
+				'Key' => $srckey,
 				));
+		$file_size = $object_data['ContentLength'];
+		
+		// copy
+		if (5368709120 > $file_size)
+		{
+			$this->client->copyObject(
+				array(
+					'Bucket' => $this->bucket,
+					'Key' => $dstkey,
+					'ACL' => $acl,
+					'CopySource' => "{$this->bucket}/{$srckey}",
+					));
+		}
+		else
+		{
+			$copier = new MultipartCopy(
+				$this->client,
+				"{$this->bucket}/{$srckey}",
+				array(
+					'Bucket' => $this->bucket,
+					'Key' => $dstkey,
+				));
+			try{
+				$result = $copier->copy();
+			}
+			catch(MultipartUploadException $e){
+				throw $e;
+			}
+		}
+
 		// delete
 		$this->client->deleteObject(
 			array(
