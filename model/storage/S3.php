@@ -9,6 +9,8 @@ use Aws\Credentials\Credentials;
 
 class S3 implements StorageImpl {
 
+	const FIVEGIGABYTE = 5 * 1024 * 1024 * 1024;
+
 	protected $bucket;
 	protected $base_url;
 	protected $external_url;
@@ -96,7 +98,7 @@ class S3 implements StorageImpl {
 		$file_size = $object_data['ContentLength'];
 		
 		// copy
-		if (5368709120 > $file_size)
+		if (FIVEGIGABYTE > $file_size)  // less than 5GB
 		{
 			$this->client->copyObject(
 				array(
