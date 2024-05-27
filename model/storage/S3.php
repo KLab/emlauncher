@@ -3,10 +3,13 @@ require_once APP_ROOT.'/model/Config.php';
 require_once APP_ROOT.'/model/Storage.php';
 
 use Aws\S3\S3Client;
+use Aws\S3\MultipartCopy;
 use Aws\S3\MultipartUploader;
 use Aws\Credentials\Credentials;
 
 class S3 implements StorageImpl {
+
+	const GIGABYTE = 1024 * 1024 * 1024;
 
 	protected $bucket;
 	protected $base_url;
@@ -87,14 +90,41 @@ class S3 implements StorageImpl {
 	{
 		$acl = 'private';
 
-		// copy
-		$this->client->copyObject(
+		$object_data = $this->client->headObject(
 			array(
 				'Bucket' => $this->bucket,
-				'Key' => $dstkey,
-				'ACL' => $acl,
-				'CopySource' => "{$this->bucket}/{$srckey}",
+				'Key' => $srckey,
 				));
+		$file_size = $object_data['ContentLength'];
+		
+		// copy
+		if (self::GIGABYTE * 5 > $file_size)  // less than 5GB
+		{
+			$this->client->copyObject(
+				array(
+					'Bucket' => $this->bucket,
+					'Key' => $dstkey,
+					'ACL' => $acl,
+					'CopySource' => "{$this->bucket}/{$srckey}",
+					));
+		}
+		else
+		{
+			$copier = new MultipartCopy(
+				$this->client,
+				"{$this->bucket}/{$srckey}",
+				array(
+					'Bucket' => $this->bucket,
+					'Key' => $dstkey,
+				));
+			try{
+				$result = $copier->copy();
+			}
+			catch(MultipartUploadException $e){
+				throw $e;
+			}
+		}
+
 		// delete
 		$this->client->deleteObject(
 			array(
