@@ -31,11 +31,6 @@ class packageActions extends MainActions
 			return $this->initializeByInstallToken(mfwRequest::param('token'));
 		}
 
-		if($this->action==='attach_download' && mfwRequest::has('token')){
-			// token付きattachダウンロードリンクの場合, token情報のみで認証する.
-			return $this->initializeByInstallToken(mfwRequest::param('token'));
-		}
-
 		if($this->action==='guestpass_install' && mfwRequest::has('token')){
 			// guestpass installの場合, guestpass token情報のみで認証する.
 			return $this->initializeByGuestPassToken(mfwRequest::param('token'));

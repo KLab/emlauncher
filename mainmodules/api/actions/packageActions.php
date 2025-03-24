@@ -169,4 +169,24 @@ class packageActions extends apiActions
 			self::HTTP_200_OK,
 			self::makeAttachedFileArray($attached));
 	}
+
+	public function executePackage_attach_download()
+	{
+		if(!mfwRequest::has('attached_file_id')) {
+			return $this->jsonResponse(
+				self::HTTP_400_BADREQUEST,
+				array('error'=>'attached_file_id required')
+			);
+		}
+
+		$id = (int)mfwRequest::param('attached_file_id');
+		$con = $this->getPDO();
+		$attached = AttachedFileDb::retrieveByPK($id, $con);
+		
+		$url = $attached->getFileUrl("+60 min");
+		apache_log('pkg_id', $this->pkg->getId());
+		apache_log('attached_id', $attached->getId());
+
+		return $this->redirect($url);
+	}
 }
