@@ -182,7 +182,15 @@ class packageActions extends apiActions
 		$id = (int)mfwRequest::param('attached_file_id');
 		$con = $this->getPDO();
 		$attached = AttachedFileDb::retrieveByPK($id, $con);
-		
+
+		if(!$attached || $attached->getPackageId()!=$this->pkg->getId()){
+			return $this->jsonResponse(
+				self::HTTP_404_NOTFOUND,
+				array(
+					'error'=>
+					"the attached file (id=$id) not found in the package (id={$this->pkg->getId()})"));
+		}
+
 		$url = $attached->getFileUrl("+60 min");
 		apache_log('pkg_id', $this->pkg->getId());
 		apache_log('attached_id', $attached->getId());
