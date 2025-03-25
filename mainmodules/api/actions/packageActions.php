@@ -191,10 +191,15 @@ class packageActions extends apiActions
 					"the attached file (id=$id) not found in the package (id={$this->pkg->getId()})"));
 		}
 
-		$url = $attached->getFileUrl("+60 min");
 		apache_log('pkg_id', $this->pkg->getId());
 		apache_log('attached_id', $attached->getId());
 
-		return $this->redirect($url);
+		// $expires 引数は DateTime などを渡してもいい
+		$expire_at = new DateTime('+60 min');
+		$url = $attached->getFileUrl($expire_at);
+
+		return $this->jsonResponse(
+			self::HTTP_200_OK,
+			self::makeAttachedFileLinkArray($attached, $url, $expire_at));
 	}
 }

@@ -15,7 +15,7 @@
     <div class="container">
       <dl class="dl-horizontal">
         <dt>HTTP Method:</dt>
-        <dd>POST</dd>
+        <dd>GET</dd>
         <dt>URL:</dt>
         <dd><a href="#"><?=url('/api/package_attach_download')?></a></dd>
         <dt>Response format:</dt>
@@ -37,7 +37,20 @@
     <div class="container">
       <dl class="dl-horizontal">
         <dt>Status:</dt>
-        <dd>302 Found</dd>
+        <dd>200 OK</dd>
+        <dt>Sample response:</dt>
+        <dd>
+          <pre><code>{
+  "attached_file": {
+    "id": "334",
+    "original_file_name": "testfile.txt",
+    "file_size": 3170,
+    "created": "2019-08-05 20:34:53"
+  },
+  "download_url": "https://example.com/download",
+  "expire": "2025-03-25 17:00:00"
+}</code></pre>
+        </dd>
       </dl>
     </div>
   </div>
