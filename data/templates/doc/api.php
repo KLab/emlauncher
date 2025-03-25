@@ -38,6 +38,10 @@
       <h3 class="list-group-item-heading">Detach File API</h3>
       <p class="list-gorup-item-text">Delete the attached file from the package.</p>
     </a>
+    <a href="<?=url('/doc/api_package_attach_download')?>" class="list-group-item">
+      <h3 class="list-group-item-heading">Attach File Download API</h3>
+      <p class="list-gorup-item-text">Get a link to the attathed file.</p>
+    </a>
   </div>
 
 
