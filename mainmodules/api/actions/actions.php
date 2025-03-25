@@ -80,4 +80,13 @@ class apiActions extends MainActions
 			'created' => $attached->getCreated(),
 			);
 	}
+
+	protected static function makeAttachedFileLinkArray(AttachedFile $attached, string $url, DateTime $expire_at)
+	{
+		return array(
+			'attached_file' => self::makeAttachedFileArray($attached),
+			'download_url' => $url,
+			'expire' => $expire_at->format('Y-m-d H:i:s'),
+			);
+	}
 }
