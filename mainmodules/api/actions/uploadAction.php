@@ -26,6 +26,7 @@ class uploadAction extends apiActions
 			$tag_names = explode(',',mfwRequest::param('tags'));
 			$protect = self::parseBool(mfwRequest::param('protect'));
 			$dsymfile = mfwRequest::param('dsym');
+			$apkfile_param = mfwRequest::param('apk');
 			if(!$file_info||!$title){
 				$fields = array();
 				if(!$file_info){
@@ -57,14 +58,31 @@ class uploadAction extends apiActions
 			}
 			if($platform===Package::PF_ANDROID){
 				if($ext==="aab"){
-					$apkfile = APKFile::extractFromAppBundle($file_info['tmp_name']);
-					$identifier = APKFile::getPackageName($apkfile);
-					$attached_files[] = array(
-						'filepath' => $apkfile,
-						'original_name' => substr($file_info['name'], 0, -3).'apk',
-						'type' => AttachedFile::TYPE_APK,
-						'mime' => Package::MIME_ANDROID_APK,
-						);
+					if($apkfile_param){
+						if(!isset($apkfile_param['error'])||$apkfile_param['error']!==UPLOAD_ERR_OK){
+							error_log(__METHOD__.'('.__LINE__.'): upload apk file error: $_FILES[apk]='.json_encode($apkfile_param));
+							return $this->jsonResponse(
+								self::HTTP_400_BADREQUEST,
+								array('error'=>'upload apk file error: $_FILES[apk]='.json_encode($apkfile_param)));
+						}
+						$identifier = APKFile::getPackageName($apkfile_param['tmp_name']);
+						$attached_files[] = array(
+							'filepath' => $apkfile_param['tmp_name'],
+							'original_name' => $apkfile_param['name'],
+							'type' => AttachedFile::TYPE_APK,
+							'mime' => Package::MIME_ANDROID_APK,
+							);
+					}
+					else{
+						$apkfile = APKFile::extractFromAppBundle($file_info['tmp_name']);
+						$identifier = APKFile::getPackageName($apkfile);
+						$attached_files[] = array(
+							'filepath' => $apkfile,
+							'original_name' => substr($file_info['name'], 0, -3).'apk',
+							'type' => AttachedFile::TYPE_APK,
+							'mime' => Package::MIME_ANDROID_APK,
+							);
+					}
 				}
 				else{
 					$identifier = APKFile::getPackageName($file_info['tmp_name']);
