@@ -69,7 +69,7 @@ $emlauncher_config = array(
 		 * 大きなファイルの並列アップロード時にロックタイムアウトする場合に設定する.
 		 * 未設定の場合はMySQLのデフォルト値(innodb_lock_wait_timeout)が使われる.
 		 */
-		'upload_lock_wait_timeout' => 300,
+		'upload_lock_wait_timeout' => 600,
 
 		/** AppStore, GooglePlayでの制限ファイルサイズ(MB) */
 		'package' => array(
