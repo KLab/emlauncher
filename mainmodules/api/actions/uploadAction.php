@@ -112,6 +112,7 @@ class uploadAction extends apiActions
 
 			// DB トランザクション開始
 			$con = $this->getPDO();
+			$con->exec('SET innodb_lock_wait_timeout = 300');
 			$con->beginTransaction();
 
 			$app = ApplicationDb::retrieveByPKForUpdate($this->app->getId(),$con);
@@ -129,8 +130,6 @@ class uploadAction extends apiActions
 					$pkg,$afile['original_name'],filesize($afile['filepath']),$afile['type'],$con);
 			}
 
-			$app->updateLastUpload($pkg->getCreated(),$con);
-
 			// tempから正しい場所へ移動
 			$pkg->renameTempFile($pkg_temp_name);
 			foreach($attached_files as $afile){
@@ -138,6 +137,8 @@ class uploadAction extends apiActions
 			}
 
 			$temp_names = array(); // rename成功、掃除不要
+
+			$app->updateLastUpload($pkg->getCreated(),$con);
 
 			// DB トランザクション終了
 			$con->commit();

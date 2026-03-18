@@ -46,6 +46,7 @@ class uploadActions extends appActions
 
 		$renamed = array();
 		$con = $this->getPDO();
+		$con->exec('SET innodb_lock_wait_timeout = 300');
 		$con->beginTransaction();
 		try{
 			$app = ApplicationDb::retrieveByPKForUpdate($this->app->getId(),$con);
