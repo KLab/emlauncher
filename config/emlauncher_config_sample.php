@@ -64,6 +64,13 @@ $emlauncher_config = array(
 			'azuread_app_secret' => 'xxxxxxxx',
 			),
 
+		/**
+		 * アップロード時のDBロック待ちタイムアウト(秒).
+		 * 大きなファイルの並列アップロード時にロックタイムアウトする場合に設定する.
+		 * 未設定の場合はMySQLのデフォルト値(innodb_lock_wait_timeout)が使われる.
+		 */
+		'upload_lock_wait_timeout' => 300,
+
 		/** AppStore, GooglePlayでの制限ファイルサイズ(MB) */
 		'package' => array(
 			'file_size_warning_ios' => 150,

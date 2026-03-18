@@ -112,7 +112,10 @@ class uploadAction extends apiActions
 
 			// DB トランザクション開始
 			$con = $this->getPDO();
-			$con->exec('SET innodb_lock_wait_timeout = 300');
+			$lock_wait_timeout = Config::get('upload_lock_wait_timeout');
+			if($lock_wait_timeout){
+				$con->exec("SET innodb_lock_wait_timeout = ".(int)$lock_wait_timeout);
+			}
 			$con->beginTransaction();
 
 			$app = ApplicationDb::retrieveByPKForUpdate($this->app->getId(),$con);
