@@ -70,6 +70,12 @@ class AttachedFile extends mfwObject {
 		Storage::saveFile($key,$file_path,$mime);
 	}
 
+	public static function uploadTempFile($file_path,$ext,$mime){
+		$tmp_name = Random::string(16).".$ext";
+		Storage::saveFile(Package::TEMP_DIR.$tmp_name,$file_path,$mime);
+		return $tmp_name;
+	}
+
 	public function renameTempFile($temp_name){
 		$tempkey = Package::TEMP_DIR.$temp_name;
 		$newkey = $this->getFileKey();
