@@ -148,11 +148,14 @@ class uploadAction extends apiActions
 		}
 		catch(Exception $e){
 			if($con) $con->rollback();
+			error_log(__METHOD__.'('.__LINE__.'): '.get_class($e).":{$e->getMessage()}");
 			// tempファイルの掃除
 			foreach($temp_names as $tmp){
-				try{ Storage::delete(Package::TEMP_DIR.$tmp); }catch(Exception $ignore){}
+				try{ Storage::delete(Package::TEMP_DIR.$tmp); }
+				catch(Exception $de){
+					error_log(__METHOD__.'('.__LINE__.'): failed to delete temp file: '.$tmp.' : '.get_class($de).":{$de->getMessage()}");
+				}
 			}
-			error_log(__METHOD__.'('.__LINE__.'): '.get_class($e).":{$e->getMessage()}");
 			return $this->jsonResponse(
 				self::HTTP_500_INTERNALSERVERERROR,
 				array('error'=>$e->getMessage(),'exception'=>get_class($e)));
