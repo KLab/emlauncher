@@ -1,4 +1,4 @@
-FROM mysql/mysql-server:5.7
+FROM mysql/mysql-server:8.0
 ENV TZ: Asia/Tokyo
 
 COPY init/00_database.sql /docker-entrypoint-initdb.d/
