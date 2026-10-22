@@ -15,9 +15,13 @@ class apiActions extends MainActions
 		$api_key = self::getRequestApiKey();
 		$this->app = ApplicationDb::selectByApiKey($api_key);
 		if(!$this->app){
+			$error = 'Invalid api_key';
+			if($api_key===null && !self::isApiKeyParamEnabled() && mfwRequest::has('api_key')){
+				$error = 'api_key request parameter is disabled. Use the Authorization: Bearer header.';
+			}
 			return $this->jsonResponse(
 				self::HTTP_400_BADREQUEST,
-				array('error'=>'Invalid api_key'));
+				array('error'=>$error));
 		}
 
 		apache_log('app_id',$this->app->getId());
@@ -29,6 +33,7 @@ class apiActions extends MainActions
 	 * `Authorization: Bearer {api_key}` ヘッダを優先し、
 	 * なければリクエストパラメータ api_key (GET/POST) を使う.
 	 * URLのクエリはアクセスログ等に残るため、ヘッダでの指定を推奨する.
+	 * 設定 api_key_param_enabled が false の場合、パラメータは使わない.
 	 * @return string|null API Key. 指定がなければnull.
 	 */
 	protected static function getRequestApiKey()
@@ -39,7 +44,19 @@ class apiActions extends MainActions
 				return $m[1];
 			}
 		}
+		if(!self::isApiKeyParamEnabled()){
+			return null;
+		}
 		return mfwRequest::param('api_key');
+	}
+
+	/**
+	 * リクエストパラメータ api_key での認証を許可するか.
+	 * 設定 api_key_param_enabled が未設定の場合は許可する (後方互換).
+	 */
+	protected static function isApiKeyParamEnabled()
+	{
+		return Config::get('api_key_param_enabled')!==false;
 	}
 
 	public function executeDefaultAction()
