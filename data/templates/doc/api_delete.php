@@ -23,7 +23,7 @@
         <dt>Fields:</dt>
         <dd>
           <ul>
-            <li><code>api_key</code> - Required (See the application preferences)</li>
+            <li><code>api_key</code> - Required (See the application preferences). Not needed if the <code>Authorization: Bearer</code> header is used. See <a href="<?=url('/doc/api')?>">Authentication</a>.</li>
             <li><code>id</code> - Required, package id to delete</li>
           </ul>
         </dd>
@@ -65,7 +65,7 @@
  <div>
     <h3 class="subheader">Sample Curl</h3>
     <div class="container">
-      <pre><code>curl "<?=url('/api/delete?api_key={application_api_key}&id={package_id}')?>"</code></pre>
+      <pre><code>curl -H "Authorization: Bearer {application_api_key}" "<?=url('/api/delete?id={package_id}')?>"</code></pre>
     </div>
  </div>
 
