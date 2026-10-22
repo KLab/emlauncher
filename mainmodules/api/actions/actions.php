@@ -12,7 +12,7 @@ class apiActions extends MainActions
 		}
 
 		// API Keyによる認証
-		$api_key = mfwRequest::param('api_key');
+		$api_key = self::getRequestApiKey();
 		$this->app = ApplicationDb::selectByApiKey($api_key);
 		if(!$this->app){
 			return $this->jsonResponse(
@@ -22,6 +22,24 @@ class apiActions extends MainActions
 
 		apache_log('app_id',$this->app->getId());
 		return null;
+	}
+
+	/**
+	 * リクエストからAPI Keyを取り出す.
+	 * `Authorization: Bearer {api_key}` ヘッダを優先し、
+	 * なければリクエストパラメータ api_key (GET/POST) を使う.
+	 * URLのクエリはアクセスログ等に残るため、ヘッダでの指定を推奨する.
+	 * @return string|null API Key. 指定がなければnull.
+	 */
+	protected static function getRequestApiKey()
+	{
+		foreach(mfwRequest::allHeaders() as $name => $value){
+			if(strcasecmp($name,'Authorization')===0
+				&& preg_match('/^Bearer +(\S+) *$/i',$value,$m)){
+				return $m[1];
+			}
+		}
+		return mfwRequest::param('api_key');
 	}
 
 	public function executeDefaultAction()
