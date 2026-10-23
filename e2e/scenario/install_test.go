@@ -2,6 +2,7 @@ package scenario
 
 import (
 	"bytes"
+	"fmt"
 	"net/http"
 	"net/url"
 	"regexp"
@@ -24,7 +25,11 @@ func expectDownload(t testing.TB, e *harness.Env, rawURL, key string, data []byt
 	if e.Storage.Kind() == "s3" {
 		// 署名付き URL は 60 分有効で, 元のファイル名でダウンロードさせる
 		expectContains(t, "url", rawURL, "X-Amz-Expires=3600")
-		expectContains(t, "Content-Disposition", res.Header.Get("Content-Disposition"), "filename*=UTF-8''"+url.QueryEscape(fileName))
+		want := "filename*=UTF-8''" + rfc5987(fileName)
+		if fileName != url.QueryEscape(fileName) && e.PHPBug("ダウンロード時のファイル名を urlencode() でエンコードしており, 空白が + になる") {
+			want = "filename*=UTF-8''" + url.QueryEscape(fileName)
+		}
+		expectContains(t, "Content-Disposition", res.Header.Get("Content-Disposition"), want)
 	}
 }
 
@@ -199,4 +204,18 @@ func TestMyAppsNotificationSetting(t *testing.T) {
 
 func htmlUnescape(s string) string {
 	return strings.NewReplacer("&amp;", "&", "&lt;", "<", "&gt;", ">", "&quot;", `"`, "&#39;", "'").Replace(s)
+}
+
+// rfc5987 は RFC 5987 の ext-value の形式でエンコードする (英数字と -._~ 以外を %XX に).
+func rfc5987(s string) string {
+	var b strings.Builder
+	for i := 0; i < len(s); i++ {
+		c := s[i]
+		if 'a' <= c && c <= 'z' || 'A' <= c && c <= 'Z' || '0' <= c && c <= '9' || strings.IndexByte("-._~", c) >= 0 {
+			b.WriteByte(c)
+		} else {
+			fmt.Fprintf(&b, "%%%02X", c)
+		}
+	}
+	return b.String()
 }

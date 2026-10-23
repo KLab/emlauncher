@@ -1,0 +1,86 @@
+# EMLauncher (Go 版) の設定例.
+# 1 環境 1 ファイル. キー名は PHP 版の config/emlauncher_config.php, config/mfw_serverenv_config.php に揃えている.
+
+# HTTP サーバの待ち受けアドレス. Apache のリバースプロキシや ALB から受ける.
+listen: 127.0.0.1:8080
+
+# DB の DATETIME を読み書きするときの TZ. 空なら実行環境の TZ (環境変数 TZ, /etc/localtime).
+# PHP 版の date.timezone と必ず同じにする (php -i | grep date.timezone で確認).
+timezone: Asia/Tokyo
+
+# memcached のキー接頭辞. PHP 版の "{application_identifier}_{MFW_ENV}_{PHP を置いたディレクトリ名}_" と同じにする.
+# 違うと, 移行前に発行したインストールトークンが使えなくなる.
+cache_prefix: emlauncher_ec2_emlauncher_
+
+# アップデート通知やパスワードリセットのメールの送信元.
+mail_sender: "EMLauncher <no-reply@example.com>"
+# メールを Bcc で送るときの To. 空なら mail_sender.
+mail_bcc_to: "EMLauncher <bcc@example.com>"
+mail:
+  # メッセージを標準入力に渡すコマンド (sendmail -t 形式).
+  sendmail: /usr/sbin/sendmail -t -i
+
+title_prefix: ""
+# ログイン時に HTTPS でなければ HTTPS にリダイレクトする.
+enable_https: false
+
+login:
+  enable_password: true
+  enable_google_auth: false
+  google_app_id: xxxxxxxx.apps.googleusercontent.com
+  google_app_secret: xxxxxxxx
+  # PHP の preg_match 形式 (区切り文字付き) のまま書いてよい.
+  allowed_mailaddr_pattern: '/@example\.com$/'
+  enable_azuread_auth: false
+  azuread_app_id: xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
+  azuread_app_secret: xxxxxxxx
+
+# AppStore, GooglePlay での制限ファイルサイズ (MB).
+package:
+  file_size_warning_ios: 150
+  file_size_warning_android: 100
+
+session:
+  # Cookie セッションの署名鍵. 複数台構成では全台で同じ値にする. 長いランダム文字列を使う.
+  secret: change-me-to-a-long-random-string
+
+database:
+  host: localhost
+  port: 3306
+  name: emlauncher
+  # "user:password" が書かれたファイル (PHP 版の authfile と同じ). 指定すると user / password より優先.
+  # authfile: /path/to/dbauth-file
+  user: emlauncher
+  password: xxxxxxxx
+
+memcache:
+  host: localhost
+  port: 11211
+
+# S3 / LocalFile
+storage_class: S3
+
+aws:
+  # 空にすると IAM ロールなど既定の認証情報を使う.
+  key: ""
+  secret: ""
+  region: ap-northeast-1
+  bucket_name: emlauncher
+  # S3 互換ストレージ (LocalStack など) を使う場合のみ.
+  # base_url: http://localstack:4566
+  # external_url: http://localhost:4566
+
+local_file:
+  path: /path/to/directory
+  url_prefix: /files
+  # true なら Go 版が url_prefix 以下を配信する. false なら Apache の Alias などに任せる.
+  serve: true
+
+apkfile:
+  java: java -Xmx2048m
+  bundletool: /path/to/bundletool.jar
+  keystore: /path/to/keystore.jks
+  kspass: pass:xxxxxxxx
+  keyalias: emlauncherkey
+  keypass: pass:xxxxxxxx
+  # aapt2: /path/to/aapt2
