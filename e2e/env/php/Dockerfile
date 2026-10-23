@@ -5,8 +5,9 @@ FROM php:8.2.26-apache-bookworm
 RUN set -x \
   && apt-get update \
   && apt-get install -y --no-install-recommends \
-    unzip pkg-config libssl-dev libsasl2-dev libmagickwand-dev libmemcached-dev libonig-dev libzip-dev zlib1g-dev default-jre-headless curl \
-  && docker-php-ext-install -j$(nproc) pdo_mysql zip \
+    unzip pkg-config libssl-dev libsasl2-dev libmagickwand-dev libmemcached-dev libonig-dev libzip-dev zlib1g-dev libpng-dev libjpeg-dev libfreetype-dev default-jre-headless curl \
+  && docker-php-ext-configure gd --with-jpeg --with-freetype \
+  && docker-php-ext-install -j$(nproc) pdo_mysql zip gd \
   && pecl install imagick-3.7.0 \
   && pecl install --configureoptions 'with-libmemcached-dir="/usr" with-zlib-dir="/usr" enable-memcached-session="yes" enable-memcached-sasl="no"' memcached-3.3.0 \
   && docker-php-ext-enable imagick memcached \
