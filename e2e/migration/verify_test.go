@@ -147,8 +147,11 @@ func TestVerify(t *testing.T) {
 	// ここから状態を変更する操作
 	t.Run("upload notification follows settings", func(t *testing.T) {
 		ownerMails, memberMails := len(e.Mailbox.To(owner.Mail)), len(e.Mailbox.To(member.Mail))
-		e.MustAPIUpload(mainApp.APIKey, "after migration", "new.apk", fixture.APK("com.example.main"),
+		newID := e.MustAPIUpload(mainApp.APIKey, "after migration", "new.apk", fixture.APK("com.example.main"),
 			url.Values{"notify": {"true"}, "tags": {"android"}})
+		k := harness.PackageKey(e.Package(newID))
+		s.After = &AfterState{Package: PkgState{ID: newID, App: "main", Title: "after migration", FileName: "new.apk",
+			Key: k, SHA256: sha(e.Storage.Read(k)), AndroidKey: k}}
 		mails := e.Mailbox.WaitTo(owner.Mail, ownerMails+1)
 		contains(t, "subject", mails[len(mails)-1].Subject, mainApp.Title)
 		if n := len(e.Mailbox.To(member.Mail)); n != memberMails {
@@ -201,6 +204,15 @@ func TestVerify(t *testing.T) {
 		key := reResetKey.FindStringSubmatch(mails[len(mails)-1].Body)[1]
 		harness.ExpectStatus(t, c.PostForm("/login/password_commit", url.Values{"key": {key}, "password": {"changed"}}), http.StatusOK)
 		e.NewClient().Login(member.Mail, "changed")
+		s.After.MemberPassword = "changed"
+	})
+
+	t.Run("issue install token for rollback check", func(t *testing.T) {
+		res := e.APICall("create_token", mainApp.APIKey, url.Values{
+			"id": {itoa(s.After.Package.ID)}, "mail": {owner.Mail}, "expire_hour": {"24"}})
+		harness.ExpectStatus(t, res, http.StatusOK)
+		s.After.InstallToken = reInstallTokenURL.FindStringSubmatch(res.JSONObject(t)["install_url"].(string))[1]
+		saveState(t, s)
 	})
 
 	t.Run("delete old packages batch", func(t *testing.T) {

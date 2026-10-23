@@ -2,6 +2,7 @@
 //
 //	E2E_MIGRATION_PHASE=seed   : 移行元 (PHP 版) に中間状態を作り, 状態を E2E_MIGRATION_STATE に書き出す
 //	E2E_MIGRATION_PHASE=verify : 移行先に対して, 書き出した状態が引き継がれていることを確認する
+//	E2E_MIGRATION_PHASE=rollback : 移行元に切り戻した後, 移行先で作ったデータが使えることを確認する
 //
 // 通常は e2e/migration/rehearse.sh から実行する.
 package migration
@@ -39,6 +40,16 @@ type State struct {
 
 	// 移行前の API の応答 (package_list)
 	PackageList map[string][]PackageSummary `json:"package_list"`
+
+	// 移行先で作ったもの (切り戻しの確認用. verify で記録する)
+	After *AfterState `json:"after,omitempty"`
+}
+
+// AfterState は移行先 (verify) で作ったデータ. 切り戻した移行元で使えることを確認する.
+type AfterState struct {
+	Package        PkgState `json:"package"`
+	InstallToken   string   `json:"install_token"`
+	MemberPassword string   `json:"member_password"`
 }
 
 type UserState struct {

@@ -13,6 +13,7 @@ import (
 	"time"
 
 	"github.com/KLabTools/emlauncher/go/internal/config"
+	"github.com/KLabTools/emlauncher/go/internal/random"
 )
 
 // Local はローカルディスクに保存する (PHP 版の LocalFile と同じ配置).
@@ -55,11 +56,14 @@ func (l *Local) SaveFile(_ context.Context, key, srcPath string) error {
 		return err
 	}
 	defer src.Close()
-	tmp, err := os.CreateTemp(filepath.Dir(p), ".tmp-*")
+	// 書き込み途中のファイルが見えないよう, 一時ファイルに書いてから rename する.
+	// パーミッションは PHP 版 (copy) と同じく 0644 & ^umask. chmod は所有者以外では失敗するので使わない.
+	tmpPath := filepath.Join(filepath.Dir(p), ".tmp-"+random.String(16))
+	tmp, err := os.OpenFile(tmpPath, os.O_WRONLY|os.O_CREATE|os.O_EXCL, 0o644)
 	if err != nil {
 		return err
 	}
-	defer os.Remove(tmp.Name())
+	defer os.Remove(tmpPath)
 	if _, err := io.Copy(tmp, src); err != nil {
 		tmp.Close()
 		return err
@@ -67,10 +71,7 @@ func (l *Local) SaveFile(_ context.Context, key, srcPath string) error {
 	if err := tmp.Close(); err != nil {
 		return err
 	}
-	if err := os.Chmod(tmp.Name(), 0o644); err != nil {
-		return err
-	}
-	return os.Rename(tmp.Name(), p)
+	return os.Rename(tmpPath, p)
 }
 
 func (l *Local) Rename(_ context.Context, srcKey, dstKey string) error {

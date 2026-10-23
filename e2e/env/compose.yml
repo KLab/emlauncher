@@ -73,11 +73,16 @@ services:
       context: ../../go
       dockerfile: ../e2e/env/go/Dockerfile
     image: emlauncher-e2e-go
+    # 移行リハーサルでは Apache と同じユーザ (www-data) で動かす
+    user: "${E2E_GO_USER:-0:0}"
     environment:
       E2E_ENV: ${E2E_ENV:-e2e_local}
       TZ: ${E2E_TZ:-Asia/Tokyo}
     volumes:
-      - ./go:/etc/emlauncher:ro
+      # 移行リハーサルでは PHP 版の設定から作った設定を使う
+      - ${E2E_GO_CONFIG_DIR:-./go}:/etc/emlauncher:ro
+      # PHP 版と同じホストにある DB の authfile (PHP 版のイメージの /dbauth と同じ内容)
+      - ./go/dbauth:/dbauth:ro
       - ../.work/files:/var/www/emlauncher
       - ../.work/mailbox:/mailbox
     ports:
