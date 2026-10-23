@@ -1,0 +1,40 @@
+{{define "content"}}
+<div class="page-header">
+  <h2 class="headding">Own Applications</h2>
+</div>
+
+<div class="row">
+{{range $i, $app := .Data.Apps}}{{if and $i (eq (mod $i 2) 0)}}
+</div>
+<div class="row">
+{{end}}
+<div class="media app-list-item col-md-6">
+  <p class="pull-left">
+    <a href="{{$.URL (printf "/app?id=%d" $app.ID)}}">
+      <img class="app-icon-sm media-object img-rounded" src="{{$app.IconURL}}">
+    </a>
+  </p>
+  <div class="media-body">
+    <h3 class="media-hedding">
+      <a href="{{$.URL (printf "/app?id=%d" $app.ID)}}">{{$app.Title}}</a>
+      <small title="Installed by {{$app.InstallUsers}} users" class="badge">{{$app.InstallUsers}}</small>
+    </h3>
+    <p>
+      {{$app.TimeLabel}}: {{$app.Time}}
+{{if eq $app.Badge "UPDATE"}}
+      <span class="label label-success">UPDATE</span>
+{{else if eq $app.Badge "NEW"}}
+      <span class="label label-primary">NEW</span>
+{{end}}
+    </p>
+  </div>
+</div>
+{{end}}
+</div>
+
+<script type="text/javascript">
+$('.app-list-item').on('click',function(event){
+  $('a',this)[0].click();
+});
+</script>
+{{end}}

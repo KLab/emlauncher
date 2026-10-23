@@ -7,28 +7,43 @@ import (
 	"log/slog"
 	"net/http"
 
-	"github.com/jmoiron/sqlx"
-
-	"github.com/KLabTools/emlauncher/go/internal/cache"
-	"github.com/KLabTools/emlauncher/go/internal/clock"
 	"github.com/KLabTools/emlauncher/go/internal/config"
+	"github.com/KLabTools/emlauncher/go/internal/core"
+	"github.com/KLabTools/emlauncher/go/internal/session"
 	"github.com/KLabTools/emlauncher/go/internal/storage"
 )
 
 type Server struct {
-	Config  *config.Config
-	DB      *sqlx.DB
-	Cache   *cache.Cache
-	Storage storage.Storage
-	Clock   *clock.Clock
-	Log     *slog.Logger
+	Config *config.Config
+	Core   *core.Core
+	Log    *slog.Logger
+
+	templates  templates
+	routeTable map[string]uiRoute
+	sessions   *session.Store
+}
+
+// Init はテンプレートの読み込みなどを行う. Handler より前に呼ぶ.
+func (s *Server) Init() error {
+	var err error
+	if s.templates, err = loadTemplates(); err != nil {
+		return err
+	}
+	s.sessions, err = session.NewStore(s.Config.Session.Secret, func(r *http.Request) bool {
+		return requestScheme(r) == "https"
+	})
+	if err != nil {
+		return err
+	}
+	s.routeTable = s.uiRoutes()
+	return nil
 }
 
 func (s *Server) Handler() http.Handler {
 	mux := http.NewServeMux()
 	mux.HandleFunc("/health", s.health)
 
-	if l, ok := s.Storage.(*storage.Local); ok && s.Config.LocalFile.Serve {
+	if l, ok := s.Core.Storage.(*storage.Local); ok && s.Config.LocalFile.Serve {
 		mux.Handle(l.URLPrefix()+"/", l.Handler())
 	}
 

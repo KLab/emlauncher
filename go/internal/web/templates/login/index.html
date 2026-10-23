@@ -1,0 +1,45 @@
+{{define "content"}}
+<div id="signin-dialog" class="col-sm-6 col-sm-offset-3">
+  <div class="panel panel-primary">
+    <div class="panel-heading">
+      <h2 class="panel-title">Login</h2>
+    </div>
+
+    <div class="panel-body">
+      {{if .Data.EnablePassword}}
+      <form class="form-horizontal" method="post" action="{{.URL "/login/password"}}">
+
+        <div class="form-group">
+          <label class="control-label col-sm-3" for="email">email</label>
+          <div class="col-sm-9">
+            <input class="form-control" type="text" id="email" name="email">
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="control-label col-sm-3" for="password">password</label>
+          <div class="col-sm-9">
+            <input class="form-control" type="password" id="password" name="password">
+          </div>
+        </div>
+        <div class="col-sm-9 col-sm-offset-3">
+          <input type="submit" class="btn btn-primary" value="Login">
+          <a class="btn btn-link" href="{{.URL "/login/password_reminder"}}">forgot password</a>
+        </div>
+      </form>
+      {{end}}
+
+      {{if .Data.EnableGoogleAuth}}
+      <div class="google-login col-sm-10 col-sm-offset-1">
+        <a class="btn btn-primary col-xs-12" href="{{.URL "/login/google"}}">Login with google account</a>
+      </div>
+      {{end}}
+
+      {{if .Data.EnableAzureADAuth}}
+      <div class="azuread-login col-sm-10 col-sm-offset-1">
+        <a class="btn btn-primary col-xs-12" href="{{.URL "/login/azuread"}}">Login with AzureAD account</a>
+      </div>
+      {{end}}
+    </div>
+  </div>
+</div>
+{{end}}

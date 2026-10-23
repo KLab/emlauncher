@@ -1,0 +1,44 @@
+{{define "content"}}
+{{template "package_header" .}}
+{{$pkg := .Data.Package}}
+
+<div class="row">
+  <div class="col-sm-4 col-md-3 hidden-xs">
+    {{template "pkg_infopanel" .}}
+  </div>
+
+  <div class="col-xs-12 col-sm-8 col-md-9">
+
+{{template "package_title" .}}
+
+    <div class="col-md-8 col-md-offset-1">
+      <div class="panel panel-danger">
+        <div class="panel-heading">
+          <h2 class="panel-title">Delete Attached File</h2>
+        </div>
+        <div class="panel-body">
+          <p>次の添付ファイルを削除します。この操作は取り消せません。</p>
+          <ul>
+            <li>{{.Data.Attached.OriginalFileName}}</li>
+          </ul>
+          <p>本当に削除しますか？</p>
+          <div class="text-center">
+            <form method="post" action="{{$.URL "/package/attach_delete"}}">
+              <input type="hidden" name="id" value="{{$pkg.ID}}">
+              <input type="hidden" name="attached_id" value="{{.Data.Attached.ID}}">
+              <input type="hidden" name="token" value="{{.Data.Token}}">
+              <button class="btn btn-danger"><i class="fa fa-trash-o"></i> Delete</button>
+              <a class="btn btn-default" href="{{$.URL (printf "/package?id=%d" $pkg.ID)}}"><i class="fa fa-times"></i> Cancel</a>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<div class="visible-xs">
+  {{template "pkg_infopanel" .}}
+</div>
+{{end}}

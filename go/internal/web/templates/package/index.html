@@ -1,0 +1,186 @@
+{{define "content"}}
+{{template "package_header" .}}
+{{$app := .Data.App}}{{$pkg := .Data.Package}}
+
+<div class="row">
+  <div class="col-sm-4 col-md-3 hidden-xs">
+    {{template "pkg_infopanel" .}}
+  </div>
+
+  <div class="col-xs-12 col-sm-8 col-md-9">
+
+    <div class="row">
+      <div class="col-xs-7">
+        <h3>
+          <a href="{{$.URL (printf "/package?id=%d" $pkg.ID)}}">
+            {{template "platform_icon" $pkg}}
+            {{$pkg.Title}}
+          </a>
+{{if $pkg.Protect}}
+          <i class="fa fa-lock"></i>
+{{end}}
+        </h3>
+        <div id="description">
+          <div class="read-more">
+            <a class="badge">more...</a>
+          </div>
+          <p>
+            {{nl2br $pkg.Description}}
+          </p>
+        </div>
+      </div>
+      <div class="col-xs-5">
+{{if $pkg.InstalledAt}}
+        <a href="{{$.URL $pkg.InstallURL}}" class="btn btn-success col-xs-12"><i class="fa fa-check"></i> Installed</a>
+        <dl id="installed-date">
+          <dt>Instaled at</dt>
+          <dd>{{$pkg.InstalledAt}}</dd>
+        </dl>
+{{else}}
+        <a href="{{$.URL $pkg.InstallURL}}" class="btn btn-primary col-xs-12"><i class="fa fa-download"></i> Install</a>
+{{end}}
+      </div>
+    </div>
+
+    <p>
+{{if $pkg.SizeWarned}}
+      <span class="label label-danger">Over {{$pkg.SizeLimitMB}} MB</span>
+{{end}}
+{{range $pkg.Tags}}
+      <span class="label label-default">{{.Name}}</span>
+{{end}}
+    </p>
+
+    <dl class="dl-horizontal">
+      <dt>Platform</dt>
+      <dd>{{template "platform_icon_name" $pkg}}</dd>
+{{if $pkg.Identifier}}
+      <dt>Bundle ID</dt>
+      <dd>{{$pkg.Identifier}}</dd>
+{{end}}
+      <dt>Original name</dt>
+      <dd>{{$pkg.OriginalName}}</dd>
+      <dt>File size</dt>
+      <dd>{{or $pkg.FileSize "-"}}</dd>
+      <dt>Install user</dt>
+{{if $app.IsOwner}}
+      <dd>
+        <div class="dropdown">
+          <a class="dropdown-toggle" id="install-user-count" data-toggle="dropdown">
+            {{len .Data.InstallUsers}}
+          </a>
+          <ul class="dropdown-menu" role="menu" aria-labelledby="install-user-count">
+{{range .Data.InstallUsers}}
+            <li role="presentation"><a role="menuitem" tabindex="-1">{{.}}</a></li>
+{{end}}
+          </ul>
+        </div>
+      </dd>
+{{else}}
+      <dd>{{len .Data.InstallUsers}}</dd>
+{{end}}
+      <dt>Uploaded</dt>
+      <dd>{{$pkg.Created}}</dd>
+      <dt>Owners</dt>
+{{range $app.Owners}}
+        <dd><a href="mailto:{{.}}">{{.}}</a></dd>
+{{end}}
+    </dl>
+
+    <div class="col-xs-12 col-sm-9">
+      <p class="text-center">
+        <a class="btn btn-default" href="{{$.URL (printf "/package/create_token?id=%d" $pkg.ID)}}"><i class="fa fa-bolt"></i> Create Install Token</a>&nbsp;
+{{if $app.IsOwner}}
+        <a class="btn btn-default" href="{{$.URL (printf "/package/create_guestpass?id=%d" $pkg.ID)}}"><i class="fa fa-users"></i> Create GuestPass</a>
+{{end}}
+      </p>
+    </div>
+
+{{if $app.IsOwner}}
+      <div class="col-xs-12 col-sm-9">
+          <h3>GuestPass</h3>
+          <table class="table  table-striped table-bordered">
+            <thead>
+                <tr>
+                    <th>Expire date</th>
+                    <th>Install count</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+{{range .Data.GuestPasses}}
+                <tr>
+                    <td><a href="{{$.URL (printf "/package/guestpass?id=%d&guestpass_id=%d" .PackageID .ID)}}">{{.Expired}}</a></td>
+                    <td>{{.InstallCount}} installed</td>
+                    <td><a class="btn btn-default btn-xs" href="{{$.URL (printf "/package/expire_guestpass?id=%d&guestpass_id=%d" .PackageID .ID)}}">Expire</a></td>
+                </tr>
+{{end}}
+            </tbody>
+          </table>
+      </div>
+{{end}}
+
+    <div class="col-xs-12 col-sm-9">
+{{if .Data.Attached}}
+      <h3>Attached Files</h3>
+      <table id="attached-files" class="table table-hover">
+{{range .Data.Attached}}
+        <tr>
+          <td>
+            <div class="col-xs-12 col-md-8">{{.Name}}</div>
+            <div class="col-xs-12 col-md-4 text-center">{{.Size}}</div>
+          </td>
+          <td class="text-center">
+            <a class="btn btn-default" href="{{$.URL (printf "/package/attach_download?id=%d&attached_id=%d" $pkg.ID .ID)}}">
+              <span class="hidden-xs"><i class="fa fa-download"></i> Download</span>
+              <span class="visible-xs"><i class="fa fa-download"></i> DL</span>
+            </a>
+{{if $app.IsOwner}}
+            <a class="btn btn-danger" href="{{$.URL (printf "/package/attach_delete_confirm?id=%d&attached_id=%d" $pkg.ID .ID)}}"><i class="fa fa-trash-o"></i></a>
+{{end}}
+          </td>
+        </tr>
+{{end}}
+      </table>
+{{end}}
+{{if $app.IsOwner}}
+      <p>
+        <button id="attach-button" class="btn btn-default">
+          <i id="attach-icon" class="fa fa-upload"></i> Attache a File
+        </button>
+      </p>
+      <form id="attach-form" enctype="multipart/form-data" method="post" action="{{$.URL "/package/attach"}}">
+        <input type="hidden" name="id" value="{{$pkg.ID}}">
+        <input type="file" class="hidden" id="attach-file" name="file">
+      </form>
+{{end}}
+    </div>
+
+  </div>
+</div>
+
+<div class="visible-xs">
+  {{template "pkg_infopanel" .}}
+</div>
+
+<script type="text/javascript">
+$('#attach-button').on('click',function(event){
+  $('#attach-file').click();
+  return false;
+});
+
+$('#attach-file').on('change',function(event){
+  $('#attach-icon').removeClass('fa-upload').addClass('fa-spinner fa-pulse');
+  $('#attach-button').attr('disabled', true);
+  $('#attach-form').submit();
+  return false;
+});
+
+if($('#description').height()>200){
+  $('#description>.read-more').addClass('active');
+  $('#description>.read-more>a').on('click',function(event){
+    $('#description>.read-more').removeClass('active');
+  });
+}
+</script>
+{{end}}

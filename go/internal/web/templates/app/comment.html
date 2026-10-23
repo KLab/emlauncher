@@ -1,0 +1,86 @@
+{{define "content"}}
+{{template "app_header" .}}
+
+<div class="row">
+  <div class="col-sm-4 col-md-3 hidden-xs">
+    {{template "app_infopanel" .}}
+  </div>
+
+  <div class="col-xs-12 col-sm-8 col-md-9">
+
+    <div id="comment-form">
+      <form class="form-horizontal" method="post" action="{{$.URL "/app/comment_post"}}">
+        <div id="alert-nomessage" class="alert alert-danger hidden">
+          コメントが入力されていません
+        </div>
+        <input type="hidden" name="id" value="{{.Data.App.ID}}">
+        <label for="message" class="sr-only">Message</label>
+        <textarea name="message" class="form-control" rows="3"></textarea>
+        <div class="controls text-right">
+          <label for="package_id">Target package</label>
+{{if .Data.InstalledPackages}}
+          <select name="package_id" class="form-control">
+{{range .Data.InstalledPackages}}
+            <option value="{{.ID}}">
+              {{.PlatformName}} -
+              {{.Title}}</option>
+{{end}}
+          </select>
+{{else}}
+          <select name="package_id" class="form-control" disabled="disabled">
+            <option value="0" selected="selected">No package installed</option>
+          </select>
+{{end}}
+          <button name="submit" class="btn btn-primary"><i class="fa fa-pencil"></i> Comment</button>
+        </div>
+      </form>
+    </div>
+
+    <div id="comments">
+      <h3>{{.Data.CommentCount}} comments</h3>
+      <ul class="list-group">
+{{range .Data.Comments}}
+        <li class="list-group-item" id="comment-{{.Number}}">
+          <dl>
+            <dt><a href="{{$.URL .PageLink}}">{{.Number}}</a></dt>
+            <dd>{{.Message}}</dd>
+          </dl>
+          <div class="text-right">
+{{if .Package}}
+            <a href="{{$.URL (printf "/package?id=%d" .Package.ID)}}">
+              {{template "platform_icon" .Package}} {{.Package.Title}}</a>
+{{else}}
+            <span>No package installed</span>
+{{end}}
+            ({{.Created}})
+          </div>
+        </li>
+{{end}}
+      </ul>
+    </div>
+
+    <div class="text-center">
+      {{template "paging" .Data.Paging}}
+    </div>
+
+  </div>
+</div>
+
+<div class="visible-xs">
+  {{template "app_infopanel" .}}
+</div>
+
+<script type="text/javascript">
+
+$('#comment-form form').submit(function(){
+ var msg = $('textarea[name="message"]',this).val();
+ if(msg.length==0){
+   $('#alert-nomessage').removeClass('hidden');
+   return false;
+ }
+ return true;
+});
+
+
+</script>
+{{end}}

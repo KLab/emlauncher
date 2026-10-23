@@ -1,0 +1,167 @@
+{{/* 共通のブロック. PHP 版の data/blocks/ に対応する. */}}
+
+{{/* platform_icon: . は pkgView. */}}
+{{define "platform_icon"}}<i class="fa {{.PlatformIcon}}"></i>{{end}}
+{{define "platform_icon_name"}}<i class="fa {{.PlatformIcon}}"></i> {{.PlatformName}}{{end}}
+
+{{/* アプリの見出し. . は page, .Data.App は appView. */}}
+{{define "app_header"}}
+<div class="media">
+  <p class="pull-left">
+    <a href="{{$.URL (printf "/app?id=%d" .Data.App.ID)}}">
+      <img class="app-icon media-object img-rounded" src="{{.Data.App.IconURL}}">
+    </a>
+  </p>
+  <div class="media-body">
+    <h2 class="media-hedding"><a href="{{$.URL (printf "/app?id=%d" .Data.App.ID)}}">{{.Data.App.Title}}</a></h2>
+    <p>{{nl2br .Data.App.Description}}</p>
+  </div>
+</div>
+{{end}}
+
+{{/* app_infopanel: . は page, .Data.App は appView. */}}
+{{define "app_infopanel"}}
+{{$app := .Data.App}}
+<div class="list-group">
+{{if $app.IsOwner}}
+  <div class="list-group-item">
+    <ul class="nav nav-pills nav-stacked">
+      <li{{if eq $.Action "upload"}} class="active"{{end}}>
+        <a href="{{$.URL (printf "/app/upload?id=%d" $app.ID)}}"><i class="fa fa-upload"></i> Upload</a>
+      </li>
+      <li{{if eq $.Action "preferences"}} class="active"{{end}}>
+        <a href="{{$.URL (printf "/app/preferences?id=%d" $app.ID)}}"><i class="fa fa-wrench"></i> Preferences</a>
+      </li>
+    </ul>
+  </div>
+{{end}}
+  <div class="list-group-item">
+    <dl>
+{{if $app.LastUpload}}
+      <dt>last upload</dt>
+      <dd>{{$app.LastUpload}}</dd>
+{{end}}
+{{if $app.LastCommented}}
+      <dt>last comment</dt>
+      <dd>{{$app.LastCommented}}</dd>
+{{end}}
+      <dt>created</dt>
+      <dd>{{$app.Created}}</dd>
+      <dt>install user</dt>
+{{if $app.IsOwner}}
+      <dd>
+        <div class="dropdown">
+          <a class="dropdown-toggle" id="install-user-count" data-toggle="dropdown">
+            {{len $app.InstallUsers}}
+          </a>
+          <ul class="dropdown-menu" role="menu" aria-labelledby="install-user-count">
+{{range $app.InstallUsers}}
+            <li role="presentation"><a role="menuitem" tabindex="-1">{{.}}</a></li>
+{{end}}
+          </ul>
+        </div>
+      </dd>
+{{else}}
+      <dd>{{len $app.InstallUsers}}</dd>
+{{end}}
+{{if $app.Repository}}
+      <dt>repository</dt>
+{{if $app.RepoHost}}
+      <dd>
+        <a target="_blank" href="{{$app.Repository}}" class="repository-link">
+{{if $app.RepoIcon}}
+          <i class="fa {{$app.RepoIcon}}"></i>
+          {{$app.RepoPath}}
+{{else}}
+          {{$app.RepoHost}}/{{$app.RepoPath}}
+{{end}}
+        </a>
+      </dd>
+{{else}}
+      <dd><input type="text" class="form-control" readonly="readonly" value="{{$app.Repository}}"></dd>
+{{end}}
+{{end}}
+      <dt>owners</dt>
+{{range $app.Owners}}
+      <dd><a href="mailto:{{.}}">{{.}}</a></dd>
+{{end}}
+    </dl>
+  </div>
+  <div class="list-group-item">
+    <div class="text-center">
+      <p>link to this app</p>
+        <img src="{{$.QR (printf "/app?id=%d" $app.ID) 150}}">
+    </div>
+  </div>
+</div>
+{{end}}
+
+{{/* パッケージの見出し (アプリのアイコンとパッケージ名). . は page. */}}
+{{define "package_header"}}
+{{$app := .Data.App}}{{$pkg := .Data.Package}}
+<div class="media">
+  <p class="pull-left">
+    <a href="{{$.URL (printf "/app?id=%d" $app.ID)}}">
+      <img class="app-icon media-object img-rounded" src="{{$app.IconURL}}">
+    </a>
+  </p>
+  <div class="media-body">
+    <h2 class="media-hedding"><a href="{{$.URL (printf "/app?id=%d" $app.ID)}}">{{$app.Title}}</a></h2>
+  </div>
+</div>
+{{end}}
+
+{{define "package_title"}}
+{{$pkg := .Data.Package}}
+    <h3>
+      <a href="{{$.URL (printf "/package?id=%d" $pkg.ID)}}">
+        {{template "platform_icon" $pkg}}
+        {{$pkg.Title}}
+      </a>
+{{if $pkg.Protect}}
+      <i class="fa fa-lock"></i>
+{{end}}
+    </h3>
+{{end}}
+
+{{/* pkg_infopanel: . は page. */}}
+{{define "pkg_infopanel"}}
+{{$app := .Data.App}}{{$pkg := .Data.Package}}
+<div class="list-group">
+{{if $app.IsOwner}}
+  <div class="list-group-item">
+    <ul class="nav nav-pills nav-stacked">
+      <li{{if eq $.Action "edit"}} class="active"{{end}}>
+        <a href="{{$.URL (printf "/package/edit?id=%d" $pkg.ID)}}"><i class="fa fa-pencil"></i> Edit</a>
+      </li>
+      <li{{if eq $.Action "delete_confirm"}} class="active"{{end}}>
+        <a href="{{$.URL (printf "/package/delete_confirm?id=%d" $pkg.ID)}}"><i class="fa fa-trash-o"></i> Delete</a>
+      </li>
+    </ul>
+  </div>
+{{end}}
+  <div class="list-group-item">
+    <div class="text-center">
+      <p>link to this package</p>
+      <img src="{{$.QR (printf "/package?id=%d" $pkg.ID) 150}}">
+    </div>
+  </div>
+</div>
+{{end}}
+
+{{/* paging: . は pagingView. */}}
+{{define "paging"}}
+<ul class="pagination  pagination-sm">
+{{range .Items}}
+{{if .Omission}}
+	<li class="disabled omission">
+		<span>..</span>
+	</li>
+{{else if .Current}}
+		<li class="disabled active"><span>{{.Num}}</span></li>
+{{else}}
+		<li{{if .Active}} class="active"{{end}}><a href="{{.URL}}">{{.Num}}</a></li>
+{{end}}
+{{end}}
+</ul>
+{{end}}

@@ -1,0 +1,210 @@
+{{define "content"}}
+{{template "app_header" .}}
+
+<div class="row">
+  <div class="col-sm-4 col-md-3 hidden-xs">
+    {{template "app_infopanel" .}}
+  </div>
+
+
+  <div class="col-xs-12 col-sm-8 col-md-9">
+
+    <div id="comments">
+      <div class="row">
+        <div class="col-xs-6">
+          <h3>{{.Data.CommentCount}} comments</h3>
+        </div>
+        <div class="col-xs-6 text-right">
+          <a href="{{$.URL (printf "/app/comment?id=%d" .Data.App.ID)}}" class="btn btn-sm btn-default"><i class="fa fa-pencil"></i> write a comment</a>
+        </div>
+      </div>
+{{if .Data.CommentCount}}
+      <ul class="list-group">
+{{range .Data.TopComments}}
+        <li class="list-group-item">
+          <dl>
+            <dt><a href="{{$.URL (printf "/app/comment?id=%d#comment-%d" $.Data.App.ID .Number)}}">{{.Number}}</a></dt>
+            <dd>{{.Message}}</dd>
+          </dl>
+          <div class="text-right">
+{{if .Package}}
+            <a href="{{$.URL (printf "/package?id=%d" .Package.ID)}}">
+              {{template "platform_icon" .Package}} {{.Package.Title}}</a>
+{{else}}
+            <span>No package installed</span>
+{{end}}
+            ({{.Created}})
+          </div>
+        </li>
+{{end}}
+      </ul>
+      <div class="text-right">
+        <a href="{{$.URL (printf "/app/comment?id=%d#comments" .Data.App.ID)}}">read more...</a>
+      </div>
+{{end}}
+    </div>
+
+    <ul id="pf-nav-tabs" class="nav nav-tabs">
+      <li{{if eq .Data.Pf "android"}} class="active"{{end}} id="android">
+        <a href="?id={{.Data.App.ID}}&pf=android">Android</a>
+      </li>
+      <li{{if eq .Data.Pf "ios"}} class="active"{{end}} id="ios">
+        <a href="?id={{.Data.App.ID}}&pf=ios">iOS</a>
+      </li>
+      <li{{if eq .Data.Pf "other"}} class="active"{{end}} id="other">
+        <a href="?id={{.Data.App.ID}}&pf=other">Other</a>
+      </li>
+      <li{{if eq .Data.Pf "all"}} class="active"{{end}} id="all">
+        <a href="?id={{.Data.App.ID}}&pf=all">All</a>
+      </li>
+    </ul>
+
+    <div id="tag-filter">
+      <a id="tag-filter-toggle" class="pull-right badge"><i class="fa fa-angle-double-{{if .Data.FilterOpen}}up{{else}}down{{end}}"></i></a>
+      <div id="tag-filter-body" style="display: {{if .Data.FilterOpen}}block{{else}}none{{end}}">
+{{range .Data.Tags}}
+        <button id="{{.ID}}" class="btn btn-default {{if .Active}}on active{{end}}" data-toggle="button">
+        {{.Name}}</button>
+{{end}}
+      </div>
+    </div>
+
+    <table id="package-list" class="table table-hover">
+{{range $pkg := .Data.Packages}}
+      <tr>
+        <td class="text-center logo">
+          {{template "platform_icon" $pkg}}
+        </td>
+        <td class="package-list-item-info">
+          <div class="row">
+            <div class="col-xs-12 col-md-7">
+{{if $pkg.Protect}}
+              <i class="fa fa-lock"></i>
+{{end}}
+              <a class="title" href="{{$.URL (printf "/package?id=%d" $pkg.ID)}}">{{$pkg.Title}}</a>
+{{if $pkg.Description}}
+              <p class="text-muted description">{{$pkg.ShortDescription}}</p>
+{{end}}
+{{if $pkg.Identifier}}
+              <span class="info hidden-xs hidden-sm">{{$pkg.Identifier}}</span>
+{{end}}
+              <span class="info hidden-xs hidden-sm">{{or $pkg.FileSize "--"}}, {{$pkg.CreatedShort}}</span>
+            </div>
+            <div class="col-xs-12 col-md-5">
+{{if $pkg.SizeWarned}}
+              <span class="label label-danger">Over {{$pkg.SizeLimitMB}} MB</span>
+{{end}}
+{{range $pkg.Tags}}
+              <span class="label label-default" data="{{.Name}}">{{.Name}}</span>
+{{end}}
+            </div>
+          </div>
+{{if $pkg.Identifier}}
+          <span class="info visible-xs visible-sm">{{$pkg.Identifier}}</span>
+{{end}}
+          <span class="info visible-xs visible-sm">{{or $pkg.FileSize "--"}}</span>
+          <span class="info visible-xs visible-sm">{{$pkg.CreatedShort}}</span>
+        </td>
+        <td class="text-center">
+{{if $pkg.InstalledAt}}
+          <a class="btn btn-success install-link col-xs-12" href="{{$.URL $pkg.InstallURL}}"><i class="fa fa-check"></i> Installed</a>
+{{else}}
+          <a class="btn btn-primary install-link col-xs-12" href="{{$.URL $pkg.InstallURL}}"><i class="fa fa-download"></i> Install</a>
+{{end}}
+        </td>
+      </tr>
+{{end}}
+    </table>
+
+    <ul class="pager">
+{{if eq .Data.CurrentPage 1}}
+      <li class="previous disabled"><span>Previous</span></li>
+{{else}}
+      <li class="previous"><a href="{{.Data.PrevURL}}">Previous</a></li>
+{{end}}
+
+{{if .Data.HasNext}}
+      <li class="next"><a href="{{.Data.NextURL}}">Next</a></li>
+{{else}}
+      <li class="next disabled"><span>Next</span></li>
+{{end}}
+    </ul>
+
+  </div>
+</div>
+
+<div class="visible-xs">
+  {{template "app_infopanel" .}}
+</div>
+
+<script type="text/javascript">
+
+$('#tag-filter-toggle').on('click',function(){
+  $down = $('i.fa-angle-double-down');
+  $up = $('i.fa-angle-double-up');
+  if($down){
+    $down.removeClass('fa-angle-double-down').addClass('fa-angle-double-up');
+  }
+  if($up){
+    $up.removeClass('fa-angle-double-up').addClass('fa-angle-double-down');
+  }
+  $('.pager>li>a').each(function(){
+    if($up.length>0){
+      this.href = this.href.replace(/&filter_open=1/,'');
+    }
+    else{
+      this.href = this.href + '&filter_open=1';
+    }
+  });
+
+  $('#tag-filter-body').slideToggle('fast');
+});
+
+function get_url_param_tabs() {
+  var $active_tags = $('#tag-filter-body>button.on');
+  if ($active_tags.length>0) {
+    var tags = '';
+    $active_tags.each(function(i){tags += $active_tags[i].id + '+';});
+    return '&tags=' + tags.substring(0, tags.length - 1);
+  } else {
+    return '';
+  }
+}
+
+function compose_url() {
+  var pf = 'all';
+  var $active_pf_tabs = $('#pf-nav-tabs>li.active');
+  if ($active_pf_tabs.length>0) {
+    pf = $active_pf_tabs[0].id
+  }
+  var of = '';
+  if ($('i.fa-angle-double-up').length>0) {
+    of = '&filter_open=1';
+  }
+  return "id={{$.Data.App.ID}}&pf=" + pf + get_url_param_tabs() + of;
+}
+
+// filter by tag
+$('#tag-filter-body>button').on('click',function(){
+  if($(this).hasClass('on')){
+    $(this).removeClass('on');
+  }
+  else{
+    $(this).addClass('on');
+  }
+  location.href = '?' + compose_url();
+});
+
+$('.package-list-item-info').on('click',function(event){
+  $('a',this)[0].click();
+});
+
+$('#pf-nav-tabs>li').on('click', function(event){
+  if ($('a', this)) {
+    location.href = $('a', this)[0].href + get_url_param_tabs();
+    event.preventDefault();
+  }
+});
+
+</script>
+{{end}}

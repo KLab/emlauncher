@@ -1,0 +1,60 @@
+{{define "content"}}
+<div class="page-header row">
+	<h2 class="headding col-xs-12 col-sm-8">EMLauncher
+		<small class="subtitle">Only my APP can shoot it.</small>
+	</h2>
+	<div id="create-app-button" class="hidden-xs col-sm-4 text-right">
+		<a class="btn btn-default" href="{{$.URL "/app/new"}}"><i class="fa fa-plus"></i> New Application</a>
+	</div>
+</div>
+
+<div class="row">
+{{range $i, $app := .Data.Apps}}{{if and $i (eq (mod $i 2) 0)}}
+</div>
+<div class="row">
+{{end}}
+<div class="media app-list-item col-md-6">
+  <p class="pull-left">
+    <a href="{{$.URL (printf "/app?id=%d" $app.ID)}}">
+      <img class="app-icon-sm media-object img-rounded" src="{{$app.IconURL}}">
+    </a>
+  </p>
+  <div class="media-body">
+    <h3 class="media-hedding">
+      <a href="{{$.URL (printf "/app?id=%d" $app.ID)}}">{{$app.Title}}</a>
+{{if $app.Comments}}
+     <div class="balloon">
+       <div title="{{$app.Comments}} comments">{{$app.Comments}}</div>
+     </div>
+{{end}}
+      <small title="Installed by {{$app.InstallUsers}} users" class="badge">{{$app.InstallUsers}}</small>
+    </h3>
+    <p>
+      {{$app.TimeLabel}}: {{$app.Time}}
+{{if eq $app.Badge "UPDATE"}}
+      <span class="label label-success">UPDATE</span>
+{{else if eq $app.Badge "NEW"}}
+      <span class="label label-primary">NEW</span>
+{{end}}
+    </p>
+  </div>
+</div>
+{{end}}
+</div>
+
+<div id="create-app-button" class="col-xs-12 visible-xs text-left">
+  <a class="btn btn-default" href="{{$.URL "/app/new"}}"><i class="fa fa-plus"></i> New Application</a>
+</div>
+
+<div class="text-center">
+  {{template "paging" .Data.Paging}}
+</div>
+
+<script type="text/javascript">
+
+$('.app-list-item').on('click',function(event){
+  $('a',this)[0].click();
+});
+
+</script>
+{{end}}

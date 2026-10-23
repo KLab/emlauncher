@@ -1,0 +1,31 @@
+{{define "content"}}
+<div class="page-header">
+    <h2 class="headding">GuestPass List</h2>
+</div>
+
+<div>
+    <table id="app-list" class="table table-hover">
+
+        <tr class="hidden-xs">
+            <th></th>
+            <th>Application Name</th>
+            <th>expire date</th>
+            <th>install count</th>
+            <th>delete</th>
+        </tr>
+{{range .Data.GuestPasses}}
+        <tr>
+            <td class="text-center icon">
+                <a href="{{$.URL (printf "/app?id=%d" .AppID)}}"><img src="{{.IconURL}}"></a>
+            </td>
+            <td>
+                <a class="title" href="{{$.URL (printf "/app?id=%d" .AppID)}}">{{.AppTitle}}</a>
+            </td>
+            <td>{{.Expired}}</td>
+            <td>{{.InstallCount}} installed</td>
+            <td><a class="btn btn-default btn-xs" href="{{$.URL (printf "/package/expire_guestpass?id=%d&guestpass_id=%d" .PackageID .ID)}}">Expire</a></td>
+        </tr>
+{{end}}
+    </table>
+</div>
+{{end}}

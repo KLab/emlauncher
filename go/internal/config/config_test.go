@@ -47,9 +47,9 @@ func TestAuthfile(t *testing.T) {
 
 func TestErrors(t *testing.T) {
 	for _, y := range []string{
-		"storage_class: S3\n",                          // bucket 無し
-		"storage_class: LocalFile\n",                   // path 無し
-		"storage_class: FTP\n",                         // 不明
+		"storage_class: S3\n",        // bucket 無し
+		"storage_class: LocalFile\n", // path 無し
+		"storage_class: FTP\n",       // 不明
 		"storage_class: LocalFile\nlocal_file: {path: /tmp}\ntimezone: Mars/Base\n",
 		"storage_class: LocalFile\nlocal_file: {path: /tmp}\nunknown_key: 1\n", // typo を検出する
 	} {

@@ -1,0 +1,82 @@
+{{define "layout"}}<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="utf-8">
+    <title>{{.TitlePrefix}}EMLauncher</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootswatch/3.3.7/spacelab/bootstrap.min.css" rel="stylesheet" media="screen">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/js/bootstrap.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.3.0/css/font-awesome.min.css">
+    <link rel="stylesheet" href="{{.URL "/css/customize.2.css"}}" type="text/css">
+    <link rel="apple-touch-icon" href="{{.URL "/apple-touch-icon.png"}}">
+    <link rel="shortcut icon" href="{{.URL "/favicon.ico"}}">
+  </head>
+  <body>
+
+    <div class="navbar navbar-inverse" role="navigation">
+      <div class="navbar-header">
+        <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-ex1-collapse">
+          <span class="sr-only">Toggle navigation</span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+        </button>
+        <a href="{{.URL "/"}}" class="navbar-brand">{{.TitlePrefix}}<span>EMLauncher</span></a>
+      </div>
+      <div class="collapse navbar-collapse navbar-ex1-collapse">
+{{if .LoginUser}}
+        <ul class="nav navbar-nav">
+          <li><a href="{{.URL "/"}}">Top</a></li>
+          <li class="dropdown">
+            <a href="#" class="dropdown-toggle" data-toggle="dropdown">My apps <b class="caret"></b></a>
+            <ul class="dropdown-menu">
+              <li><a href="{{.URL "/myapps/installed"}}">Installed Apps</a></li>
+              <li><a href="{{.URL "/myapps/own"}}">Own Apps</a></li>
+            </ul>
+          </li>
+          <li class="dropdown">
+            <a href="#" class="dropdown-toggle" data-toggle="dropdown">Documents <b class="caret"></b></a>
+            <ul class="dropdown-menu">
+              <li><a href="{{.URL "/doc/api"}}">API</a></li>
+              <li><a href="{{.URL "/doc/keystore"}}">Keystore</a></li>
+            </ul>
+          </li>
+        </ul>
+
+        <ul class="nav navbar-nav navbar-right">
+          <li class="dropdown">
+            <a href="#" class="dropdown-toggle" data-toggle="dropdown">{{.LoginUser}} <b class="caret"></b></a>
+            <ul class="dropdown-menu">
+              <li><a href="{{.URL "/guestpass/list"}}">GuestPass history</a></li>
+              <li><a href="{{.URL "/logout"}}">Logout</a></li>
+            </ul>
+          </li>
+        </ul>
+{{else}}
+        <ul class="nav navbar-nav navbar-right">
+          <li><a href="{{.URL "/login"}}">Login</a></li>
+        </ul>
+{{end}}
+      </div>
+    </div>
+
+    <div id="{{.Module}}-{{.Action}}" class="container">
+{{template "content" .}}
+    </div>
+  </body>
+</html>
+{{end}}
+
+{{define "error"}}
+<div id="error-dialog" class="col-sm-6 col-sm-offset-3">
+  <div class="panel panel-danger">
+    <div class="panel-heading">
+      <h2 class="panel-title">Error</h2>
+    </div>
+    <div class="panel-body">
+      <p>{{.Data}}</p>
+    </div>
+  </div>
+</div>
+{{end}}

@@ -13,11 +13,15 @@ import (
 	"os/signal"
 	"syscall"
 	"time"
+	_ "time/tzdata" // tzdata の無い環境でも timezone を指定できるように
 
 	"github.com/KLabTools/emlauncher/go/internal/cache"
 	"github.com/KLabTools/emlauncher/go/internal/clock"
 	"github.com/KLabTools/emlauncher/go/internal/config"
+	"github.com/KLabTools/emlauncher/go/internal/core"
 	"github.com/KLabTools/emlauncher/go/internal/db"
+	"github.com/KLabTools/emlauncher/go/internal/mail"
+	"github.com/KLabTools/emlauncher/go/internal/pkgfile"
 	"github.com/KLabTools/emlauncher/go/internal/storage"
 	"github.com/KLabTools/emlauncher/go/internal/web"
 )
@@ -51,12 +55,21 @@ func run(configPath string, log *slog.Logger) error {
 		return err
 	}
 	srv := &web.Server{
-		Config:  cfg,
-		DB:      d,
-		Cache:   cache.New(cfg.Memcache.Host, cfg.Memcache.Port, cfg.CachePrefix),
-		Storage: st,
-		Clock:   clock.New(cfg.Location()),
-		Log:     log,
+		Config: cfg,
+		Core: &core.Core{
+			Config:     cfg,
+			DB:         d,
+			Storage:    st,
+			Clock:      clock.New(cfg.Location()),
+			Cache:      cache.New(cfg.Memcache.Host, cfg.Memcache.Port, cfg.CachePrefix),
+			Mail:       &mail.Sendmail{Command: cfg.Mail.Sendmail},
+			Bundletool: pkgfile.NewBundletool(cfg.APKFile),
+			Log:        log,
+		},
+		Log: log,
+	}
+	if err := srv.Init(); err != nil {
+		return err
 	}
 	hs := &http.Server{
 		Addr:              cfg.Listen,
