@@ -43,9 +43,11 @@ PHP 版 EMLauncher を Go に移植する計画。挙動の完全一致は求め
 | 用途 | キー | S3 ACL / ContentType |
 |---|---|---|
 | アイコン | `app-icons/{app_id}/{rand16}.png`（144×144 PNG） | public-read / image/png。URL は署名なし |
-| パッケージ | `package/{app_id}/{pkg_id}_{package.file_name}` | private / apk: `application/vnd.android.package-archive`、ipa・aab: `application/octet-stream` |
-| 添付ファイル | `package/{app_id}/{pkg_id}_{attached_id}_{attached_file.file_name}` | private / apk は上と同じ、それ以外はアップロード時の type |
-| 一時ファイル | `temp-data/{rand16}.{ext}` | private。確定時に copy + delete で正式キーへ移動 |
+| パッケージ | `package/{app_id}/{pkg_id}_{package.file_name}` | private / `application/octet-stream`（※） |
+| 添付ファイル | `package/{app_id}/{pkg_id}_{attached_id}_{attached_file.file_name}` | private / `application/octet-stream`（※） |
+| 一時ファイル | `temp-data/{rand16}.{ext}` | private / `application/octet-stream`（※）。確定時に copy + delete で正式キーへ移動 |
+
+※ コード上は apk に `application/vnd.android.package-archive` などを指定しているが、aws-sdk-php の MultipartUploader がその設定を読まず、アップロード元の一時ファイルに拡張子も無いため、実際にはすべて `application/octet-stream` で保存されている（シナリオテストで確認）。Go 版もこれに合わせる。正しい MIME にするかは別途判断する。
 
 - ダウンロードは 60 分有効の署名付き URL。`ResponseContentDisposition: attachment; filename*=UTF-8''{urlencode(original_file_name)}`
 - `aws.base_url` 指定時は path-style。署名付き URL の `base_url` 部分を `external_url` に置換して返す。
@@ -53,7 +55,7 @@ PHP 版 EMLauncher を Go に移植する計画。挙動の完全一致は求め
 
 ### 1.4 memcached
 
-キーの先頭には `{application_identifier}_{env}_{branch}_` が付く（mfwServerEnv::cachePrefix）。
+キーの先頭には `{application_identifier}_{env}_{branch}_` が付く（mfwServerEnv::cachePrefix）。`branch` は **PHP を置いたディレクトリ名**（`basename(APP_ROOT)`）。Go 版では設定 `cache_prefix` で明示し、移行時に PHP 版と同じ値にする。
 
 | キー | 値 | 有効期限 | Go 版での扱い |
 |---|---|---|---|
@@ -76,7 +78,7 @@ PHP のファイルセッション（Cookie 名 `{prefix}seskey`）。内容は�
 
 1. **DB スキーマとストレージのキー・ACL・ContentType は変えない。** 既存スキーマに合わせた手書き SQL で実装する。
 2. **URL とリクエストパラメータ名は変えない。** API は外部（CI）互換のため。画面の form パラメータ名も、シナリオテストを PHP 版と共用するため変えない。
-3. **API の JSON は形と型を合わせる。** `PDO::ATTR_STRINGIFY_FETCHES` 有効のため、PHP 版は数値カラムを文字列で返す（`"id":"12"`）。`protect` は bool。シナリオテストで PHP 版の型を固定し、Go 版も合わせる。
+3. **API の JSON はキーを合わせる。** 数値フィールド（id、file_size など）の型は、API ドキュメントの Caveats で「文字列か数値か不定」とされており、PHP 版も実際にエンドポイントによって混在している（アップロード直後は数値、DB から読んだものは文字列）。Go 版は文字列に統一する。`protect` は bool。
 4. **インストールトークン（memcached）は同じキーと形式で読み書きする。** 切替前に発行済みの URL を切替後も使えるようにするため。
 5. **セッションは署名付き Cookie にする。** ALB 配下で複数台になってもスティッキーセッションが不要になる。
 6. **OAuth のコールバック URL（`/login/google_callback`, `/login/azuread_callback`）は変えない。**
@@ -148,6 +150,14 @@ docs/go-migration/           本計画書・テスト・移行手順
 
 ### 3.5 PHP 版の既知の不具合（踏襲しない）
 
+シナリオテストで確認したもの（[TESTING.md](TESTING.md)）:
+
+- **`api/delete` で最新のパッケージを消すと、1 つ前のパッケージのファイルを消し、削除対象のファイルが残る**（`$pkg` 変数の再代入）。データ消失のバグで、本番にも「DB に行があるのにファイルが無い」パッケージと、行の無いファイルがありうる。Go 版はファイルが無いパッケージがあっても動くようにする。必要なら DB とストレージの突き合わせツールを用意する。
+- `api/delete` で最後のパッケージを消すと 500 を返す（DB からは消えている）。
+- app / package モジュールのエラーページがステータス 200 で返る（`build()` が headers を捨てる）。Go 版は 403 / 404 などを返す。
+
+コードを読んで見つけたもの:
+
 - `model/storage/S3.php` の catch 節が未定義の `$s3Client` を参照している。
 - `api/delete` が添付ファイルの実体を消していない（ストレージにゴミが残る）。
 - いくつかの更新処理で `$con` を渡し忘れている（共有 PDO のため偶然動いている）。
@@ -157,7 +167,7 @@ docs/go-migration/           本計画書・テスト・移行手順
 
 | # | 内容 | 完了の条件 |
 |---|---|---|
-| 0 | テスト基盤: PHP 版のシナリオテストと中間状態の作成・検証テスト（[TESTING.md](TESTING.md)）。各環境の TZ と storage_class を確認 | シナリオテストが PHP 版で全て通る |
+| 0 | テスト基盤: PHP 版のシナリオテストと移行リハーサル（[TESTING.md](TESTING.md)）。各環境の TZ・storage_class・memcached の接頭辞を確認 | シナリオテストと移行リハーサル（php → php）が PHP 版で全て通る（**テストは完了。環境の確認は未**） |
 | 1 | 基盤: config（TZ）、DB、Storage（S3 / LocalFile）、memcached、ログ、ALB 対応の URL 生成 | Storage のテストが S3（エミュレータ）と LocalFile の両方で通る |
 | 2 | パッケージ解析（IPA / APK / AAB）、アイコン変換 | テスト用フィクスチャで identifier が PHP 版と一致 |
 | 3 | API 7 本 + health + qr | API のシナリオテストが Go 版で通る |
@@ -166,10 +176,6 @@ docs/go-migration/           本計画書・テスト・移行手順
 | 6 | 画面の一覧作成 → 画面移植 → 新旧スクリーンショット確認、ajax、インストールフロー、ゲストパス、メール通知 | 全シナリオテストが Go 版で通る。iOS / Android 実機でインストールできる |
 | 7 | バッチ移植、移行手順書の作成、**移行リハーサルテスト**、全体切替（systemd 化）、PHP 撤去 | 移行リハーサルテストが通る。本番運用 |
 
-## 5. 移行手順（概要。フェーズ 7 で詳細化し、テストで検証する）
+## 5. 移行手順
 
-1. Go 版の設定ファイルを PHP の設定（`config/emlauncher_config.php`, `config/mfw_serverenv_config.php`）から作る。TZ を PHP と揃える。
-2. LocalFile 環境ではファイルの所有者・権限を確認する。
-3. Go を起動し、Apache のリバースプロキシ先を Go に切り替える（PHP は停止）。
-4. 利用者は再ログインする。発行済みのインストールトークン URL、ゲストパス URL はそのまま使える。
-5. cron の `delete_old_packages.php` を Go 版のバッチに差し替える。
+[MIGRATION.md](MIGRATION.md)（草案）。フェーズ 7 で詳細化し、移行リハーサル（`e2e/migration/rehearse.sh <storage> go`）で検証する。

@@ -1,0 +1,115 @@
+# Go 移植のテスト
+
+PHP 版に対して作ったシナリオテストを、そのまま Go 版にも流す。テストは HTTP で EMLauncher を操作し、DB・ストレージ（LocalFile / S3）・memcached・送信メールを直接確認する。URL、リクエストパラメータ名、DB の内容、ストレージのキーを「仕様」として固定するためのもの。
+
+```
+e2e/
+  env/                テスト環境 (docker compose: MySQL / memcached / LocalStack / PHP 版)
+  internal/fixture    テスト用の IPA / APK / AAB / PNG を生成
+  internal/harness    クライアント, DB・ストレージ・メールの確認, 高レベル操作
+  scenario/           シナリオテスト
+  migration/          移行リハーサル (seed → 移行 → verify)
+  cmd/genfixture      フィクスチャを書き出す (手動確認用)
+  .work/              作業領域 (git 管理外): LocalFile の保存先, メールボックス, 移行状態
+```
+
+`e2e/` は独立した Go モジュール。リポジトリ直下には composer の `vendor/` があり、ルートに `go.mod` を置くと Go の vendoring と衝突するため。
+
+## 必要なもの
+
+- Docker（WSL の Ubuntu 上の Docker で動作確認済み。Docker Desktop は使わない）
+- Go 1.23 以上
+- `composer install` と `git submodule update --init` 済みのリポジトリ（PHP 版を動かすため）
+
+WSL の Go が古い場合は、公式の方法でホーム以下に追加できる。
+
+```sh
+go install golang.org/dl/go1.23.4@latest && ~/go/bin/go1.23.4 download
+export PATH=$HOME/sdk/go1.23.4/bin:$PATH
+```
+
+## シナリオテスト
+
+```sh
+# PHP 版 (LocalFile) を起動. DB・ストレージ・メールボックスは毎回空になる
+e2e/env/up.sh local
+cd e2e && go test ./scenario/ -count=1
+
+# S3 (LocalStack) で
+e2e/env/up.sh s3
+cd e2e && E2E_STORAGE=s3 go test ./scenario/ -count=1
+```
+
+PHP 版に対しては LocalFile・S3 の両方で全シナリオが通る（2026-10-23 時点で 36 件）。
+
+### 主な環境変数
+
+| 変数 | 既定値 | 内容 |
+|---|---|---|
+| `E2E_TARGET` | `php` | `php` / `go`。PHP 版の既知バグの扱いを切り替える |
+| `E2E_BASE_URL` | `http://localhost:18081` | テスト対象の URL |
+| `E2E_DB_DSN` | `emlauncher:emlauncher@tcp(localhost:13306)/emlauncher?charset=utf8mb4` | DB |
+| `E2E_STORAGE` | `local` | `local` / `s3` |
+| `E2E_LOCAL_DIR` | `e2e/.work/files` | LocalFile の保存先（ホスト側のパス） |
+| `E2E_S3_ENDPOINT` / `E2E_S3_BUCKET` | `http://localhost:14566` / `emlauncher-e2e` | S3 |
+| `E2E_MAILBOX` | `e2e/.work/mailbox` | 送信メールの置き場所（1 通 1 ファイル、sendmail -t 形式） |
+| `E2E_MEMCACHED` / `E2E_CACHE_PREFIX` | `localhost:21211` / `emlauncher_e2e_{storage}_emlauncher_` | memcached とキーの接頭辞 |
+| `E2E_TZ` | `Asia/Tokyo` | テスト対象の TZ。DB の日時がこの TZ で「今」になっているかを確認する |
+| `E2E_BATCH_CMD` | PHP 版のバッチを docker で実行 | 古いパッケージ削除バッチ。`{keep}` が保持数に置き換わる |
+
+Go 版をテストするときは、Go 版を同じ DB・memcached・ストレージ・メールボックスに向けて起動し、`E2E_TARGET=go E2E_BASE_URL=... E2E_BATCH_CMD=...` を指定する。メールは sendmail 互換コマンドで `E2E_MAILBOX` にファイルとして書き出せるようにしておく。
+
+### 仕様として固定したもの
+
+- URL とリクエストパラメータ名（API、画面の form、ajax）
+- API の JSON のキー。数値フィールド（id、file_size など）は文字列・数値のどちらでもよい（API ドキュメントの Caveats のとおり。PHP 版はエンドポイントによって混在している）
+- DB の行の内容（日時は TZ のローカル時刻、ランダム文字列の形式、タグの再利用、コメント番号、date_to_sort、last_upload の巻き戻しなど）
+- ストレージのキー、S3 の ContentType と ACL
+- memcached のインストールトークンの形式（`pkg_install_token_{token}` に JSON `{"mail","package_id","expire"}`）
+- メール（宛先、Bcc、件名、本文の主な内容）
+- エラーページの本文のメッセージ（"Not Found"、"Permission Denied" など）
+
+### PHP 版の既知バグ
+
+`E2E_TARGET=php` のときは現状の（誤った）挙動を確認し、`go` のときは正しい挙動を要求する（`Env.PHPBug`）。
+
+| バグ | 影響 |
+|---|---|
+| API `delete` で最新のパッケージを消すと、**1 つ前のパッケージのファイルを消し、削除対象のファイルが残る**。レスポンスも 1 つ前のパッケージになる | データ消失。本番にも「DB に行があるのにファイルが無い」パッケージと、行の無いファイルがありうる |
+| API `delete` で最後のパッケージを消すと 500（DB からは消えている） | クライアントがエラー扱いする |
+| app / package モジュールのエラーページ（Not Found、Permission Denied など）がステータス 200 で返る | 表示上は問題ない |
+
+### PHP 版の実際の挙動に合わせたもの
+
+- **S3 の ContentType**: パッケージ・添付ファイル・一時ファイルはすべて `application/octet-stream`（アイコンだけ `image/png`）。PHP 版はコード上は MIME を指定しているが、aws-sdk-php の MultipartUploader がその設定を読まず、アップロード元の一時ファイルに拡張子も無いため。S3 の構成を変えないため、これを仕様とした。
+- `description` を省略してアップロードすると NULL になる。
+
+## 移行リハーサル
+
+PHP 版で運用中にありそうな「中間状態」を作り、移行手順どおりに切り替えた後、状態がそのまま使えることを確認する。
+
+```sh
+cd e2e
+migration/rehearse.sh local php   # LocalFile, 移行先は PHP 版 (仕組みの確認用)
+migration/rehearse.sh s3 php      # S3
+migration/rehearse.sh local go    # Go 版の実装後
+```
+
+1. PHP 版を空の状態で起動する
+2. **seed**（`E2E_MIGRATION_PHASE=seed`）: 画面と API だけで中間状態を作り、`e2e/.work/migration-state.json` に記録する
+   - パスワードリセットで登録したユーザと、passhash を直接持つユーザ
+   - 共同オーナーのアプリ、API キー更新済みのアプリ
+   - IPA（保護）、APK（画面で編集・添付）、AAB（生成 APK・dSYM 付き）、画面からのアップロード、不明形式、削除済み（id の欠番）
+   - インストール履歴（Android / iOS / PC）、通知を切ったユーザ、コメント
+   - 有効なゲストパスと失効したゲストパス、API と画面で発行したインストールトークン（memcached）
+   - upload_post されずに残った一時ファイル
+3. **移行**: 移行先が `php` ならコンテナを作り直すだけ。`go` なら [MIGRATION.md](MIGRATION.md) の手順を実行する（Go 版の実装後にスクリプトを実装する）
+4. **verify**（`E2E_MIGRATION_PHASE=verify`）
+   - 移行手順の前後で DB とストレージが変わっていない
+   - 既存のパスワードで再ログインできる。画面・API の応答が移行前と同じ
+   - 移行前にアップロードされたファイルをダウンロードでき、中身が同じ（Android では AAB の生成 APK）
+   - iOS のインストール（plist）、移行前に発行したインストールトークンとゲストパス
+   - 通知設定が引き継がれる、既存タグが再利用される、コメント番号が続く
+   - 移行前のパッケージを編集・削除できる（ファイルも消える）、パスワードリセット、古いパッケージ削除バッチ
+
+verify は状態を変更するため、一度流したら seed からやり直す。
