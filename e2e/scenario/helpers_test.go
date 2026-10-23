@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"bytes"
 	"image/png"
-	"net/http"
 	"net/url"
 	"reflect"
 	"regexp"
@@ -234,9 +233,5 @@ func checkPackageJSONWithoutDB(t testing.TB, e *harness.Env, m map[string]any, p
 // expectErrorPage はエラーページ (本文に message を含む) が status で返ることを確認する.
 func expectErrorPage(t testing.TB, e *harness.Env, res *harness.Response, status int, message string) {
 	t.Helper()
-	expectContains(t, res.URL, res.String(), message)
-	if res.Status == http.StatusOK && e.PHPBug("app / package モジュールのエラーページがステータス 200 で返る (build() が headers を捨てる)") {
-		return
-	}
-	harness.ExpectStatus(t, res, status)
+	e.ExpectErrorPage(res, status, message)
 }

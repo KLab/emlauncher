@@ -12,30 +12,10 @@ import (
 	"github.com/KLabTools/emlauncher/e2e/internal/harness"
 )
 
-// keyFromURL はダウンロード URL からストレージのキーを取り出す.
-func keyFromURL(t testing.TB, e *harness.Env, rawURL string) string {
-	t.Helper()
-	u, err := url.Parse(rawURL)
-	if err != nil {
-		t.Fatalf("parse %q: %v", rawURL, err)
-	}
-	var prefix string
-	switch e.Storage.Kind() {
-	case "local":
-		prefix = "/files/"
-	case "s3":
-		prefix = "/" + e.Config.S3Bucket + "/"
-	}
-	if !strings.HasPrefix(u.Path, prefix) {
-		t.Fatalf("download url %q does not start with %q", rawURL, prefix)
-	}
-	return strings.TrimPrefix(u.Path, prefix)
-}
-
 // expectDownload は URL がキーを指し, 中身が data と一致することを確認する.
 func expectDownload(t testing.TB, e *harness.Env, rawURL, key string, data []byte, fileName string) {
 	t.Helper()
-	expectEq(t, "download key", keyFromURL(t, e, rawURL), key)
+	expectEq(t, "download key", e.KeyFromURL(rawURL), key)
 	res := e.Download(rawURL)
 	harness.ExpectStatus(t, res, http.StatusOK)
 	if !bytes.Equal(res.Body, data) {

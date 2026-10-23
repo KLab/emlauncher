@@ -116,3 +116,5 @@ func (e *Env) PHPBug(description string) bool {
 	}
 	return false
 }
+
+func Itoa(n int64) string { return strconv.FormatInt(n, 10) }
