@@ -9,8 +9,8 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/KLabTools/emlauncher/e2e/internal/fixture"
-	"github.com/KLabTools/emlauncher/e2e/internal/harness"
+	"emlauncher-e2e/internal/fixture"
+	"emlauncher-e2e/internal/harness"
 )
 
 // TestVerify は移行後の環境で, 移行元で作った中間状態がそのまま使えることを確認する.

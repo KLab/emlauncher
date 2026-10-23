@@ -16,8 +16,8 @@ import (
 	"github.com/aws/aws-sdk-go-v2/service/s3"
 	"github.com/aws/aws-sdk-go-v2/service/s3/types"
 
-	"github.com/KLabTools/emlauncher/go/internal/config"
-	"github.com/KLabTools/emlauncher/go/internal/random"
+	"emlauncher/internal/config"
+	"emlauncher/internal/random"
 )
 
 func TestContentDisposition(t *testing.T) {

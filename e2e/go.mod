@@ -1,4 +1,4 @@
-module github.com/KLabTools/emlauncher/e2e
+module emlauncher-e2e
 
 go 1.23
 

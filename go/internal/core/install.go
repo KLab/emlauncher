@@ -9,9 +9,9 @@ import (
 	"text/template"
 	"time"
 
-	"github.com/KLabTools/emlauncher/go/internal/mail"
-	"github.com/KLabTools/emlauncher/go/internal/model"
-	"github.com/KLabTools/emlauncher/go/internal/random"
+	"emlauncher/internal/mail"
+	"emlauncher/internal/model"
+	"emlauncher/internal/random"
 )
 
 // memcached のキー. PHP 版と共有する (移行前に発行したトークンを移行後も使えるように).

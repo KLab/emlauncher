@@ -16,7 +16,7 @@ import (
 	"runtime"
 	"testing"
 
-	"github.com/KLabTools/emlauncher/e2e/internal/harness"
+	"emlauncher-e2e/internal/harness"
 )
 
 type State struct {

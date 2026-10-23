@@ -10,7 +10,7 @@ import (
 	"time"
 	"unicode/utf8"
 
-	"github.com/KLabTools/emlauncher/go/internal/model"
+	"emlauncher/internal/model"
 )
 
 // 画面に渡すデータ (ビュー). 時刻などは表示用の文字列にしておく.

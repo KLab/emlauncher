@@ -12,8 +12,8 @@ import (
 	"strings"
 	"time"
 
-	"github.com/KLabTools/emlauncher/go/internal/config"
-	"github.com/KLabTools/emlauncher/go/internal/random"
+	"emlauncher/internal/config"
+	"emlauncher/internal/random"
 )
 
 // Local はローカルディスクに保存する (PHP 版の LocalFile と同じ配置).

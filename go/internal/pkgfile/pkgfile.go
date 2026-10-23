@@ -18,7 +18,7 @@ import (
 	"github.com/shogo82148/androidbinary"
 	"howett.net/plist"
 
-	"github.com/KLabTools/emlauncher/go/internal/config"
+	"emlauncher/internal/config"
 )
 
 const (

@@ -7,8 +7,8 @@ import (
 	"testing"
 	"time"
 
-	"github.com/KLabTools/emlauncher/e2e/internal/fixture"
-	"github.com/KLabTools/emlauncher/e2e/internal/harness"
+	"emlauncher-e2e/internal/fixture"
+	"emlauncher-e2e/internal/harness"
 )
 
 var reGuestpassURL = regexp.MustCompile(`https?://[^"<\s]+/package/guestpass_install\?token=([0-9A-Za-z]{32})`)

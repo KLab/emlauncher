@@ -13,7 +13,7 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/KLabTools/emlauncher/go/internal/core"
+	"emlauncher/internal/core"
 )
 
 // maxValueBytes はファイル以外のフォームの値の上限 (アイコンの data URL を含む).

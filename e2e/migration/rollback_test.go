@@ -4,7 +4,7 @@ import (
 	"net/http"
 	"testing"
 
-	"github.com/KLabTools/emlauncher/e2e/internal/harness"
+	"emlauncher-e2e/internal/harness"
 )
 
 // TestRollback は移行元 (PHP 版) に切り戻した後, 移行先で作ったデータが使えることを確認する.

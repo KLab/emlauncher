@@ -10,7 +10,7 @@ import (
 
 	"howett.net/plist"
 
-	"github.com/KLabTools/emlauncher/go/internal/config"
+	"emlauncher/internal/config"
 )
 
 // testdata は e2e の genfixture で生成したもの (universal.apk は bundletool で sample.aab から生成).

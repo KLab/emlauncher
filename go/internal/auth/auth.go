@@ -11,7 +11,7 @@ import (
 	"strconv"
 	"strings"
 
-	random "github.com/KLabTools/emlauncher/go/internal/random"
+	random "emlauncher/internal/random"
 )
 
 // HashPassword は PHP 版 (model/UserPass.php) と同じ形式 "{stretch}:{salt}:{hash}" でハッシュを作る.

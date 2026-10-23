@@ -9,12 +9,12 @@ import (
 
 	"github.com/jmoiron/sqlx"
 
-	"github.com/KLabTools/emlauncher/go/internal/cache"
-	"github.com/KLabTools/emlauncher/go/internal/clock"
-	"github.com/KLabTools/emlauncher/go/internal/config"
-	"github.com/KLabTools/emlauncher/go/internal/mail"
-	"github.com/KLabTools/emlauncher/go/internal/pkgfile"
-	"github.com/KLabTools/emlauncher/go/internal/storage"
+	"emlauncher/internal/cache"
+	"emlauncher/internal/clock"
+	"emlauncher/internal/config"
+	"emlauncher/internal/mail"
+	"emlauncher/internal/pkgfile"
+	"emlauncher/internal/storage"
 )
 
 type Core struct {

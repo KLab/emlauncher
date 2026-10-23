@@ -9,8 +9,8 @@ import (
 	"strings"
 	"time"
 
-	"github.com/KLabTools/emlauncher/go/internal/core"
-	"github.com/KLabTools/emlauncher/go/internal/model"
+	"emlauncher/internal/core"
+	"emlauncher/internal/model"
 )
 
 // API (/api/{action}). api_key で認証する. 仕様は /doc/api と PHP 版 (mainmodules/api) を参照.

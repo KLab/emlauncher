@@ -4,8 +4,8 @@ import (
 	"net/http"
 	"testing"
 
-	"github.com/KLabTools/emlauncher/e2e/internal/fixture"
-	"github.com/KLabTools/emlauncher/e2e/internal/harness"
+	"emlauncher-e2e/internal/fixture"
+	"emlauncher-e2e/internal/harness"
 )
 
 func TestComments(t *testing.T) {

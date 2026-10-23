@@ -15,15 +15,15 @@ import (
 	"time"
 	_ "time/tzdata" // tzdata の無い環境でも timezone を指定できるように
 
-	"github.com/KLabTools/emlauncher/go/internal/cache"
-	"github.com/KLabTools/emlauncher/go/internal/clock"
-	"github.com/KLabTools/emlauncher/go/internal/config"
-	"github.com/KLabTools/emlauncher/go/internal/core"
-	"github.com/KLabTools/emlauncher/go/internal/db"
-	"github.com/KLabTools/emlauncher/go/internal/mail"
-	"github.com/KLabTools/emlauncher/go/internal/pkgfile"
-	"github.com/KLabTools/emlauncher/go/internal/storage"
-	"github.com/KLabTools/emlauncher/go/internal/web"
+	"emlauncher/internal/cache"
+	"emlauncher/internal/clock"
+	"emlauncher/internal/config"
+	"emlauncher/internal/core"
+	"emlauncher/internal/db"
+	"emlauncher/internal/mail"
+	"emlauncher/internal/pkgfile"
+	"emlauncher/internal/storage"
+	"emlauncher/internal/web"
 )
 
 func main() {

@@ -12,10 +12,10 @@ import (
 	"strings"
 	"time"
 
-	"github.com/KLabTools/emlauncher/go/internal/auth"
-	"github.com/KLabTools/emlauncher/go/internal/mail"
-	"github.com/KLabTools/emlauncher/go/internal/model"
-	"github.com/KLabTools/emlauncher/go/internal/random"
+	"emlauncher/internal/auth"
+	"emlauncher/internal/mail"
+	"emlauncher/internal/model"
+	"emlauncher/internal/random"
 )
 
 const passwordResetTTL = 30 * time.Minute

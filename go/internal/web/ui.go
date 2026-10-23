@@ -4,7 +4,7 @@ import (
 	"net/http"
 	"strings"
 
-	"github.com/KLabTools/emlauncher/go/internal/session"
+	"emlauncher/internal/session"
 )
 
 // セッションのキー (PHP 版と同じ名前).

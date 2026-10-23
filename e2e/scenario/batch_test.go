@@ -3,8 +3,8 @@ package scenario
 import (
 	"testing"
 
-	"github.com/KLabTools/emlauncher/e2e/internal/fixture"
-	"github.com/KLabTools/emlauncher/e2e/internal/harness"
+	"emlauncher-e2e/internal/fixture"
+	"emlauncher-e2e/internal/harness"
 )
 
 // TestDeleteOldPackagesBatch は古いパッケージ削除バッチを確認する.

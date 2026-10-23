@@ -10,7 +10,7 @@ import (
 	"github.com/go-sql-driver/mysql"
 	"github.com/jmoiron/sqlx"
 
-	"github.com/KLabTools/emlauncher/go/internal/config"
+	"emlauncher/internal/config"
 )
 
 // DSN は設定から go-sql-driver/mysql の DSN を作る.

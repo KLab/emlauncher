@@ -5,7 +5,7 @@ import (
 	"regexp"
 	"testing"
 
-	"github.com/KLabTools/emlauncher/e2e/internal/harness"
+	"emlauncher-e2e/internal/harness"
 )
 
 func TestLoginRequired(t *testing.T) {

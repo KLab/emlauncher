@@ -6,8 +6,8 @@ import (
 	"testing"
 	"time"
 
-	"github.com/KLabTools/emlauncher/go/internal/clock"
-	"github.com/KLabTools/emlauncher/go/internal/config"
+	"emlauncher/internal/clock"
+	"emlauncher/internal/config"
 )
 
 // testDatabase は E2E 環境の MySQL (e2e/env/up.sh) を使う. EML_TEST_DB_HOST が無ければスキップ.

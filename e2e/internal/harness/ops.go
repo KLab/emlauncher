@@ -10,7 +10,7 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/KLabTools/emlauncher/e2e/internal/fixture"
+	"emlauncher-e2e/internal/fixture"
 )
 
 // User はログイン済みのクライアントを持つ利用者.

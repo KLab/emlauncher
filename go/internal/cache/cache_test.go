@@ -5,7 +5,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/KLabTools/emlauncher/go/internal/random"
+	"emlauncher/internal/random"
 )
 
 func TestExpiration(t *testing.T) {

@@ -13,7 +13,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/KLabTools/emlauncher/go/internal/config"
+	"emlauncher/internal/config"
 )
 
 // FileContentType はパッケージ類を保存するときの ContentType.

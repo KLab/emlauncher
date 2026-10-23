@@ -13,12 +13,12 @@ import (
 	"time"
 	_ "time/tzdata"
 
-	"github.com/KLabTools/emlauncher/go/internal/clock"
-	"github.com/KLabTools/emlauncher/go/internal/config"
-	"github.com/KLabTools/emlauncher/go/internal/core"
-	"github.com/KLabTools/emlauncher/go/internal/db"
-	"github.com/KLabTools/emlauncher/go/internal/model"
-	"github.com/KLabTools/emlauncher/go/internal/storage"
+	"emlauncher/internal/clock"
+	"emlauncher/internal/config"
+	"emlauncher/internal/core"
+	"emlauncher/internal/db"
+	"emlauncher/internal/model"
+	"emlauncher/internal/storage"
 )
 
 // 1 回の実行でアプリごとに削除する上限 (PHP 版と同じ).

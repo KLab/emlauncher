@@ -12,8 +12,8 @@ import (
 	"strings"
 	"time"
 
-	"github.com/KLabTools/emlauncher/go/internal/core"
-	"github.com/KLabTools/emlauncher/go/internal/model"
+	"emlauncher/internal/core"
+	"emlauncher/internal/model"
 )
 
 const linesInPage = 20

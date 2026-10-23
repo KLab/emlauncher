@@ -9,8 +9,8 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/KLabTools/emlauncher/e2e/internal/fixture"
-	"github.com/KLabTools/emlauncher/e2e/internal/harness"
+	"emlauncher-e2e/internal/fixture"
+	"emlauncher-e2e/internal/harness"
 )
 
 // expectDownload は URL がキーを指し, 中身が data と一致することを確認する.

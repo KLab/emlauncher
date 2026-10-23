@@ -10,9 +10,9 @@ import (
 	"text/template"
 	"time"
 
-	"github.com/KLabTools/emlauncher/go/internal/core"
-	"github.com/KLabTools/emlauncher/go/internal/model"
-	"github.com/KLabTools/emlauncher/go/internal/random"
+	"emlauncher/internal/core"
+	"emlauncher/internal/model"
+	"emlauncher/internal/random"
 )
 
 const (

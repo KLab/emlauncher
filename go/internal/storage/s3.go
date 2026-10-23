@@ -15,7 +15,7 @@ import (
 	"github.com/aws/aws-sdk-go-v2/service/s3"
 	"github.com/aws/aws-sdk-go-v2/service/s3/types"
 
-	"github.com/KLabTools/emlauncher/go/internal/config"
+	"emlauncher/internal/config"
 )
 
 type S3 struct {

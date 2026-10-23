@@ -11,7 +11,7 @@ import (
 
 	"github.com/skip2/go-qrcode"
 
-	"github.com/KLabTools/emlauncher/go/internal/model"
+	"emlauncher/internal/model"
 )
 
 // マイアプリ

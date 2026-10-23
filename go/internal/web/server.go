@@ -7,10 +7,10 @@ import (
 	"log/slog"
 	"net/http"
 
-	"github.com/KLabTools/emlauncher/go/internal/config"
-	"github.com/KLabTools/emlauncher/go/internal/core"
-	"github.com/KLabTools/emlauncher/go/internal/session"
-	"github.com/KLabTools/emlauncher/go/internal/storage"
+	"emlauncher/internal/config"
+	"emlauncher/internal/core"
+	"emlauncher/internal/session"
+	"emlauncher/internal/storage"
 )
 
 type Server struct {

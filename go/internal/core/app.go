@@ -8,9 +8,9 @@ import (
 
 	"github.com/jmoiron/sqlx"
 
-	"github.com/KLabTools/emlauncher/go/internal/icon"
-	"github.com/KLabTools/emlauncher/go/internal/model"
-	"github.com/KLabTools/emlauncher/go/internal/random"
+	"emlauncher/internal/icon"
+	"emlauncher/internal/model"
+	"emlauncher/internal/random"
 )
 
 // AppInfo はアプリの基本情報.

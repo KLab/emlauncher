@@ -10,9 +10,9 @@ import (
 
 	"github.com/jmoiron/sqlx"
 
-	"github.com/KLabTools/emlauncher/go/internal/model"
-	"github.com/KLabTools/emlauncher/go/internal/pkgfile"
-	"github.com/KLabTools/emlauncher/go/internal/random"
+	"emlauncher/internal/model"
+	"emlauncher/internal/pkgfile"
+	"emlauncher/internal/random"
 )
 
 // Upload はアップロードされたファイル (一時ファイルに保存済み).

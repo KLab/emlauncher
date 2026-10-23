@@ -10,7 +10,7 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/KLabTools/emlauncher/e2e/internal/fixture"
+	"emlauncher-e2e/internal/fixture"
 )
 
 func main() {

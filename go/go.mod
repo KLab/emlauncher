@@ -1,4 +1,4 @@
-module github.com/KLabTools/emlauncher/go
+module emlauncher
 
 go 1.23
 

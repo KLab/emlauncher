@@ -55,7 +55,7 @@ func LoadConfig() Config {
 		Memcached:   env("E2E_MEMCACHED", "localhost:21211"),
 		CachePrefix: env("E2E_CACHE_PREFIX", "emlauncher_e2e_"+storage+"_emlauncher_"),
 		BatchCmd:    env("E2E_BATCH_CMD", batch),
-		TZ: tz,
+		TZ:          tz,
 	}
 }
 

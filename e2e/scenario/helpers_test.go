@@ -12,7 +12,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/KLabTools/emlauncher/e2e/internal/harness"
+	"emlauncher-e2e/internal/harness"
 )
 
 var (

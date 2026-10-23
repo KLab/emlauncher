@@ -11,8 +11,8 @@ import (
 	"testing"
 	"time"
 
-	"github.com/KLabTools/emlauncher/e2e/internal/fixture"
-	"github.com/KLabTools/emlauncher/e2e/internal/harness"
+	"emlauncher-e2e/internal/fixture"
+	"emlauncher-e2e/internal/harness"
 )
 
 func TestAPIUploadIPA(t *testing.T) {
