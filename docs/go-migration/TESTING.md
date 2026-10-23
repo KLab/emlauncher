@@ -5,8 +5,8 @@ PHP 版に対して作ったシナリオテストを、そのまま Go 版にも
 ```
 e2e/
   env/                テスト環境 (docker compose: MySQL / memcached / LocalStack / PHP 版)
-  internal/fixture    テスト用の IPA / APK / AAB / PNG を生成
-  internal/harness    クライアント, DB・ストレージ・メールの確認, 高レベル操作
+  *.go                テスト用のクライアント, DB・ストレージ・メールの確認, 高レベル操作,
+                      IPA / APK / AAB / PNG の生成 (package e2e)
   scenario/           シナリオテスト
   migration/          移行リハーサル (seed → 移行 → verify)
   cmd/genfixture      フィクスチャを書き出す (手動確認用)

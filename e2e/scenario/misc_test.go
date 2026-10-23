@@ -6,21 +6,21 @@ import (
 	"net/http"
 	"testing"
 
-	"emlauncher-e2e/internal/harness"
+	e2e "emlauncher-e2e"
 )
 
 func TestHealth(t *testing.T) {
-	e := harness.New(t)
+	e := e2e.New(t)
 	res := e.NewClient().Get("/health")
-	harness.ExpectStatus(t, res, http.StatusOK)
+	e2e.ExpectStatus(t, res, http.StatusOK)
 	expectEq(t, "body", res.String(), "OK")
 }
 
 func TestQRCode(t *testing.T) {
-	e := harness.New(t)
+	e := e2e.New(t)
 	// ログイン不要
 	res := e.NewClient().Get("/qr/code?s=250&q=%2Fpackage%2Finstall%3Ftoken%3Dabc")
-	harness.ExpectStatus(t, res, http.StatusOK)
+	e2e.ExpectStatus(t, res, http.StatusOK)
 	expectEq(t, "Content-Type", res.Header.Get("Content-Type"), "image/png")
 	img, err := png.Decode(bytes.NewReader(res.Body))
 	if err != nil {
@@ -38,23 +38,23 @@ func TestQRCode(t *testing.T) {
 }
 
 func TestDocPages(t *testing.T) {
-	e := harness.New(t)
+	e := e2e.New(t)
 	u := e.NewUser("user")
 	for _, p := range []string{"api", "api_upload", "api_package_list", "api_delete", "api_create_token",
 		"api_package_edit", "api_package_attach", "api_package_detach"} {
-		harness.ExpectStatus(t, u.Get("/doc/"+p), http.StatusOK)
+		e2e.ExpectStatus(t, u.Get("/doc/"+p), http.StatusOK)
 	}
-	harness.ExpectStatus(t, u.Get("/doc/no_such_page"), http.StatusNotFound)
+	e2e.ExpectStatus(t, u.Get("/doc/no_such_page"), http.StatusNotFound)
 	res := u.Get("/doc/keystore")
-	harness.ExpectStatus(t, res, http.StatusOK)
+	e2e.ExpectStatus(t, res, http.StatusOK)
 	expectContains(t, "keystore page", res.String(), "emlauncher")
 }
 
 func TestTopPagePaging(t *testing.T) {
-	e := harness.New(t)
+	e := e2e.New(t)
 	u := e.NewUser("user")
-	app := e.CreateApp(u, harness.Unique("newest"))
+	app := e.CreateApp(u, e2e.Unique("newest"))
 	// 最新のアプリは 1 ページ目に出る
 	expectContains(t, "top page", u.Get("/?page=1").String(), app.Title)
-	harness.ExpectStatus(t, u.Get("/?page=9999"), http.StatusOK)
+	e2e.ExpectStatus(t, u.Get("/?page=9999"), http.StatusOK)
 }

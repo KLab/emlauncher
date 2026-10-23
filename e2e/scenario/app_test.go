@@ -1,21 +1,19 @@
 package scenario
 
 import (
+	e2e "emlauncher-e2e"
 	"image/color"
 	"net/http"
 	"regexp"
 	"sort"
 	"strings"
 	"testing"
-
-	"emlauncher-e2e/internal/fixture"
-	"emlauncher-e2e/internal/harness"
 )
 
 func TestCreateApp(t *testing.T) {
-	e := harness.New(t)
+	e := e2e.New(t)
 	owner := e.NewUser("owner")
-	title := harness.Unique("app")
+	title := e2e.Unique("app")
 	app := e.CreateApp(owner, title)
 
 	a := e.Application(app.ID)
@@ -39,7 +37,7 @@ func TestCreateApp(t *testing.T) {
 	expectEq(t, "icon size", [2]int{w, h}, [2]int{144, 144})
 
 	page := owner.Get("/app?id=" + itoa(app.ID))
-	harness.ExpectStatus(t, page, http.StatusOK)
+	e2e.ExpectStatus(t, page, http.StatusOK)
 	expectContains(t, "app page", page.String(), title)
 	expectContains(t, "app page", page.String(), a.Str("icon_key"))
 
@@ -49,28 +47,28 @@ func TestCreateApp(t *testing.T) {
 
 	// 他のユーザも閲覧できる
 	other := e.NewUser("other")
-	harness.ExpectStatus(t, other.Get("/app?id="+itoa(app.ID)), http.StatusOK)
+	e2e.ExpectStatus(t, other.Get("/app?id="+itoa(app.ID)), http.StatusOK)
 	if strings.Contains(other.Get("/myapps/own").String(), title) {
 		t.Fatal("other user's own apps contains the app")
 	}
 
-	harness.ExpectStatus(t, owner.Get("/app/new"), http.StatusOK)
+	e2e.ExpectStatus(t, owner.Get("/app/new"), http.StatusOK)
 	expectErrorPage(t, e, owner.Get("/app?id=99999999"), http.StatusNotFound, "Not Found")
 
 	// アイコン無しは作れない
 	res := owner.PostForm("/app/create", form("title", "no icon"))
-	harness.ExpectStatus(t, res, http.StatusBadRequest)
+	e2e.ExpectStatus(t, res, http.StatusBadRequest)
 }
 
 func TestAppPreferences(t *testing.T) {
-	e := harness.New(t)
+	e := e2e.New(t)
 	owner := e.NewUser("owner")
 	other := e.NewUser("other")
-	app := e.CreateApp(owner, harness.Unique("app"))
+	app := e.CreateApp(owner, e2e.Unique("app"))
 	id := itoa(app.ID)
 
 	expectErrorPage(t, e, other.Get("/app/preferences?id="+id), http.StatusForbidden, "Permission Denied")
-	harness.ExpectStatus(t, owner.Get("/app/preferences?id="+id), http.StatusOK)
+	e2e.ExpectStatus(t, owner.Get("/app/preferences?id="+id), http.StatusOK)
 
 	t.Run("refresh api key", func(t *testing.T) {
 		// 古いキーが一致しなければ変わらない
@@ -85,8 +83,8 @@ func TestAppPreferences(t *testing.T) {
 		if newKey == app.APIKey {
 			t.Fatal("api key not changed")
 		}
-		harness.ExpectStatus(t, e.APICall("package_list", app.APIKey, nil), http.StatusBadRequest)
-		harness.ExpectStatus(t, e.APICall("package_list", newKey, nil), http.StatusOK)
+		e2e.ExpectStatus(t, e.APICall("package_list", app.APIKey, nil), http.StatusBadRequest)
+		e2e.ExpectStatus(t, e.APICall("package_list", newKey, nil), http.StatusOK)
 		app.APIKey = newKey
 	})
 
@@ -102,7 +100,7 @@ func TestAppPreferences(t *testing.T) {
 		expectEq(t, "icon kept", a.Str("icon_key"), oldIcon)
 
 		res = owner.PostForm("/app/preferences_update", form("id", id, "title", app.Title,
-			"icon-data", harness.IconDataURL(fixture.PNG(50, 80, color.RGBA{0xff, 0, 0, 0xff}))))
+			"icon-data", e2e.IconDataURL(e2e.PNG(50, 80, color.RGBA{0xff, 0, 0, 0xff}))))
 		owner.ExpectRedirect(res, "/app/preferences?id="+id)
 		newIcon := e.Application(app.ID).Str("icon_key")
 		if newIcon == oldIcon {
@@ -111,7 +109,7 @@ func TestAppPreferences(t *testing.T) {
 		checkStored(t, e, newIcon, nil, "image/png", true)
 		checkNotStored(t, e, oldIcon)
 
-		harness.ExpectStatus(t, owner.PostForm("/app/preferences_update", form("id", id, "title", "")), http.StatusBadRequest)
+		e2e.ExpectStatus(t, owner.PostForm("/app/preferences_update", form("id", id, "title", "")), http.StatusBadRequest)
 		expectErrorPage(t, e, other.PostForm("/app/preferences_update", form("id", id, "title", "hijack")), http.StatusForbidden, "Permission Denied")
 		expectEq(t, "title", e.Application(app.ID).Str("title"), app.Title)
 	})
@@ -120,7 +118,7 @@ func TestAppPreferences(t *testing.T) {
 		res := owner.PostForm("/app/preferences_update_owners", form("id", id, "owners[]", other.Mail, "owners[]", ""))
 		owner.ExpectRedirect(res, "/app/preferences?id="+id)
 		expectEq(t, "owners", ownerMails(e, app.ID), sortedJoin(owner.Mail, other.Mail))
-		harness.ExpectStatus(t, other.Get("/app/preferences?id="+id), http.StatusOK)
+		e2e.ExpectStatus(t, other.Get("/app/preferences?id="+id), http.StatusOK)
 
 		// 更新した本人は必ず残る
 		res = other.PostForm("/app/preferences_update_owners", form("id", id, "owners[]", ""))
@@ -133,7 +131,7 @@ func TestAppPreferences(t *testing.T) {
 	})
 
 	t.Run("delete tags", func(t *testing.T) {
-		p := e.MustAPIUpload(app.APIKey, "p", "a.apk", fixture.APK("com.example.a"), form("tags", "keep,drop"))
+		p := e.MustAPIUpload(app.APIKey, "p", "a.apk", e2e.APK("com.example.a"), form("tags", "keep,drop"))
 		drop := e.DB.Row("SELECT id FROM tag WHERE app_id = ? AND name = 'drop'", app.ID).Str("id")
 		res := owner.PostForm("/app/preferences_delete_tags", form("id", id, "tags[]", drop))
 		owner.ExpectRedirect(res, "/app/preferences?id="+id)
@@ -142,7 +140,7 @@ func TestAppPreferences(t *testing.T) {
 	})
 }
 
-func ownerMails(e *harness.Env, appID int64) string {
+func ownerMails(e *e2e.Env, appID int64) string {
 	var mails []string
 	for _, r := range e.DB.Rows("SELECT owner_mail FROM application_owner WHERE app_id = ? ORDER BY owner_mail", appID) {
 		mails = append(mails, r.Str("owner_mail"))

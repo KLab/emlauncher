@@ -5,6 +5,9 @@ package main
 
 import (
 	"context"
+	"emlauncher"
+	"emlauncher/pkgfile"
+	"emlauncher/storage"
 	"errors"
 	"flag"
 	"log/slog"
@@ -14,16 +17,6 @@ import (
 	"syscall"
 	"time"
 	_ "time/tzdata" // tzdata の無い環境でも timezone を指定できるように
-
-	"emlauncher/internal/cache"
-	"emlauncher/internal/clock"
-	"emlauncher/internal/config"
-	"emlauncher/internal/core"
-	"emlauncher/internal/db"
-	"emlauncher/internal/mail"
-	"emlauncher/internal/pkgfile"
-	"emlauncher/internal/storage"
-	"emlauncher/internal/web"
 )
 
 func main() {
@@ -38,31 +31,31 @@ func main() {
 }
 
 func run(configPath string, log *slog.Logger) error {
-	cfg, err := config.Load(configPath)
+	cfg, err := emlauncher.LoadConfig(configPath)
 	if err != nil {
 		return err
 	}
 	ctx, stop := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM)
 	defer stop()
 
-	d, err := db.Open(cfg)
+	d, err := emlauncher.OpenDB(cfg)
 	if err != nil {
 		return err
 	}
 	defer d.Close()
-	st, err := storage.New(ctx, cfg)
+	st, err := storage.New(ctx, cfg.StorageClass, cfg.AWS, cfg.LocalFile)
 	if err != nil {
 		return err
 	}
-	srv := &web.Server{
+	srv := &emlauncher.Server{
 		Config: cfg,
-		Core: &core.Core{
+		Core: &emlauncher.Core{
 			Config:     cfg,
 			DB:         d,
 			Storage:    st,
-			Clock:      clock.New(cfg.Location()),
-			Cache:      cache.New(cfg.Memcache.Host, cfg.Memcache.Port, cfg.CachePrefix),
-			Mail:       &mail.Sendmail{Command: cfg.Mail.Sendmail},
+			Clock:      emlauncher.NewClock(cfg.Location()),
+			Cache:      emlauncher.NewCache(cfg.Memcache.Host, cfg.Memcache.Port, cfg.CachePrefix),
+			Mail:       &emlauncher.Sendmail{Command: cfg.Mail.Sendmail},
 			Bundletool: pkgfile.NewBundletool(cfg.APKFile),
 			Log:        log,
 		},

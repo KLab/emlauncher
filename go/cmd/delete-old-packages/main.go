@@ -6,19 +6,14 @@ package main
 
 import (
 	"context"
+	"emlauncher"
+	"emlauncher/storage"
 	"flag"
 	"fmt"
 	"log/slog"
 	"os"
 	"time"
 	_ "time/tzdata"
-
-	"emlauncher/internal/clock"
-	"emlauncher/internal/config"
-	"emlauncher/internal/core"
-	"emlauncher/internal/db"
-	"emlauncher/internal/model"
-	"emlauncher/internal/storage"
 )
 
 // 1 回の実行でアプリごとに削除する上限 (PHP 版と同じ).
@@ -37,24 +32,24 @@ func main() {
 }
 
 func run(configPath string, keep int, dryrun bool) error {
-	cfg, err := config.Load(configPath)
+	cfg, err := emlauncher.LoadConfig(configPath)
 	if err != nil {
 		return err
 	}
 	ctx := context.Background()
-	d, err := db.Open(cfg)
+	d, err := emlauncher.OpenDB(cfg)
 	if err != nil {
 		return err
 	}
 	defer d.Close()
-	st, err := storage.New(ctx, cfg)
+	st, err := storage.New(ctx, cfg.StorageClass, cfg.AWS, cfg.LocalFile)
 	if err != nil {
 		return err
 	}
-	clk := clock.New(cfg.Location())
-	c := &core.Core{Config: cfg, DB: d, Storage: st, Clock: clk, Log: slog.New(slog.NewTextHandler(os.Stderr, nil))}
+	clk := emlauncher.NewClock(cfg.Location())
+	c := &emlauncher.Core{Config: cfg, DB: d, Storage: st, Clock: clk, Log: slog.New(slog.NewTextHandler(os.Stderr, nil))}
 
-	apps, err := model.AllApplications(ctx, d)
+	apps, err := emlauncher.AllApplications(ctx, d)
 	if err != nil {
 		return err
 	}
@@ -62,9 +57,9 @@ func run(configPath string, keep int, dryrun bool) error {
 	if dryrun {
 		suffix = " (DRYRUN)"
 	}
-	now := func() string { return time.Now().In(cfg.Location()).Format(clock.Layout) }
+	now := func() string { return time.Now().In(cfg.Location()).Format(emlauncher.DateTimeLayout) }
 	for _, app := range apps {
-		pkgs, err := model.DeletablePackages(ctx, d, app.ID, keep, limitPerApp)
+		pkgs, err := emlauncher.DeletablePackages(ctx, d, app.ID, keep, limitPerApp)
 		if err != nil {
 			return err
 		}

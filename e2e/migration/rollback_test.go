@@ -4,7 +4,7 @@ import (
 	"net/http"
 	"testing"
 
-	"emlauncher-e2e/internal/harness"
+	e2e "emlauncher-e2e"
 )
 
 // TestRollback は移行元 (PHP 版) に切り戻した後, 移行先で作ったデータが使えることを確認する.
@@ -23,21 +23,21 @@ func TestRollback(t *testing.T) {
 
 	t.Run("pages", func(t *testing.T) {
 		app := member.Get("/app?id=" + itoa(mainApp.ID))
-		harness.ExpectStatus(t, app, http.StatusOK)
+		e2e.ExpectStatus(t, app, http.StatusOK)
 		contains(t, "app page", app.String(), s.After.Package.Title)
-		harness.ExpectStatus(t, member.Get("/package?id="+itoa(s.After.Package.ID)), http.StatusOK)
-		harness.ExpectStatus(t, member.Get("/app/comment?id="+itoa(mainApp.ID)), http.StatusOK)
+		e2e.ExpectStatus(t, member.Get("/package?id="+itoa(s.After.Package.ID)), http.StatusOK)
+		e2e.ExpectStatus(t, member.Get("/app/comment?id="+itoa(mainApp.ID)), http.StatusOK)
 	})
 
 	t.Run("download package uploaded by the new version", func(t *testing.T) {
-		member.UserAgent = harness.UAAndroid
+		member.UserAgent = e2e.UAAndroid
 		res := member.Get("/package/install?id=" + itoa(s.After.Package.ID))
-		harness.ExpectStatus(t, res, http.StatusFound)
+		e2e.ExpectStatus(t, res, http.StatusFound)
 		if got := e.KeyFromURL(res.Location()); got != s.After.Package.Key {
 			t.Fatalf("download key = %q, want %q", got, s.After.Package.Key)
 		}
 		dl := e.Download(res.Location())
-		harness.ExpectStatus(t, dl, http.StatusOK)
+		e2e.ExpectStatus(t, dl, http.StatusOK)
 		if sha(dl.Body) != s.After.Package.SHA256 {
 			t.Fatal("content mismatch")
 		}
@@ -45,9 +45,9 @@ func TestRollback(t *testing.T) {
 
 	t.Run("install token issued by the new version", func(t *testing.T) {
 		c := e.NewClient()
-		c.UserAgent = harness.UAAndroid
+		c.UserAgent = e2e.UAAndroid
 		res := c.Get("/package/install?token=" + s.After.InstallToken)
-		harness.ExpectStatus(t, res, http.StatusFound)
+		e2e.ExpectStatus(t, res, http.StatusFound)
 		if got := e.KeyFromURL(res.Location()); got != s.After.Package.Key {
 			t.Fatalf("download key = %q, want %q", got, s.After.Package.Key)
 		}

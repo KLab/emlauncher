@@ -101,20 +101,21 @@ PHP のファイルセッション（Cookie 名 `{prefix}seskey`）。内容は�
 
 ### 2.2 ディレクトリ構成
 
-PHP 版の `vendor/`（composer）がリポジトリ直下にあるため、ルートに `go.mod` を置くと Go の vendoring と衝突する。Go のコードは `go/` 以下の独立モジュールにする。
+PHP 版の `vendor/`（composer）がリポジトリ直下にあるため、ルートに `go.mod` を置くと Go の vendoring と衝突する。Go のコードは `go/` 以下の独立モジュール（モジュール名 `emlauncher`）にする。リポジトリには github.com 以外のミラーもあるので、モジュール名にホスト名は含めない。
+
+パッケージは基本的にフラットにし、独立させる理由があるものだけ分ける。
 
 ```
-go/
+go/                          package emlauncher: 設定, DB (table*.go), 業務処理 (core*.go), HTTP ハンドラ, セッション, メール
+  templates/, static/        画面のテンプレートと静的ファイル (バイナリに埋め込む)
+  storage/                   S3 / LocalFile. 外部サービスとの境界. 同じテストを両方の実装に流す
+  pkgfile/                   IPA / APK / AAB の解析. アプリ本体に依存しない. テストデータを持つ
   cmd/emlauncher/            HTTP サーバ
   cmd/delete-old-packages/   バッチ
-  internal/config            設定（環境ごとの切替、TZ）
-  internal/db, internal/model
-  internal/storage           S3 / LocalFile（共通インタフェース）
-  internal/pkgfile           IPA / APK / AAB 解析
-  internal/session, internal/auth
-  internal/mail
-  internal/web               ルーティング・ハンドラ・テンプレート
-e2e/                         シナリオテスト（PHP 版・Go 版共用、独立モジュール）
+  tools/                     移行用のスクリプト (PHP 版の設定の書き出し)
+e2e/                         package e2e: テスト用のクライアント・フィクスチャ (モジュール名 emlauncher-e2e)
+  scenario/, migration/      シナリオテストと移行リハーサル (実行の仕方が違うので分ける)
+  env/                       テスト環境 (docker compose)
 docs/go-migration/           本計画書・テスト・移行手順
 ```
 

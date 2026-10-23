@@ -12,7 +12,7 @@ import (
 	"strings"
 	"testing"
 
-	"emlauncher-e2e/internal/harness"
+	e2e "emlauncher-e2e"
 )
 
 var (
@@ -111,7 +111,7 @@ func jsonKeys(m map[string]any) []string {
 }
 
 // checkPackageJSON は API が返す package の JSON を DB の行と突き合わせる.
-func checkPackageJSON(t testing.TB, e *harness.Env, m map[string]any, pkg harness.Row) {
+func checkPackageJSON(t testing.TB, e *e2e.Env, m map[string]any, pkg e2e.Row) {
 	t.Helper()
 	wantKeys := []string{"application_url", "attached_files", "created", "description", "file_size", "id",
 		"identifier", "install_count", "original_file_name", "package_url", "platform", "protect", "tags", "title"}
@@ -164,7 +164,7 @@ func checkPackageJSON(t testing.TB, e *harness.Env, m map[string]any, pkg harnes
 	}
 }
 
-func checkAttachedJSON(t testing.TB, m map[string]any, af harness.Row) {
+func checkAttachedJSON(t testing.TB, m map[string]any, af e2e.Row) {
 	t.Helper()
 	if got, want := jsonKeys(m), []string{"created", "file_size", "id", "original_file_name"}; !reflect.DeepEqual(got, want) {
 		t.Fatalf("attached json keys = %v, want %v", got, want)
@@ -176,7 +176,7 @@ func checkAttachedJSON(t testing.TB, m map[string]any, af harness.Row) {
 }
 
 // checkStored はストレージにキーが存在し, 中身と (S3 なら) ContentType・ACL が期待どおりか確認する.
-func checkStored(t testing.TB, e *harness.Env, key string, data []byte, contentType string, public bool) {
+func checkStored(t testing.TB, e *e2e.Env, key string, data []byte, contentType string, public bool) {
 	t.Helper()
 	if !e.Storage.Exists(key) {
 		t.Fatalf("storage key %s does not exist (keys: %v)", key, e.Storage.Keys(key[:strings.LastIndex(key, "/")+1]))
@@ -192,7 +192,7 @@ func checkStored(t testing.TB, e *harness.Env, key string, data []byte, contentT
 	}
 }
 
-func checkNotStored(t testing.TB, e *harness.Env, key string) {
+func checkNotStored(t testing.TB, e *e2e.Env, key string) {
 	t.Helper()
 	if e.Storage.Exists(key) {
 		t.Fatalf("storage key %s still exists", key)
@@ -220,7 +220,7 @@ func form(kv ...string) url.Values {
 func itoa(n int64) string { return fmt.Sprint(n) }
 
 // checkPackageJSONWithoutDB は削除済みなど DB に行が無い package の JSON を, 事前に取得した行と比べる.
-func checkPackageJSONWithoutDB(t testing.TB, e *harness.Env, m map[string]any, pkg harness.Row) {
+func checkPackageJSONWithoutDB(t testing.TB, e *e2e.Env, m map[string]any, pkg e2e.Row) {
 	t.Helper()
 	expectEq(t, "id", jsonNum(t, m, "id"), pkg.Str("id"))
 	expectEq(t, "package_url", jsonStr(t, m, "package_url"), e.Config.BaseURL+"/package?id="+pkg.Str("id"))
@@ -231,7 +231,7 @@ func checkPackageJSONWithoutDB(t testing.TB, e *harness.Env, m map[string]any, p
 }
 
 // expectErrorPage はエラーページ (本文に message を含む) が status で返ることを確認する.
-func expectErrorPage(t testing.TB, e *harness.Env, res *harness.Response, status int, message string) {
+func expectErrorPage(t testing.TB, e *e2e.Env, res *e2e.Response, status int, message string) {
 	t.Helper()
 	e.ExpectErrorPage(res, status, message)
 }

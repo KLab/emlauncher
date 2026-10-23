@@ -1,24 +1,22 @@
 package scenario
 
 import (
+	e2e "emlauncher-e2e"
 	"net/http"
 	"testing"
-
-	"emlauncher-e2e/internal/fixture"
-	"emlauncher-e2e/internal/harness"
 )
 
 func TestComments(t *testing.T) {
-	e := harness.New(t)
+	e := e2e.New(t)
 	owner := e.NewUser("owner")
 	coOwner := e.NewUser("coowner")
-	app := e.CreateApp(owner, harness.Unique("app"))
+	app := e.CreateApp(owner, e2e.Unique("app"))
 	owner.PostForm("/app/preferences_update_owners", form("id", itoa(app.ID), "owners[]", coOwner.Mail))
-	pid := e.MustAPIUpload(app.APIKey, "commented build", "a.apk", fixture.APK("com.example.a"), nil)
+	pid := e.MustAPIUpload(app.APIKey, "commented build", "a.apk", e2e.APK("com.example.a"), nil)
 
 	user := e.NewUser("user")
-	harness.ExpectStatus(t, user.Get("/package/install?id="+itoa(pid)), http.StatusFound)
-	harness.ExpectStatus(t, user.Get("/app/comment?id="+itoa(app.ID)), http.StatusOK)
+	e2e.ExpectStatus(t, user.Get("/package/install?id="+itoa(pid)), http.StatusFound)
+	e2e.ExpectStatus(t, user.Get("/app/comment?id="+itoa(app.ID)), http.StatusOK)
 
 	res := user.PostForm("/app/comment_post", form("id", itoa(app.ID), "message", "first comment コメント", "package_id", itoa(pid)))
 	user.ExpectRedirect(res, "/app/comment?id="+itoa(app.ID))
@@ -40,12 +38,12 @@ func TestComments(t *testing.T) {
 	expectEq(t, "date_to_sort", a.Str("date_to_sort"), rows[1].Str("created"))
 
 	page := user.Get("/app/comment?id=" + itoa(app.ID))
-	harness.ExpectStatus(t, page, http.StatusOK)
+	e2e.ExpectStatus(t, page, http.StatusOK)
 	expectContains(t, "comment page", page.String(), "first comment コメント")
 	expectContains(t, "app page", user.Get("/app?id="+itoa(app.ID)).String(), "second comment")
 
 	// オーナー全員に通知される
-	for _, o := range []*harness.User{owner, coOwner} {
+	for _, o := range []*e2e.User{owner, coOwner} {
 		mails := e.Mailbox.WaitTo(o.Mail, 2)
 		expectEq(t, "subject", mails[0].Subject, "New Comment to "+app.Title)
 		expectContains(t, "body", mails[0].Body, "first comment コメント")

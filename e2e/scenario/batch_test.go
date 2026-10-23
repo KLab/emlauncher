@@ -1,26 +1,24 @@
 package scenario
 
 import (
+	e2e "emlauncher-e2e"
 	"testing"
-
-	"emlauncher-e2e/internal/fixture"
-	"emlauncher-e2e/internal/harness"
 )
 
 // TestDeleteOldPackagesBatch は古いパッケージ削除バッチを確認する.
 // バッチは DB の全アプリが対象なので, 他のテストのアプリのパッケージも消えうる.
 func TestDeleteOldPackagesBatch(t *testing.T) {
-	e := harness.New(t)
+	e := e2e.New(t)
 	owner := e.NewUser("owner")
-	app := e.CreateApp(owner, harness.Unique("app"))
+	app := e.CreateApp(owner, e2e.Unique("app"))
 
 	var ids []int64
-	ids = append(ids, e.MustAPIUpload(app.APIKey, "p0 protected", "a.apk", fixture.APK("com.example.a"), form("protect", "1")))
-	ids = append(ids, e.MustAPIUpload(app.APIKey, "p1", "b.aab", fixture.AAB("com.example.a"), form("tags", "t")))
+	ids = append(ids, e.MustAPIUpload(app.APIKey, "p0 protected", "a.apk", e2e.APK("com.example.a"), form("protect", "1")))
+	ids = append(ids, e.MustAPIUpload(app.APIKey, "p1", "b.aab", e2e.AAB("com.example.a"), form("tags", "t")))
 	for i := 2; i < 6; i++ {
-		ids = append(ids, e.MustAPIUpload(app.APIKey, "p", "c.apk", fixture.APK("com.example.a"), nil))
+		ids = append(ids, e.MustAPIUpload(app.APIKey, "p", "c.apk", e2e.APK("com.example.a"), nil))
 	}
-	var pkgs []harness.Row
+	var pkgs []e2e.Row
 	for _, id := range ids {
 		pkgs = append(pkgs, e.Package(id))
 	}
@@ -35,13 +33,13 @@ func TestDeleteOldPackagesBatch(t *testing.T) {
 		want := i == 0 || i >= 3
 		expectEq(t, "package "+itoa(id)+" exists", exists, want)
 		if want {
-			checkStored(t, e, harness.PackageKey(pkgs[i]), nil, "", false)
+			checkStored(t, e, e2e.PackageKey(pkgs[i]), nil, "", false)
 		} else {
-			checkNotStored(t, e, harness.PackageKey(pkgs[i]))
+			checkNotStored(t, e, e2e.PackageKey(pkgs[i]))
 		}
 	}
 	expectEq(t, "package_tag", e.DB.Count("SELECT count(*) FROM package_tag WHERE package_id = ?", ids[1]), 0)
 	expectEq(t, "attached_file", e.DB.Count("SELECT count(*) FROM attached_file WHERE package_id = ?", ids[1]), 0)
-	checkNotStored(t, e, harness.AttachedKey(att))
+	checkNotStored(t, e, e2e.AttachedKey(att))
 	expectEq(t, "last_upload", e.Application(app.ID).Str("last_upload"), lastUpload)
 }

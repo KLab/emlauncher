@@ -1,24 +1,22 @@
 package scenario
 
 import (
+	e2e "emlauncher-e2e"
 	"net/http"
 	"regexp"
 	"strings"
 	"testing"
 	"time"
-
-	"emlauncher-e2e/internal/fixture"
-	"emlauncher-e2e/internal/harness"
 )
 
 var reGuestpassURL = regexp.MustCompile(`https?://[^"<\s]+/package/guestpass_install\?token=([0-9A-Za-z]{32})`)
 
 func TestGuestPass(t *testing.T) {
-	e := harness.New(t)
+	e := e2e.New(t)
 	owner := e.NewUser("owner")
 	other := e.NewUser("other")
-	app := e.CreateApp(owner, harness.Unique("app"))
-	apk := fixture.APK("com.example.guest")
+	app := e.CreateApp(owner, e2e.Unique("app"))
+	apk := e2e.APK("com.example.guest")
 	pid := e.MustAPIUpload(app.APIKey, "apk", "guest.apk", apk, nil)
 	id := itoa(pid)
 
@@ -26,7 +24,7 @@ func TestGuestPass(t *testing.T) {
 
 	res := owner.Get("/package/create_guestpass?id=" + id)
 	owner.ExpectRedirect(res, "/package/guestpass?id="+id+"&guestpass_id=")
-	gpID := harness.QueryInt(t, res.Location(), "guestpass_id")
+	gpID := e2e.QueryInt(t, res.Location(), "guestpass_id")
 	gp := e.DB.Row("SELECT * FROM guest_pass WHERE id = ?", gpID)
 	expectEq(t, "app_id", gp.Int("app_id"), app.ID)
 	expectEq(t, "package_id", gp.Int("package_id"), pid)
@@ -38,23 +36,23 @@ func TestGuestPass(t *testing.T) {
 	}
 
 	page := owner.Get(res.Location())
-	harness.ExpectStatus(t, page, http.StatusOK)
+	e2e.ExpectStatus(t, page, http.StatusOK)
 	m := reGuestpassURL.FindStringSubmatch(page.String())
 	if m == nil || m[1] != gp.Str("token") {
 		t.Fatalf("guestpass url not found:\n%s", page.Body)
 	}
 	expectErrorPage(t, e, other.Get("/package/guestpass?id="+id+"&guestpass_id="+gp.Str("id")), http.StatusForbidden, "Forbidden")
 	expectContains(t, "package page", owner.Get("/package?id="+id).String(), "guestpass_id="+gp.Str("id"))
-	harness.ExpectStatus(t, owner.Get("/guestpass/list"), http.StatusOK)
+	e2e.ExpectStatus(t, owner.Get("/guestpass/list"), http.StatusOK)
 
 	// ログインしていないゲストがインストールできる
 	guest := e.NewClient()
-	guest.UserAgent = harness.UAAndroid
+	guest.UserAgent = e2e.UAAndroid
 	res = guest.Get(m[0])
-	harness.ExpectStatus(t, res, http.StatusFound)
-	expectDownload(t, e, res.Location(), harness.PackageKey(e.Package(pid)), apk, "guest.apk")
+	e2e.ExpectStatus(t, res, http.StatusFound)
+	expectDownload(t, e, res.Location(), e2e.PackageKey(e.Package(pid)), apk, "guest.apk")
 	log := e.DB.Row("SELECT * FROM guestpass_log WHERE guest_pass_id = ?", gpID)
-	expectEq(t, "user_agent", log.Str("user_agent"), harness.UAAndroid)
+	expectEq(t, "user_agent", log.Str("user_agent"), e2e.UAAndroid)
 	if log.Str("ip_address") == "" {
 		t.Fatal("ip_address is empty")
 	}
@@ -63,14 +61,14 @@ func TestGuestPass(t *testing.T) {
 	expectEq(t, "install_log", e.DB.Count("SELECT count(*) FROM install_log WHERE package_id = ?", pid), 0)
 
 	// iOS のゲスト
-	ipa := fixture.IPA("Guest", "com.example.guest.ios")
+	ipa := e2e.IPA("Guest", "com.example.guest.ios")
 	ipaID := itoa(e.MustAPIUpload(app.APIKey, "ipa", "guest.ipa", ipa, nil))
 	res = owner.Get("/package/create_guestpass?id=" + ipaID)
-	iosToken := e.DB.Row("SELECT token FROM guest_pass WHERE id = ?", harness.QueryInt(t, res.Location(), "guestpass_id")).Str("token")
+	iosToken := e.DB.Row("SELECT token FROM guest_pass WHERE id = ?", e2e.QueryInt(t, res.Location(), "guestpass_id")).Str("token")
 	ios := e.NewClient()
-	ios.UserAgent = harness.UAiOS
+	ios.UserAgent = e2e.UAiOS
 	res = ios.Get("/package/guestpass_install?token=" + iosToken)
-	harness.ExpectStatus(t, res, http.StatusFound)
+	e2e.ExpectStatus(t, res, http.StatusFound)
 	if !strings.HasPrefix(res.Location(), "itms-services://") {
 		t.Fatalf("location = %q", res.Location())
 	}

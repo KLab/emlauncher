@@ -1,32 +1,30 @@
 package scenario
 
 import (
+	e2e "emlauncher-e2e"
 	"net/http"
 	"testing"
 	"time"
-
-	"emlauncher-e2e/internal/fixture"
-	"emlauncher-e2e/internal/harness"
 )
 
 func TestUploadNotification(t *testing.T) {
-	e := harness.New(t)
+	e := e2e.New(t)
 	owner := e.NewUser("owner")
-	app := e.CreateApp(owner, harness.Unique("app"))
-	first := e.MustAPIUpload(app.APIKey, "first", "a.apk", fixture.APK("com.example.a"), nil)
+	app := e.CreateApp(owner, e2e.Unique("app"))
+	first := e.MustAPIUpload(app.APIKey, "first", "a.apk", e2e.APK("com.example.a"), nil)
 
 	subscriber := e.NewUser("subscriber")
 	muted := e.NewUser("muted")
-	for _, u := range []*harness.User{subscriber, muted} {
-		harness.ExpectStatus(t, u.Get("/package/install?id="+itoa(first)), http.StatusFound)
+	for _, u := range []*e2e.User{subscriber, muted} {
+		e2e.ExpectStatus(t, u.Get("/package/install?id="+itoa(first)), http.StatusFound)
 	}
-	harness.ExpectStatus(t, muted.Get("/ajax/notification_setting?id="+itoa(app.ID)+"&value=0"), http.StatusOK)
+	e2e.ExpectStatus(t, muted.Get("/ajax/notification_setting?id="+itoa(app.ID)+"&value=0"), http.StatusOK)
 
 	// notify 無しでは送らない
-	e.MustAPIUpload(app.APIKey, "silent", "a.apk", fixture.APK("com.example.a"), nil)
+	e.MustAPIUpload(app.APIKey, "silent", "a.apk", e2e.APK("com.example.a"), nil)
 
 	// API から notify 付き
-	pid := e.MustAPIUpload(app.APIKey, "notified build", "a.apk", fixture.APK("com.example.a"),
+	pid := e.MustAPIUpload(app.APIKey, "notified build", "a.apk", e2e.APK("com.example.a"),
 		form("notify", "true", "description", "release note", "tags", "rc"))
 	mails := e.Mailbox.WaitTo(subscriber.Mail, 1)
 	expectEq(t, "mails", len(mails), 1)
@@ -42,8 +40,8 @@ func TestUploadNotification(t *testing.T) {
 	expectContains(t, "To", m.Header.Get("To"), "bcc@example.com")
 
 	// 画面から notify 付き
-	res := harness.UIUploadTemp(owner, "b.apk", fixture.APK("com.example.a"))
-	f := harness.UIUploadPostForm(res.JSONObject(t), 10)
+	res := e2e.UIUploadTemp(owner, "b.apk", e2e.APK("com.example.a"))
+	f := e2e.UIUploadPostForm(res.JSONObject(t), 10)
 	f.Set("title", "ui notified")
 	f.Set("notify", "1")
 	owner.ExpectRedirect(owner.PostForm("/app/upload_post?id="+itoa(app.ID), f), "/package?id=")

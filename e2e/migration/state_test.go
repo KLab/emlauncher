@@ -16,7 +16,7 @@ import (
 	"runtime"
 	"testing"
 
-	"emlauncher-e2e/internal/harness"
+	e2e "emlauncher-e2e"
 )
 
 type State struct {
@@ -35,8 +35,8 @@ type State struct {
 	OrphanTemp   string `json:"orphan_temp"` // upload_post されなかった一時ファイルのキー
 
 	// 移行手順で DB とストレージが変わっていないことの確認用
-	DB      map[string][]harness.Row `json:"db"`
-	Storage map[string]string        `json:"storage"` // key -> sha256
+	DB      map[string][]e2e.Row `json:"db"`
+	Storage map[string]string    `json:"storage"` // key -> sha256
 
 	// 移行前の API の応答 (package_list)
 	PackageList map[string][]PackageSummary `json:"package_list"`
@@ -105,12 +105,12 @@ var tables = map[string]string{
 	"guestpass_log":     "id",
 }
 
-func phase(t *testing.T, want string) *harness.Env {
+func phase(t *testing.T, want string) *e2e.Env {
 	t.Helper()
 	if os.Getenv("E2E_MIGRATION_PHASE") != want {
 		t.Skipf("set E2E_MIGRATION_PHASE=%s to run", want)
 	}
-	return harness.New(t)
+	return e2e.New(t)
 }
 
 func statePath() string {
@@ -146,15 +146,15 @@ func loadState(t *testing.T) *State {
 	return &s
 }
 
-func snapshotDB(e *harness.Env) map[string][]harness.Row {
-	out := map[string][]harness.Row{}
+func snapshotDB(e *e2e.Env) map[string][]e2e.Row {
+	out := map[string][]e2e.Row{}
 	for table, order := range tables {
 		out[table] = e.DB.Rows("SELECT * FROM `" + table + "` ORDER BY " + order)
 	}
 	return out
 }
 
-func snapshotStorage(e *harness.Env) map[string]string {
+func snapshotStorage(e *e2e.Env) map[string]string {
 	out := map[string]string{}
 	for _, k := range e.Storage.Keys("") {
 		out[k] = sha(e.Storage.Read(k))
@@ -168,10 +168,10 @@ func sha(b []byte) string {
 }
 
 // packageList は package_list API の応答を PackageSummary に揃える.
-func packageList(t *testing.T, e *harness.Env, apiKey string) []PackageSummary {
+func packageList(t *testing.T, e *e2e.Env, apiKey string) []PackageSummary {
 	t.Helper()
 	res := e.APICall("package_list", apiKey, map[string][]string{"limit": {"100"}})
-	harness.ExpectStatus(t, res, 200)
+	e2e.ExpectStatus(t, res, 200)
 	var out []PackageSummary
 	for _, v := range res.JSON(t).([]any) {
 		m := v.(map[string]any)
