@@ -122,10 +122,8 @@ func (s *Server) ui(w http.ResponseWriter, r *http.Request) {
 		action = parts[1]
 	}
 	route, ok := s.routeTable[module+"/"+action]
-	if !ok && module == "doc" {
-		if _, ok := s.templates["doc/"+action]; ok {
-			route, ok = uiRoute{authLogin, s.docPage}, true
-		}
+	if _, isDoc := s.templates["doc/"+action]; !ok && module == "doc" && isDoc {
+		route, ok = uiRoute{authLogin, s.docPage}, true
 	}
 	if !ok {
 		if module == "ajax" {

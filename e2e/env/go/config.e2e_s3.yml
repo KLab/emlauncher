@@ -1,0 +1,45 @@
+# E2E テスト用 (S3). PHP 版 (e2e/env/php/config) と同じ DB・memcached・ストレージを使う.
+listen: 0.0.0.0:8080
+# 空にして, コンテナの環境変数 TZ を使う
+timezone: ""
+cache_prefix: emlauncher_e2e_s3_emlauncher_
+title_prefix: "[E2E Go] "
+mail_sender: "EMLauncher <no-reply@example.com>"
+mail_bcc_to: "EMLauncher <bcc@example.com>"
+mail:
+  sendmail: /usr/local/bin/capture-mail -t -i
+login:
+  enable_password: true
+package:
+  file_size_warning_ios: 150
+  file_size_warning_android: 100
+session:
+  secret: e2e-session-secret-0123456789
+database:
+  host: db
+  port: 3306
+  name: emlauncher
+  user: emlauncher
+  password: emlauncher
+memcache:
+  host: memcached
+  port: 11211
+storage_class: S3
+local_file:
+  path: /var/www/emlauncher
+  url_prefix: /files
+  serve: true
+apkfile:
+  java: java -Xmx1g
+  bundletool: /bundletool.jar
+  keystore: /emlauncher.keystore
+  kspass: pass:emlauncher
+  keyalias: emlauncher
+  keypass: pass:emlauncher
+aws:
+  key: test
+  secret: test
+  region: ap-northeast-1
+  bucket_name: emlauncher-e2e
+  base_url: http://s3:4566
+  external_url: http://localhost:14566

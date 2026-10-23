@@ -14,7 +14,7 @@ export E2E_ENV="e2e_${storage}"
 
 compose() { docker compose -f compose.yml "$@"; }
 
-compose down -v --remove-orphans >/dev/null 2>&1 || true
+compose --profile go down -v --remove-orphans >/dev/null 2>&1 || true
 rm -rf ../.work/files ../.work/mailbox
 mkdir -p ../.work/files ../.work/mailbox
 chmod 777 ../.work/files ../.work/mailbox

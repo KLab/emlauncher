@@ -1,9 +1,9 @@
 package scenario
 
 import (
+	"bytes"
 	"encoding/json"
 	"fmt"
-	"bytes"
 	"image/png"
 	"net/url"
 	"reflect"

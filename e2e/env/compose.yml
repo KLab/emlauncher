@@ -65,3 +65,23 @@ services:
         condition: service_started
       s3:
         condition: service_started
+
+  # Go 版 (e2e/env/up-go.sh で起動する). PHP 版と同じ DB・memcached・ストレージ・メールボックスを使う.
+  go:
+    profiles: ["go"]
+    build:
+      context: ../../go
+      dockerfile: ../e2e/env/go/Dockerfile
+    image: emlauncher-e2e-go
+    environment:
+      E2E_ENV: ${E2E_ENV:-e2e_local}
+      TZ: ${E2E_TZ:-Asia/Tokyo}
+    volumes:
+      - ./go:/etc/emlauncher:ro
+      - ../.work/files:/var/www/emlauncher
+      - ../.work/mailbox:/mailbox
+    ports:
+      - "${E2E_GO_PORT:-18082}:8080"
+    depends_on:
+      db:
+        condition: service_healthy
