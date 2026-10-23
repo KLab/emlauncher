@@ -174,13 +174,14 @@ docs/go-migration/           本計画書・テスト・移行手順
 | 3 | API 7 本 + health + qr | 完了（シナリオテスト合格） |
 | 4 | Apache の mod_proxy で `/api/*` だけ Go に切替 | 手順は [MIGRATION.md](MIGRATION.md) に記載。本番での実施は未 |
 | 5 | 認証（既存パスワードとの互換、リセットメール、Google / AzureAD）、Cookie セッション | 完了。Google / AzureAD は実際の IdP では未確認 |
-| 6 | 画面移植、ajax、インストールフロー、ゲストパス、メール通知 | 完了（PHP 版のテンプレートの構造をそのまま移植したので配置は同じ）。新旧画面の目視確認と iOS / Android 実機の確認は未 |
+| 6 | 画面移植、ajax、インストールフロー、ゲストパス、メール通知 | 完了。PHP 版のテンプレートの構造と CSS / JS のバージョンをそのまま使い, 新旧の画面が一致することをスクリーンショットの差分で確認した。iOS / Android 実機の確認は未 |
 | 7 | バッチ移植、移行手順書、移行リハーサル、切り戻しの確認 | 完了。本番切替は未 |
 
 ### 残っていること
 
 - 各本番環境で `go/tools/export_php_config.php` を実行し, 書き出された TZ・storage_class・cache_prefix を確認する
-- 画面の新旧の目視確認（配置は同じだが, CDN の Bootstrap を 3.0.0 → 3.3.7 に上げたので細部の見た目が違いうる）
+- 画面の新旧のスクリーンショット（`e2e/.work/screenshots/index.html`）を人が見て確認する
+- 画面のデザインの刷新（必要なら. 今は PHP 版と同じ見た目）
 - iOS / Android 実機でのインストール, Google / AzureAD ログインの確認
 - （任意）PHP 版の api/delete のバグで生じた, DB とストレージの不整合の調査
 

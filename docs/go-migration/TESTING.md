@@ -96,6 +96,22 @@ cd e2e && E2E_TARGET=go E2E_STORAGE=s3 go test ./scenario/ -count=1
 - **S3 の ContentType**: パッケージ・添付ファイル・一時ファイルはすべて `application/octet-stream`（アイコンだけ `image/png`）。PHP 版はコード上は MIME を指定しているが、aws-sdk-php の MultipartUploader がその設定を読まず、アップロード元の一時ファイルに拡張子も無いため。S3 の構成を変えないため、これを仕様とした。
 - `description` を省略してアップロードすると NULL になる。
 
+## 画面の比較
+
+PHP 版と Go 版を同じ DB に向けて起動した状態で, 同じ画面を PC 幅・スマホ幅で撮影して並べる（Playwright のコンテナを使う）。
+
+```sh
+cd e2e
+docker run --rm --network host -v $PWD:/e2e -w /e2e mcr.microsoft.com/playwright/python:v1.48.0-jammy   sh -c "pip install -q playwright==1.48.0; python3 screenshots.py --mail <mail> --password <password> --app <app id> --package <package id>"
+# e2e/.work/screenshots/index.html (左が PHP 版, 右が Go 版)
+```
+
+2026-10-23 時点で, 15 画面 × 2 幅のすべてでページの大きさが一致し, 画素の差は次のものだけ（画素の差分で確認）。
+
+- テスト環境のタイトルの接頭辞（`[E2E]` と `[E2E Go]`）
+- QR コードの模様（生成ライブラリが違う. 読み取れる URL は同じ）
+- ドキュメント内の URL（ポート番号）
+
 ## 移行リハーサル
 
 PHP 版で運用中にありそうな「中間状態」を作り、移行手順どおりに切り替えた後、状態がそのまま使えることを確認する。
