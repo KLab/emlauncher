@@ -8,3 +8,6 @@ vendor/
 
 #intelliJ
 .idea/
+
+# E2E テストの作業領域
+e2e/.work/

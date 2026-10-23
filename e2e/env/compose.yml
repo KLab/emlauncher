@@ -1,0 +1,67 @@
+# E2E テスト用の環境 (PHP 版).
+# リポジトリ直下から: docker compose -f e2e/env/compose.yml up -d --build
+# 実際の起動は e2e/env/up.sh を使う.
+name: emlauncher-e2e
+
+services:
+  db:
+    image: mysql:5.7.44
+    environment:
+      MYSQL_ROOT_PASSWORD: password
+      MYSQL_DATABASE: emlauncher
+      MYSQL_USER: emlauncher
+      MYSQL_PASSWORD: emlauncher
+    command: ["--character-set-server=utf8mb4", "--collation-server=utf8mb4_general_ci"]
+    volumes:
+      - ../../data/sql/tables.sql:/docker-entrypoint-initdb.d/01_tables.sql:ro
+    ports:
+      - "${E2E_DB_PORT:-13306}:3306"
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "127.0.0.1", "-uemlauncher", "-pemlauncher"]
+      interval: 2s
+      timeout: 5s
+      retries: 60
+
+  memcached:
+    image: memcached:1.6.32
+    ports:
+      - "${E2E_MEMCACHED_PORT:-21211}:11211"
+
+  s3:
+    image: localstack/localstack:3.8.1
+    environment:
+      SERVICES: s3
+      DEFAULT_REGION: ap-northeast-1
+    ports:
+      - "${E2E_S3_PORT:-14566}:4566"
+
+  php:
+    build: ./php
+    environment:
+      # e2e_local (LocalFile) / e2e_s3 (S3)
+      MFW_ENV: ${E2E_ENV:-e2e_local}
+      PHP_TZ: ${E2E_TZ:-Asia/Tokyo}
+      E2E_S3_EXTERNAL_URL: http://localhost:${E2E_S3_PORT:-14566}
+    # APP_ROOT は /srv/emlauncher. ディレクトリ名は memcached のキー接頭辞に入る
+    # (本番と同じ "emlauncher" にしている). config/ だけ E2E 用に差し替える.
+    volumes:
+      - ../../initialize.php:/srv/emlauncher/initialize.php:ro
+      - ../../web:/srv/emlauncher/web:ro
+      - ../../mainmodules:/srv/emlauncher/mainmodules:ro
+      - ../../model:/srv/emlauncher/model:ro
+      - ../../data:/srv/emlauncher/data:ro
+      - ../../batch:/srv/emlauncher/batch:ro
+      - ../../mfw:/srv/emlauncher/mfw:ro
+      - ../../vendor:/srv/emlauncher/vendor:ro
+      - ./php/config:/srv/emlauncher/config:ro
+      - ../.work/files:/var/www/emlauncher
+      - ../.work/mailbox:/mailbox
+    ports:
+      - "${E2E_PHP_PORT:-18081}:80"
+    depends_on:
+      db:
+        condition: service_healthy
+      memcached:
+        condition: service_started
+      s3:
+        condition: service_started

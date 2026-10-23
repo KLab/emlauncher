@@ -1,0 +1,3 @@
+#!/bin/sh
+# sendmail の代わりに, 送信されたメールを /mailbox にファイルとして保存する.
+cat > "/mailbox/$(date +%s%N)-$$.eml"
