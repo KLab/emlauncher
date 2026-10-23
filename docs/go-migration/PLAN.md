@@ -165,16 +165,23 @@ docs/go-migration/           本計画書・テスト・移行手順
 
 ## 4. フェーズ
 
-| # | 内容 | 完了の条件 |
+| # | 内容 | 状態 |
 |---|---|---|
-| 0 | テスト基盤: PHP 版のシナリオテストと移行リハーサル（[TESTING.md](TESTING.md)）。各環境の TZ・storage_class・memcached の接頭辞を確認 | シナリオテストと移行リハーサル（php → php）が PHP 版で全て通る（**テストは完了。環境の確認は未**） |
-| 1 | 基盤: config（TZ）、DB、Storage（S3 / LocalFile）、memcached、ログ、ALB 対応の URL 生成 | Storage のテストが S3（エミュレータ）と LocalFile の両方で通る |
-| 2 | パッケージ解析（IPA / APK / AAB）、アイコン変換 | テスト用フィクスチャで identifier が PHP 版と一致 |
-| 3 | API 7 本 + health + qr | API のシナリオテストが Go 版で通る |
-| 4 | Apache の mod_proxy で `/api/*` だけ Go に切替 | CI からのアップロードが本番で動く |
-| 5 | 認証（既存パスワードとの互換、リセットメール、Google / AzureAD）、Cookie セッション | ログインのシナリオテストが通る |
-| 6 | 画面の一覧作成 → 画面移植 → 新旧スクリーンショット確認、ajax、インストールフロー、ゲストパス、メール通知 | 全シナリオテストが Go 版で通る。iOS / Android 実機でインストールできる |
-| 7 | バッチ移植、移行手順書の作成、**移行リハーサルテスト**、全体切替（systemd 化）、PHP 撤去 | 移行リハーサルテストが通る。本番運用 |
+| 0 | テスト基盤: PHP 版のシナリオテストと移行リハーサル（[TESTING.md](TESTING.md)） | 完了 |
+| 1 | 基盤: config（TZ）、DB、Storage（S3 / LocalFile）、memcached、ログ、ALB 対応の URL 生成 | 完了 |
+| 2 | パッケージ解析（IPA / APK / AAB）、アイコン変換 | 完了 |
+| 3 | API 7 本 + health + qr | 完了（シナリオテスト合格） |
+| 4 | Apache の mod_proxy で `/api/*` だけ Go に切替 | 手順は [MIGRATION.md](MIGRATION.md) に記載。本番での実施は未 |
+| 5 | 認証（既存パスワードとの互換、リセットメール、Google / AzureAD）、Cookie セッション | 完了。Google / AzureAD は実際の IdP では未確認 |
+| 6 | 画面移植、ajax、インストールフロー、ゲストパス、メール通知 | 完了（PHP 版のテンプレートの構造をそのまま移植したので配置は同じ）。新旧画面の目視確認と iOS / Android 実機の確認は未 |
+| 7 | バッチ移植、移行手順書、移行リハーサル、切り戻しの確認 | 完了。本番切替は未 |
+
+### 残っていること
+
+- 各本番環境で `go/tools/export_php_config.php` を実行し, 書き出された TZ・storage_class・cache_prefix を確認する
+- 画面の新旧の目視確認（配置は同じだが, CDN の Bootstrap を 3.0.0 → 3.3.7 に上げたので細部の見た目が違いうる）
+- iOS / Android 実機でのインストール, Google / AzureAD ログインの確認
+- （任意）PHP 版の api/delete のバグで生じた, DB とストレージの不整合の調査
 
 ## 5. 移行手順
 

@@ -40,7 +40,19 @@ e2e/env/up.sh s3
 cd e2e && E2E_STORAGE=s3 go test ./scenario/ -count=1
 ```
 
-PHP 版に対しては LocalFile・S3 の両方で全シナリオが通る（2026-10-23 時点で 36 件）。
+### Go 版に対して
+
+Go 版は PHP 版と同じ DB・memcached・ストレージ・メールボックスに向けて起動する（`e2e/env/go/` の設定を使う）。`E2E_TARGET=go` にすると, 接続先（`http://localhost:18082`）とバッチのコマンドが Go 版に切り替わる。
+
+```sh
+e2e/env/up.sh local && e2e/env/up-go.sh local
+cd e2e && E2E_TARGET=go go test ./scenario/ -count=1
+
+e2e/env/up.sh s3 && e2e/env/up-go.sh s3
+cd e2e && E2E_TARGET=go E2E_STORAGE=s3 go test ./scenario/ -count=1
+```
+
+2026-10-23 時点で, PHP 版・Go 版とも LocalFile・S3 の両方で全 36 シナリオが通る。
 
 ### 主な環境変数
 
@@ -57,7 +69,7 @@ PHP 版に対しては LocalFile・S3 の両方で全シナリオが通る（202
 | `E2E_TZ` | `Asia/Tokyo` | テスト対象の TZ。DB の日時がこの TZ で「今」になっているかを確認する |
 | `E2E_BATCH_CMD` | PHP 版のバッチを docker で実行 | 古いパッケージ削除バッチ。`{keep}` が保持数に置き換わる |
 
-Go 版をテストするときは、Go 版を同じ DB・memcached・ストレージ・メールボックスに向けて起動し、`E2E_TARGET=go E2E_BASE_URL=... E2E_BATCH_CMD=...` を指定する。メールは sendmail 互換コマンドで `E2E_MAILBOX` にファイルとして書き出せるようにしておく。
+`E2E_TARGET=go` のとき, `E2E_BASE_URL` と `E2E_BATCH_CMD` の既定値は Go 版のもの（`e2e/env/up-go.sh` で起動したもの）になる。メールは sendmail 互換コマンドで `E2E_MAILBOX` にファイルとして書き出す。
 
 ### 仕様として固定したもの
 
@@ -90,10 +102,12 @@ PHP 版で運用中にありそうな「中間状態」を作り、移行手順�
 
 ```sh
 cd e2e
-migration/rehearse.sh local php   # LocalFile, 移行先は PHP 版 (仕組みの確認用)
-migration/rehearse.sh s3 php      # S3
-migration/rehearse.sh local go    # Go 版の実装後
+migration/rehearse.sh local go    # LocalFile, PHP 版 → Go 版 → PHP 版へ切り戻し
+migration/rehearse.sh s3 go       # S3
+migration/rehearse.sh local php   # 移行先を PHP 版にする (リハーサルの仕組み自体の確認用)
 ```
+
+2026-10-23 時点で, LocalFile・S3 の両方で全フェーズが通る。
 
 1. PHP 版を空の状態で起動する
 2. **seed**（`E2E_MIGRATION_PHASE=seed`）: 画面と API だけで中間状態を作り、`e2e/.work/migration-state.json` に記録する
@@ -103,7 +117,11 @@ migration/rehearse.sh local go    # Go 版の実装後
    - インストール履歴（Android / iOS / PC）、通知を切ったユーザ、コメント
    - 有効なゲストパスと失効したゲストパス、API と画面で発行したインストールトークン（memcached）
    - upload_post されずに残った一時ファイル
-3. **移行**: 移行先が `php` ならコンテナを作り直すだけ。`go` なら [MIGRATION.md](MIGRATION.md) の手順を実行する（Go 版の実装後にスクリプトを実装する）
+3. **移行**: 移行先が `go` なら [MIGRATION.md](MIGRATION.md) の手順どおりに行う
+   - PHP 版のコンテナで `go/tools/export_php_config.php` を実行して Go 版の設定を書き出す（TZ, memcached の接頭辞, DB, ストレージなど）
+   - `listen` だけ環境に合わせて書き換える
+   - PHP 版を止め, Go 版を **Apache と同じユーザ（www-data）** で起動する。authfile は同じホストにある前提でマウントする
+   - 移行先が `php` ならコンテナを作り直すだけ
 4. **verify**（`E2E_MIGRATION_PHASE=verify`）
    - 移行手順の前後で DB とストレージが変わっていない
    - 既存のパスワードで再ログインできる。画面・API の応答が移行前と同じ
@@ -112,4 +130,15 @@ migration/rehearse.sh local go    # Go 版の実装後
    - 通知設定が引き継がれる、既存タグが再利用される、コメント番号が続く
    - 移行前のパッケージを編集・削除できる（ファイルも消える）、パスワードリセット、古いパッケージ削除バッチ
 
+5. **切り戻し**（移行先が `go` のとき）: Go 版を止めて PHP 版を起動する
+6. **rollback**（`E2E_MIGRATION_PHASE=rollback`）: verify で Go 版が作ったデータが PHP 版で使える
+   - Go 版で変更したパスワード（Go 版が作ったハッシュ）でログインできる
+   - Go 版がアップロードしたパッケージを表示・ダウンロードできる
+   - Go 版が発行したインストールトークン（memcached）が使える
+
 verify は状態を変更するため、一度流したら seed からやり直す。
+
+### リハーサルで見つかったこと
+
+- 書き出した設定の `database.authfile` は PHP 版のサーバ上のパス。Go 版を同じサーバで, そのファイルを読めるユーザで動かす必要がある（手順書に記載）。
+- Go 版を Apache と同じユーザで動かすと, LocalFile の保存で chmod が失敗した（所有者の違うディレクトリ）。chmod を使わないよう修正した。
