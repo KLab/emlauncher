@@ -1,0 +1,17 @@
+# README のユニット例と同じ内容 (User とパスだけテスト環境に合わせている).
+[Unit]
+Description=EMLauncher
+After=network.target
+
+[Service]
+User=www-data
+RuntimeDirectory=emlauncher
+PIDFile=/run/emlauncher/emlauncher.pid
+ExecStart=/usr/local/bin/emlauncher -config /etc/emlauncher/config.yml -pid-file /run/emlauncher/emlauncher.pid
+ExecReload=/bin/sh -c 'kill -HUP $MAINPID'
+# 停止時は処理中のリクエスト (大きなアップロード) を待つ. emlauncher の -drain-timeout (既定 1h) に合わせる
+TimeoutStopSec=1h
+Restart=always
+
+[Install]
+WantedBy=multi-user.target

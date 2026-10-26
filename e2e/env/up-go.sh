@@ -9,7 +9,7 @@ export E2E_ENV="e2e_${storage}"
 
 # 設定の指定が無ければ e2e/env/go/ の設定をコピーして使う (テストが一時的に書き換えるため)
 if [ -z "${E2E_GO_CONFIG_DIR:-}" ]; then
-	rm -rf ../.work/go-runtime-config
+	# ディレクトリは作り直さない (他のコンテナがマウントしているため). ファイルだけ上書きする
 	mkdir -p ../.work/go-runtime-config
 	cp go/config.*.yml ../.work/go-runtime-config/
 fi

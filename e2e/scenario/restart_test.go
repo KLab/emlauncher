@@ -21,7 +21,7 @@ import (
 //   - 古いプロセスは処理を終えたら終了する
 func TestGracefulRestart(t *testing.T) {
 	e := e2e.New(t)
-	if e.Config.Target != "go" {
+	if e.Config.Target == "php" {
 		t.Skip("無停止の再起動は Go 版のみ")
 	}
 	owner := e.NewUser("owner")
@@ -90,14 +90,17 @@ func TestGracefulRestart(t *testing.T) {
 		}
 	}()
 
-	if out, err := e.GoExec("kill -HUP $(cat /tmp/emlauncher.pid)"); err != nil {
-		t.Fatalf("SIGHUP: %v: %s", err, out)
-	}
+	e.ReloadServer()
 	newPID := waitFor(t, "new process", func() (string, bool) {
 		pid := e.ServerPID()
 		return pid, pid != oldPID
 	})
 	t.Logf("pid %s -> %s", oldPID, newPID)
+	// systemd で動かしている場合, 古いプロセスが処理を終えるまではメインプロセスは古いまま.
+	// 古いプロセスが終了した時点で PID ファイルから新しいプロセスに移る (下で確認する)
+	if pid := e.MainPID(); e.Config.GoMainPID != "" && pid != oldPID && pid != newPID {
+		t.Fatalf("systemd MainPID = %s, want %s or %s", pid, oldPID, newPID)
+	}
 
 	// 新しいプロセスがリクエストを処理する (API も DB も使える)
 	res := e.APICall("package_list", app.APIKey, nil)
@@ -122,10 +125,28 @@ func TestGracefulRestart(t *testing.T) {
 	pkg := e.DB.Row("SELECT * FROM package WHERE app_id = ? AND title = 'uploaded across restart'", app.ID)
 	checkStored(t, e, e2e.PackageKey(pkg), apk, mimeStored, false)
 
-	// 4. 古いプロセスは終了する
+	// 4. 古いプロセスは終了する. 新しいプロセスは動き続ける (systemd がサービスごと止めたりしない)
 	waitFor(t, "old process to exit", func() (string, bool) {
 		return "", !e.ProcessAlive(oldPID)
 	})
+	time.Sleep(time.Second)
+	if !e.ProcessAlive(newPID) {
+		t.Fatal("new process exited after the old process exited")
+	}
+	if e.Config.GoMainPID != "" {
+		waitFor(t, "systemd MainPID to be the new process", func() (string, bool) {
+			pid := e.MainPID()
+			return pid, pid == newPID
+		})
+		// 再起動 (Restart=always) されずに動き続けている
+		if out, _ := e.GoExec("systemctl show -p ActiveState --value emlauncher"); out != "active" {
+			t.Fatalf("ActiveState after restart = %q", out)
+		}
+		if out, _ := e.GoExec("systemctl show -p NRestarts --value emlauncher"); out != "0" {
+			t.Fatalf("NRestarts after restart = %q", out)
+		}
+	}
+	e2e.ExpectStatus(t, e.NewClient().Get("/health"), http.StatusOK)
 
 	close(stop)
 	wg.Wait()
@@ -144,7 +165,7 @@ func TestGracefulRestart(t *testing.T) {
 // 古いプロセスが動き続けることを確認する. Go 版のみ.
 func TestGracefulRestartFailure(t *testing.T) {
 	e := e2e.New(t)
-	if e.Config.Target != "go" {
+	if e.Config.Target == "php" {
 		t.Skip("無停止の再起動は Go 版のみ")
 	}
 	orig, err := os.ReadFile(e.Config.GoConfig)
@@ -157,9 +178,7 @@ func TestGracefulRestartFailure(t *testing.T) {
 	}
 
 	oldPID := e.ServerPID()
-	if out, err := e.GoExec("kill -HUP $(cat /tmp/emlauncher.pid)"); err != nil {
-		t.Fatalf("SIGHUP: %v: %s", err, out)
-	}
+	e.ReloadServer()
 	time.Sleep(3 * time.Second)
 	if pid := e.ServerPID(); pid != oldPID {
 		t.Fatalf("process replaced with a broken config: %s -> %s", oldPID, pid)
@@ -168,14 +187,15 @@ func TestGracefulRestartFailure(t *testing.T) {
 		t.Fatal("old process exited")
 	}
 	e2e.ExpectStatus(t, e.NewClient().Get("/health"), http.StatusOK)
+	if pid := e.MainPID(); e.Config.GoMainPID != "" && pid != oldPID {
+		t.Fatalf("systemd MainPID = %s, want %s", pid, oldPID)
+	}
 
 	// 設定を直せば再起動できる
 	if err := os.WriteFile(e.Config.GoConfig, orig, 0o644); err != nil {
 		t.Fatal(err)
 	}
-	if out, err := e.GoExec("kill -HUP $(cat /tmp/emlauncher.pid)"); err != nil {
-		t.Fatalf("SIGHUP: %v: %s", err, out)
-	}
+	e.ReloadServer()
 	waitFor(t, "new process", func() (string, bool) {
 		pid := e.ServerPID()
 		return pid, pid != oldPID
@@ -196,5 +216,79 @@ func waitFor(t *testing.T, what string, cond func() (string, bool)) string {
 			t.Fatalf("timeout waiting for %s", what)
 		}
 		time.Sleep(200 * time.Millisecond)
+	}
+}
+
+// TestSystemdStopStart は systemd で動かしているとき, 無停止の再起動でプロセスが入れ替わった後でも
+// systemd がプロセスを把握していること (異常終了したら再起動する, systemctl stop / start が効く) を確認する.
+func TestSystemdStopStart(t *testing.T) {
+	e := e2e.New(t)
+	if e.Config.GoMainPID == "" {
+		t.Skip("systemd で動かしているときのみ")
+	}
+	// 入れ替わった後のプロセスに対して行う
+	oldPID := e.ServerPID()
+	e.ReloadServer()
+	newPID := waitFor(t, "new process", func() (string, bool) {
+		pid := e.ServerPID()
+		return pid, pid != oldPID
+	})
+	waitFor(t, "old process to exit", func() (string, bool) { return "", !e.ProcessAlive(oldPID) })
+	waitFor(t, "systemd MainPID to be the new process", func() (string, bool) {
+		pid := e.MainPID()
+		return pid, pid == newPID
+	})
+
+	// 異常終了したら systemd が再起動する (Restart=always)
+	restarts := func() string {
+		out, err := e.GoExec("systemctl show -p NRestarts --value emlauncher")
+		if err != nil {
+			t.Fatalf("NRestarts: %v: %s", err, out)
+		}
+		return out
+	}
+	before := restarts()
+	if out, err := e.GoExec("kill -9 " + newPID); err != nil {
+		t.Fatalf("kill: %v: %s", err, out)
+	}
+	newPID = waitFor(t, "systemd to restart the service", func() (string, bool) {
+		pid := e.MainPID()
+		return pid, restarts() != before && pid != "0" && pid != newPID && e.ProcessAlive(pid)
+	})
+	waitFor(t, "service to be ready", func() (string, bool) {
+		res, err := http.Get(e.Config.BaseURL + "/health")
+		if err != nil {
+			return "", false
+		}
+		res.Body.Close()
+		return "", res.StatusCode == http.StatusOK
+	})
+
+	if out, err := e.GoExec("systemctl stop emlauncher"); err != nil {
+		t.Fatalf("stop: %v: %s", err, out)
+	}
+	if out, _ := e.GoExec("systemctl is-active emlauncher"); out != "inactive" {
+		t.Fatalf("is-active after stop = %q", out)
+	}
+	if e.ProcessAlive(newPID) {
+		t.Fatalf("process %s is still running after stop", newPID)
+	}
+	if pids := e.ServerProcesses(); len(pids) > 0 {
+		t.Fatalf("emlauncher processes remain after stop: %v", pids)
+	}
+
+	if out, err := e.GoExec("systemctl start emlauncher"); err != nil {
+		t.Fatalf("start: %v: %s", err, out)
+	}
+	waitFor(t, "service to be ready", func() (string, bool) {
+		res, err := http.Get(e.Config.BaseURL + "/health")
+		if err != nil {
+			return "", false
+		}
+		res.Body.Close()
+		return "", res.StatusCode == http.StatusOK
+	})
+	if pid, main := e.ServerPID(), e.MainPID(); pid != main {
+		t.Fatalf("pid file %s != MainPID %s", pid, main)
 	}
 }

@@ -60,6 +60,17 @@ cd e2e && E2E_TARGET=go E2E_STORAGE=s3 go test ./scenario/ -count=1
 
 Go 版だけのシナリオとして, 無停止の再起動（`TestGracefulRestart`, `TestGracefulRestartFailure`）がある（PHP 版ではスキップ）。Go 版のコンテナで `kill -HUP` を送り, 再起動中に送り続けたリクエストが失敗しないこと, 途中まで送っていたアップロードが古いプロセスで完了すること, 古いプロセスが終了すること, 設定を壊したときは古いプロセスが動き続けることを確認する。Go 版の設定は `e2e/.work/go-runtime-config/` のコピーを使い, テストが一時的に書き換える。
 
+### systemd の下で動かす
+
+README のユニット例と同じユニットファイル（`e2e/env/systemd/emlauncher.service`）で, systemd を PID 1 にしたコンテナで Go 版を動かす（ポート 18083）。`/tmp` は noexec にしている（本番で noexec のサーバがありうるため）。
+
+```sh
+e2e/env/up.sh local && e2e/env/up-systemd.sh local
+cd e2e && E2E_TARGET=systemd go test ./scenario/ -count=1
+```
+
+`E2E_TARGET=systemd` では, 再起動を `systemctl reload emlauncher` で行い, systemd が把握しているメインプロセス（`MainPID`）も確認する（`TestSystemdStopStart` は systemd のときだけ実行）。2026-10-26 時点で全 39 件が通る。
+
 ### 主な環境変数
 
 | 変数 | 既定値 | 内容 |

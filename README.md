@@ -42,6 +42,7 @@ keytool -genkeypair -keystore emlauncher-keystore.jks -keyalg RSA -keysize 2048 
 
 キーストアのパスワード, ファイル名, エイリアス名は設定ファイルの `apkfile` に書きます.
 ARM64 のサーバで動かす場合は, bundletool に含まれる aapt2 が動かないので, ARM64 向けの aapt2 を用意して `apkfile.aapt2` に指定します.
+bundletool は内蔵の aapt2 を Java の一時ディレクトリ（既定は `/tmp`）に展開して実行します. `/tmp` が noexec でマウントされている場合は, `apkfile.java` に `-Djava.io.tmpdir=<実行可能なディレクトリ>` を付けてください（例: `java -Xmx2048m -Djava.io.tmpdir=/var/tmp`）.
 
 ### 4. 設定
 
@@ -67,7 +68,7 @@ User=emlauncher
 RuntimeDirectory=emlauncher
 PIDFile=/run/emlauncher/emlauncher.pid
 ExecStart=/opt/emlauncher/emlauncher -config /etc/emlauncher/config.yml -pid-file /run/emlauncher/emlauncher.pid
-ExecReload=/bin/kill -HUP $MAINPID
+ExecReload=/bin/sh -c 'kill -HUP $MAINPID'
 # 停止時は処理中のリクエスト (大きなアップロード) を待つ. emlauncher の -drain-timeout (既定 1h) に合わせる
 TimeoutStopSec=1h
 Restart=always

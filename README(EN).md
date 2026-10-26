@@ -42,6 +42,7 @@ keytool -genkeypair -keystore emlauncher-keystore.jks -keyalg RSA -keysize 2048 
 
 Set the keystore password, file name and alias in `apkfile` of the config file.
 On ARM64 servers, the aapt2 bundled in bundletool does not work. Prepare an ARM64 aapt2 and set it to `apkfile.aapt2`.
+bundletool extracts its aapt2 into the Java temporary directory (default `/tmp`) and executes it. If `/tmp` is mounted with noexec, add `-Djava.io.tmpdir=<an executable directory>` to `apkfile.java` (e.g. `java -Xmx2048m -Djava.io.tmpdir=/var/tmp`).
 
 ### 4. Configuration
 
@@ -67,7 +68,7 @@ User=emlauncher
 RuntimeDirectory=emlauncher
 PIDFile=/run/emlauncher/emlauncher.pid
 ExecStart=/opt/emlauncher/emlauncher -config /etc/emlauncher/config.yml -pid-file /run/emlauncher/emlauncher.pid
-ExecReload=/bin/kill -HUP $MAINPID
+ExecReload=/bin/sh -c 'kill -HUP $MAINPID'
 # Wait for in-flight requests (large uploads) on stop. Match -drain-timeout of emlauncher (default 1h)
 TimeoutStopSec=1h
 Restart=always

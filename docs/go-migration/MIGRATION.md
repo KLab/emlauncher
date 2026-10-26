@@ -68,7 +68,7 @@ User=apache
 RuntimeDirectory=emlauncher
 PIDFile=/run/emlauncher/emlauncher.pid
 ExecStart=/opt/emlauncher/emlauncher -config /etc/emlauncher/config.yml -pid-file /run/emlauncher/emlauncher.pid
-ExecReload=/bin/kill -HUP $MAINPID
+ExecReload=/bin/sh -c 'kill -HUP $MAINPID'
 # 停止時は処理中のリクエスト (大きなアップロード) を待つ. emlauncher の -drain-timeout (既定 1h) に合わせる
 TimeoutStopSec=1h
 Restart=always

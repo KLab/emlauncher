@@ -192,7 +192,11 @@ docs/go-migration/           本計画書・テスト・移行手順
 
 ### 完了した追加の対応
 
-- 無停止の再起動（2026-10-26）: `cloudflare/tableflip` で, SIGHUP（`systemctl reload`）を受けると新しいプロセスに待ち受けソケットを引き継ぎ, 古いプロセスは処理中のリクエストを終えてから終了する. 新しいプロセスは設定を読み直す. 起動に失敗したら古いプロセスが動き続ける. e2e テスト（`TestGracefulRestart*`）で, 再起動中のリクエストが失敗しないこと, 再起動前に始まったアップロードが完了すること, 設定を誤ったときに古いプロセスが残ることを確認した. systemd 上での動作（PIDFile による入れ替わりの追跡）は未確認.
+- 無停止の再起動（2026-10-26）: `cloudflare/tableflip` で, SIGHUP（`systemctl reload`）を受けると新しいプロセスに待ち受けソケットを引き継ぎ, 古いプロセスは処理中のリクエストを終えてから終了する. 新しいプロセスは設定を読み直す. 起動に失敗したら古いプロセスが動き続ける. e2e テスト（`TestGracefulRestart*`, `TestSystemdStopStart`）で, Docker と systemd の両方で確認した.
+  - systemd では, 古いプロセスが処理中のリクエストを終えるまでは `MainPID` は古いプロセスのまま. 古いプロセスが終了した時点で PID ファイルから新しいプロセスに移る. その後に新しいプロセスが異常終了しても `Restart=always` で再起動される. `systemctl stop` / `start` も効く.
+  - `systemctl reload` はシグナルを送った時点で成功を返す. 新しいプロセスの起動に失敗したかはログ（`upgrade failed`）で確認する.
+  - 古いプロセスが処理中のリクエストを終えるまでは, 次の reload は拒否される（tableflip の仕様. ログに `parent hasn't exited`）.
+  - ユニットの `ExecReload` は `/bin/sh -c 'kill -HUP $MAINPID'` にした（`/bin/kill` が無い環境があるため. tableflip の README の例は `/bin/kill`）.
   - PHP 版はテンプレートのファイルを書き換えれば再起動なしで反映できたが, Go 版はテンプレートをバイナリに埋め込んでいる. 再起動が止まらないので埋め込みのままでよい, という判断.
 
 ## 5. 移行手順

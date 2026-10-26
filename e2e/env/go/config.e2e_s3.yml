@@ -30,7 +30,8 @@ local_file:
   url_prefix: /files
   serve: true
 apkfile:
-  java: java -Xmx1g
+  # /tmp が noexec でも bundletool (内蔵の aapt2 を一時ディレクトリで実行する) が動くように
+  java: java -Xmx1g -Djava.io.tmpdir=/var/tmp
   bundletool: /bundletool.jar
   keystore: /emlauncher.keystore
   kspass: pass:emlauncher

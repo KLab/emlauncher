@@ -179,7 +179,7 @@ func (e *Env) GoExec(script string) (string, error) {
 // ServerPID は Go 版のサーバの PID (PID ファイルの値).
 func (e *Env) ServerPID() string {
 	e.t.Helper()
-	out, err := e.GoExec("cat /tmp/emlauncher.pid")
+	out, err := e.GoExec("cat " + e.Config.GoPIDFile)
 	if err != nil {
 		e.t.Fatalf("read pid file: %v: %s", err, out)
 	}
@@ -196,4 +196,41 @@ func (e *Env) ProcessAlive(pid string) bool {
 	}
 	fields := strings.Fields(out[strings.LastIndex(out, ")")+1:])
 	return len(fields) > 0 && fields[0] != "Z"
+}
+
+// ReloadServer は Go 版の無停止の再起動を行う (kill -HUP または systemctl reload).
+func (e *Env) ReloadServer() {
+	e.t.Helper()
+	if out, err := e.GoExec(e.Config.GoReload); err != nil {
+		e.t.Fatalf("reload (%s): %v: %s", e.Config.GoReload, err, out)
+	}
+}
+
+// MainPID は systemd が把握しているメインプロセスの PID. systemd で動かしていなければ空.
+func (e *Env) MainPID() string {
+	e.t.Helper()
+	if e.Config.GoMainPID == "" {
+		return ""
+	}
+	out, err := e.GoExec(e.Config.GoMainPID)
+	if err != nil {
+		e.t.Fatalf("main pid: %v: %s", err, out)
+	}
+	return out
+}
+
+// ServerProcesses は Go 版のコンテナで動いている emlauncher のプロセス (終了済みのゾンビを除く).
+func (e *Env) ServerProcesses() []string {
+	e.t.Helper()
+	out, err := e.GoExec(`for p in /proc/[0-9]*; do [ "$(cat $p/comm 2>/dev/null)" = emlauncher ] && echo ${p#/proc/}; done; true`)
+	if err != nil {
+		e.t.Fatalf("list processes: %v: %s", err, out)
+	}
+	var pids []string
+	for _, pid := range strings.Fields(out) {
+		if e.ProcessAlive(pid) {
+			pids = append(pids, pid)
+		}
+	}
+	return pids
 }

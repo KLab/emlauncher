@@ -13,7 +13,7 @@ import (
 )
 
 type Config struct {
-	Target      string // E2E_TARGET: php | go. PHP 版の既知バグの扱いを切り替える
+	Target      string // E2E_TARGET: php | go | systemd (Go 版を systemd の下で動かしたもの). PHP 版の既知バグの扱いを切り替える
 	BaseURL     string // E2E_BASE_URL
 	DBDSN       string // E2E_DB_DSN
 	Storage     string // E2E_STORAGE: local | s3
@@ -26,6 +26,9 @@ type Config struct {
 	BatchCmd    string // E2E_BATCH_CMD: 古いパッケージ削除バッチ. {keep} が保持数に置き換わる
 	GoExec      string // E2E_GO_EXEC: Go 版のコンテナでコマンドを実行する (無停止の再起動のテスト用)
 	GoConfig    string // E2E_GO_CONFIG: Go 版が読んでいる設定ファイル (ホスト側のパス)
+	GoPIDFile   string // E2E_GO_PIDFILE: Go 版のコンテナでの PID ファイル
+	GoReload    string // E2E_GO_RELOAD: Go 版のコンテナで無停止の再起動を行うコマンド
+	GoMainPID   string // E2E_GO_MAINPID: systemd が把握しているメインプロセスの PID を出力するコマンド (systemd のみ)
 	TZ          *time.Location
 }
 
@@ -41,9 +44,21 @@ func LoadConfig() Config {
 	target := env("E2E_TARGET", "php")
 	baseURL := "http://localhost:18081"
 	batch := "docker compose -f " + compose + " exec -T php php /srv/emlauncher/batch/delete_old_packages.php -e e2e_" + storage + " -k {keep}"
-	if target == "go" {
+	goExec := "docker compose -f " + compose + " exec -T go"
+	pidFile := "/tmp/emlauncher.pid"
+	reload := "kill -HUP $(cat " + pidFile + ")"
+	mainPID := ""
+	switch target {
+	case "go":
 		baseURL = "http://localhost:18082"
-		batch = "docker compose -f " + compose + " exec -T go delete-old-packages -config /etc/emlauncher/config.e2e_" + storage + ".yml -k {keep}"
+		batch = goExec + " delete-old-packages -config /etc/emlauncher/config.e2e_" + storage + ".yml -k {keep}"
+	case "systemd":
+		baseURL = "http://localhost:18083"
+		goExec = "docker compose -f " + compose + " exec -T systemd"
+		batch = goExec + " delete-old-packages -config /etc/emlauncher/config.yml -k {keep}"
+		pidFile = "/run/emlauncher/emlauncher.pid"
+		reload = "systemctl reload emlauncher"
+		mainPID = "systemctl show -p MainPID --value emlauncher"
 	}
 	return Config{
 		Target:      target,
@@ -57,7 +72,10 @@ func LoadConfig() Config {
 		Memcached:   env("E2E_MEMCACHED", "localhost:21211"),
 		CachePrefix: env("E2E_CACHE_PREFIX", "emlauncher_e2e_"+storage+"_emlauncher_"),
 		BatchCmd:    env("E2E_BATCH_CMD", batch),
-		GoExec:      env("E2E_GO_EXEC", "docker compose -f "+compose+" exec -T go"),
+		GoExec:      env("E2E_GO_EXEC", goExec),
+		GoPIDFile:   env("E2E_GO_PIDFILE", pidFile),
+		GoReload:    env("E2E_GO_RELOAD", reload),
+		GoMainPID:   env("E2E_GO_MAINPID", mainPID),
 		GoConfig:    env("E2E_GO_CONFIG", filepath.Join(root, ".work", "go-runtime-config", "config.e2e_"+storage+".yml")),
 		TZ:          tz,
 	}

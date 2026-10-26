@@ -77,6 +77,8 @@ local_file:
   serve: true
 
 apkfile:
+  # bundletool は内蔵の aapt2 を一時ディレクトリに展開して実行する. /tmp が noexec の場合は
+  # -Djava.io.tmpdir=<実行可能なディレクトリ> を付ける (例: java -Xmx2048m -Djava.io.tmpdir=/var/tmp)
   java: java -Xmx2048m
   bundletool: /path/to/bundletool.jar
   keystore: /path/to/keystore.jks

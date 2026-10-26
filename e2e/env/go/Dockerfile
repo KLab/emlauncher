@@ -16,6 +16,7 @@ RUN set -x \
   && curl -sSfL -o /bundletool.jar https://github.com/google/bundletool/releases/download/1.17.2/bundletool-all-1.17.2.jar \
   && keytool -genkeypair -keystore /emlauncher.keystore -alias emlauncher -storepass emlauncher -keypass emlauncher \
        -keyalg RSA -keysize 2048 -validity 36524 -dname 'CN=EMLauncher E2E, O=KLab Inc., L=Tokyo, C=JP' \
+  && chmod 644 /emlauncher.keystore \
   && printf '#!/bin/sh\n# sendmail の代わりに, 送信されたメールを /mailbox にファイルとして保存する.\ncat > "/mailbox/$(date +%%s%%N)-$$.eml"\n' > /usr/local/bin/capture-mail \
   && chmod 755 /usr/local/bin/capture-mail \
   && mkdir -p /mailbox /var/www/emlauncher

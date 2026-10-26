@@ -93,3 +93,26 @@ services:
     depends_on:
       db:
         condition: service_healthy
+
+  # Go 版を systemd の下で動かす (e2e/env/up-systemd.sh で起動する). ユニットファイルと systemctl reload の確認用.
+  systemd:
+    profiles: ["systemd"]
+    build:
+      context: ../..
+      dockerfile: e2e/env/systemd/Dockerfile
+    image: emlauncher-e2e-systemd
+    privileged: true
+    tmpfs:
+      - /run
+      - /run/lock
+      - /tmp
+    volumes:
+      - /sys/fs/cgroup:/sys/fs/cgroup:ro
+      - ${E2E_GO_CONFIG_DIR:-../.work/go-runtime-config}/config.${E2E_ENV:-e2e_local}.yml:/etc/emlauncher/config.yml:ro
+      - ../.work/files:/var/www/emlauncher
+      - ../.work/mailbox:/mailbox
+    ports:
+      - "${E2E_SYSTEMD_PORT:-18083}:8080"
+    depends_on:
+      db:
+        condition: service_healthy
