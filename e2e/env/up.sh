@@ -14,6 +14,9 @@ export E2E_ENV="e2e_${storage}"
 
 compose() { docker compose -f compose.yml "$@"; }
 
+# PHP 版のソース (過去のコミットから取り出す)
+./php-src.sh
+
 compose --profile go down -v --remove-orphans >/dev/null 2>&1 || true
 rm -rf ../.work/files ../.work/mailbox
 mkdir -p ../.work/files ../.work/mailbox

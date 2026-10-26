@@ -1,6 +1,9 @@
 # EMLauncher Go 移植計画
 
-PHP 版 EMLauncher を Go に移植する計画。挙動の完全一致は求めないが、**DB スキーマと S3（ストレージ）の構成は一切変えない**ことを絶対条件とする。
+PHP 版 EMLauncher を Go に移植する計画。
+
+> 移植は完了し, PHP 版はリポジトリから削除した（最終版はコミット `4124ca6`）。以下の「現行構成」は PHP 版の記録。PHP 版が必要なとき（E2E テストや移行リハーサル）は, 過去のコミットからソースを取り出して使う（`e2e/env/php-src.sh`）。
+挙動の完全一致は求めないが、**DB スキーマと S3（ストレージ）の構成は一切変えない**ことを絶対条件とする。
 
 ## 0. 決定事項
 
@@ -25,7 +28,7 @@ PHP 版 EMLauncher を Go に移植する計画。挙動の完全一致は求め
 
 ### 1.2 DB（12 テーブル、utf8mb4）
 
-`application`, `application_owner`, `tag`, `package`, `package_tag`, `attached_file`, `comment`, `install_log`, `app_install_user`, `guest_pass`, `guestpass_log`, `user_pass`（定義: `data/sql/tables.sql`）
+`application`, `application_owner`, `tag`, `package`, `package_tag`, `attached_file`, `comment`, `install_log`, `app_install_user`, `guest_pass`, `guestpass_log`, `user_pass`（定義: `sql/tables.sql`）
 
 移植で守るべき暗黙の仕様:
 
@@ -101,21 +104,23 @@ PHP のファイルセッション（Cookie 名 `{prefix}seskey`）。内容は�
 
 ### 2.2 ディレクトリ構成
 
-PHP 版の `vendor/`（composer）がリポジトリ直下にあるため、ルートに `go.mod` を置くと Go の vendoring と衝突する。Go のコードは `go/` 以下の独立モジュール（モジュール名 `emlauncher`）にする。リポジトリには github.com 以外のミラーもあるので、モジュール名にホスト名は含めない。
+Go のコードはリポジトリ直下に置く（モジュール名 `emlauncher`）。リポジトリには github.com 以外のミラーもあるので、モジュール名にホスト名は含めない。
 
 パッケージは基本的にフラットにし、独立させる理由があるものだけ分ける。
 
 ```
-go/                          package emlauncher: 設定, DB (table*.go), 業務処理 (core*.go), HTTP ハンドラ, セッション, メール
+./                           package emlauncher: 設定, DB (table*.go), 業務処理 (core*.go), HTTP ハンドラ, セッション, メール
   templates/, static/        画面のテンプレートと静的ファイル (バイナリに埋め込む)
   storage/                   S3 / LocalFile. 外部サービスとの境界. 同じテストを両方の実装に流す
   pkgfile/                   IPA / APK / AAB の解析. アプリ本体に依存しない. テストデータを持つ
   cmd/emlauncher/            HTTP サーバ
   cmd/delete-old-packages/   バッチ
+  sql/                       DB スキーマ (PHP 版から変えていない)
   tools/                     移行用のスクリプト (PHP 版の設定の書き出し)
-e2e/                         package e2e: テスト用のクライアント・フィクスチャ (モジュール名 emlauncher-e2e)
+e2e/                         package e2e: テスト用のクライアント・フィクスチャ. テスト専用の依存
+                             (AWS SDK など) を本体に持ち込まないよう別モジュール (emlauncher-e2e)
   scenario/, migration/      シナリオテストと移行リハーサル (実行の仕方が違うので分ける)
-  env/                       テスト環境 (docker compose)
+  env/                       テスト環境 (docker compose). PHP 版は過去のコミットから取り出す
 docs/go-migration/           本計画書・テスト・移行手順
 ```
 
@@ -179,7 +184,7 @@ docs/go-migration/           本計画書・テスト・移行手順
 
 ### 残っていること
 
-- 各本番環境で `go/tools/export_php_config.php` を実行し, 書き出された TZ・storage_class・cache_prefix を確認する
+- 各本番環境で `tools/export_php_config.php` を実行し, 書き出された TZ・storage_class・cache_prefix を確認する
 - 画面の新旧のスクリーンショット（`e2e/.work/screenshots/index.html`）を人が見て確認する
 - 画面のデザインの刷新（必要なら. 今は PHP 版と同じ見た目）
 - iOS / Android 実機でのインストール, Google / AzureAD ログインの確認

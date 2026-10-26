@@ -13,7 +13,7 @@ services:
       MYSQL_PASSWORD: emlauncher
     command: ["--character-set-server=utf8mb4", "--collation-server=utf8mb4_general_ci"]
     volumes:
-      - ../../data/sql/tables.sql:/docker-entrypoint-initdb.d/01_tables.sql:ro
+      - ../../sql/tables.sql:/docker-entrypoint-initdb.d/01_tables.sql:ro
     ports:
       - "${E2E_DB_PORT:-13306}:3306"
     healthcheck:
@@ -42,17 +42,18 @@ services:
       MFW_ENV: ${E2E_ENV:-e2e_local}
       PHP_TZ: ${E2E_TZ:-Asia/Tokyo}
       E2E_S3_EXTERNAL_URL: http://localhost:${E2E_S3_PORT:-14566}
+    # PHP 版のソースは e2e/env/php-src.sh で過去のコミットから取り出したもの (.work/php-src).
     # APP_ROOT は /srv/emlauncher. ディレクトリ名は memcached のキー接頭辞に入る
     # (本番と同じ "emlauncher" にしている). config/ だけ E2E 用に差し替える.
     volumes:
-      - ../../initialize.php:/srv/emlauncher/initialize.php:ro
-      - ../../web:/srv/emlauncher/web:ro
-      - ../../mainmodules:/srv/emlauncher/mainmodules:ro
-      - ../../model:/srv/emlauncher/model:ro
-      - ../../data:/srv/emlauncher/data:ro
-      - ../../batch:/srv/emlauncher/batch:ro
-      - ../../mfw:/srv/emlauncher/mfw:ro
-      - ../../vendor:/srv/emlauncher/vendor:ro
+      - ../.work/php-src/initialize.php:/srv/emlauncher/initialize.php:ro
+      - ../.work/php-src/web:/srv/emlauncher/web:ro
+      - ../.work/php-src/mainmodules:/srv/emlauncher/mainmodules:ro
+      - ../.work/php-src/model:/srv/emlauncher/model:ro
+      - ../.work/php-src/data:/srv/emlauncher/data:ro
+      - ../.work/php-src/batch:/srv/emlauncher/batch:ro
+      - ../.work/php-src/mfw:/srv/emlauncher/mfw:ro
+      - ../.work/php-src/vendor:/srv/emlauncher/vendor:ro
       - ./php/config:/srv/emlauncher/config:ro
       - ../.work/files:/var/www/emlauncher
       - ../.work/mailbox:/mailbox
@@ -70,8 +71,8 @@ services:
   go:
     profiles: ["go"]
     build:
-      context: ../../go
-      dockerfile: ../e2e/env/go/Dockerfile
+      context: ../..
+      dockerfile: e2e/env/go/Dockerfile
     image: emlauncher-e2e-go
     # 移行リハーサルでは Apache と同じユーザ (www-data) で動かす
     user: "${E2E_GO_USER:-0:0}"

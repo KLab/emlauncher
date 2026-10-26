@@ -7,7 +7,6 @@ EC2 + Apache + ALB の構成で, PHP 版を Go 版に切り替える手順. DB �
 ## 0. 準備（ビルド）
 
 ```sh
-cd go
 GOOS=linux GOARCH=amd64 CGO_ENABLED=0 go build -o dist/ ./cmd/emlauncher ./cmd/delete-old-packages
 ```
 
@@ -23,8 +22,10 @@ PHP, composer, memcached の PHP 拡張は Go 版には不要.
 
 ### 1-1. PHP 版の設定から書き出す
 
+このリポジトリの `tools/export_php_config.php` を PHP 版のサーバにコピーして実行する.
+
 ```sh
-php go/tools/export_php_config.php /path/to/emlauncher <MFW_ENV> > /etc/emlauncher/config.yml
+php export_php_config.php /path/to/emlauncher <MFW_ENV> > /etc/emlauncher/config.yml
 ```
 
 `/path/to/emlauncher` は PHP 版を置いたディレクトリ（`initialize.php` があるところ）. 次の値を PHP 版と同じにして書き出す.

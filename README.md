@@ -1,157 +1,100 @@
 EMLauncher
 ==========
 
+社内向けのアプリ配布サービスです. iOS (ipa) / Android (apk, aab) のパッケージをアップロードし, 端末からインストールできます.
+
+Go で実装しています. PHP 版はリポジトリから削除しました（最終版はコミット `4124ca6`）. PHP 版からの移行手順は [docs/go-migration/MIGRATION.md](docs/go-migration/MIGRATION.md) を参照してください.
+
+## 必要なもの
+
+- MySQL 5.7 以降 / MariaDB
+- memcached
+- 保存先: Amazon S3（または S3 互換ストレージ）, もしくはローカルディスク
+- Java（Android App Bundle (aab) から apk を作る bundletool と keytool に使う）
+- sendmail 互換のコマンド（更新通知やパスワードリセットのメール）
+- ビルドに Go 1.23 以降
+
 ## Setup
 
-EC2のAmazonLinux2でEMLauncherを動かす手順です。
+### 1. ビルド
 
-### 1. Launch EC2 instance
-
-インスタンスを立ち上げたらセキュリティグループの設定でHTTP(80)を許可しておきます。
-
-t1.microの場合はメモリが足りなくなることがあるので、swapファイルを用意します。
-```BASH
-sudo dd if=/dev/zero of=/swapfile bs=1M count=1024
-sudo mkswap /swapfile
-sudo swapon /swapfile
-sudo sh -c "echo '/swapfile swap swap defaults 0 0' >> /etc/fstab"
+```sh
+GOOS=linux GOARCH=amd64 CGO_ENABLED=0 go build -o dist/ ./cmd/emlauncher ./cmd/delete-old-packages
 ```
 
-### 2. Install required packages
+`dist/emlauncher`（HTTP サーバ）と `dist/delete-old-packages`（古いパッケージの削除バッチ）をサーバに配置します. テンプレートや CSS はバイナリに含まれています.
 
-```BASH
-sudo amazon-linux-extras install php8.2
-sudo amazon-linux-extras install mariadb10.5
-sudo amazon-linux-extras install memcached1.5
-sudo yum groupinstall "Development Tools"
-sudo yum install httpd php php-gd php-mbstring php-xml git php-devel php-pear zlib-devel libmemcached.x86_64 libmemcached-devel.x86_64 ImageMagick.x86_64 ImageMagick-devel.x86_64 libzip-devel.x86_64
-sudo pecl install igbinary
-sudo pecl install msgpack
-sudo pecl install memcached
-sudo pecl install imagick
-sudo sh -c "echo 'extension=imagick.so' > /etc/php.d/40-imagick.ini"
-sudo sh -c 'cat <<EOF > /etc/php.d/50-memcached.ini
-extension=memcached.so
+### 2. Database
 
-[memcached]
-memcached.sess_locking = On
-memcached.sess_lock_wait_min = 1000
-memcached.sess_lock_wait_max = 2000
-memcached.sess_lock_retries = 5
-memcached.sess_lock_expire = 0
-memcached.sess_prefix = "memc.sess.key."
-memcached.sess_persistent = Off
-memcached.sess_consistent_hash = On
-memcached.sess_remove_failed_servers = Off
-memcached.sess_number_of_replicas = 0
-memcached.sess_binary_protocol = On
-memcached.sess_randomize_replica_read = Off
-memcached.sess_connect_timeout = 1000
-memcached.sess_sasl_username = NULL
-memcached.sess_sasl_password = NULL
-memcached.compression_type = "fastlz"
-memcached.compression_factor = "1.3"
-memcached.compression_threshold = 2000
-memcached.serializer = "igbinary"
-memcached.store_retry_count = 2
-memcached.default_consistent_hash = Off
-memcached.default_binary_protocol = Off
-memcached.default_connect_timeout = 0
-EOF'
-curl -sS https://getcomposer.org/installer | php
-sudo cp composer.phar /usr/local/bin/composer
+[sql/database.sql](sql/database.sql) のパスワードを修正してから流し, テーブルを作ります.
+
+```sh
+mysql -uroot < sql/database.sql
+mysql -uroot emlauncher < sql/tables.sql
 ```
 
-### 3. Deploy codes
+### 3. bundletool（Android App Bundle を扱う場合）
 
-```BASH
-git clone https://github.com/KLab/emlauncher.git
-cd emlauncher
-git submodule init
-git submodule update
-composer install
-```
-Apacheがファイルにアクセスできるようにパーミッションを調整してください。
-
-### 4. Apache setup
-
-/etc/httpd/conf/httpd.confを編集します。
-```XML
-DocumentRoot "/path/to/emlauncher/web"
-SetEnv MFW_ENV 'ec2'
-<Directory "/path/to/emlauncher/web">
-  AllowOverride All
-  ...略...
-</Directory>
+```sh
+curl -sLO https://github.com/google/bundletool/releases/download/1.17.2/bundletool-all-1.17.2.jar
+keytool -genkeypair -keystore emlauncher-keystore.jks -keyalg RSA -keysize 2048 -validity 10000 -alias emlauncherkey
 ```
 
-```BASH
-sudo systemctl start httpd
-sudo systemctl enable httpd
+キーストアのパスワード, ファイル名, エイリアス名は設定ファイルの `apkfile` に書きます.
+ARM64 のサーバで動かす場合は, bundletool に含まれる aapt2 が動かないので, ARM64 向けの aapt2 を用意して `apkfile.aapt2` に指定します.
+
+### 4. 設定
+
+[config.sample.yml](config.sample.yml) をコピーして環境に合わせて書き換えます（例: `/etc/emlauncher/config.yml`）. 主な項目:
+
+- `timezone`: DB の日時の TZ（空なら実行環境の TZ）
+- `database`, `memcache`
+- `storage_class`: `S3` / `LocalFile`. S3 のバケットは予め作成しておきます
+- `session.secret`: 長いランダムな文字列. 複数台で動かす場合は全台で同じ値にします
+- `login`: パスワードログイン, Google / AzureAD ログイン
+
+### 5. 起動
+
+systemd のユニットの例:
+
+```ini
+[Unit]
+Description=EMLauncher
+After=network.target
+
+[Service]
+User=emlauncher
+ExecStart=/opt/emlauncher/emlauncher -config /etc/emlauncher/config.yml
+Restart=always
+
+[Install]
+WantedBy=multi-user.target
 ```
 
+`listen`（既定 `127.0.0.1:8080`）で待ち受けます. Apache / nginx のリバースプロキシや ALB の裏に置いてください. `X-Forwarded-Proto` / `X-Forwarded-Host` を見て URL を組み立てます. ヘルスチェックは `/health` です.
 
-### 5. Database setup
+アップロードされたファイルは一時ディレクトリ（`TMPDIR`, 既定は `/tmp`）にいったん書かれるので, 最大のパッケージを置ける空きを用意してください.
 
-```BASH
-sudo systemctl start mariadb
-sudo systemctl enable mariadb
+### 6. ユーザの追加
+
+パスワードでログインするユーザは, `user_pass` テーブルにメールアドレスだけを登録し, ログイン画面の「forgot password」からパスワードを設定してもらいます.
+
+```sql
+INSERT INTO user_pass (mail) VALUES ('your-name@example.com');
 ```
 
-DBのユーザ名、パスワードを書いたファイルを作成します。
+Google / AzureAD ログインでは, `login.allowed_mailaddr_pattern` に一致するか `user_pass` に登録されたアカウントがログインできます.
 
-例:
-```
-echo 'emlauncher:password' > $HOME/dbauth
-```
+### 7. 古いパッケージの削除（任意）
 
-data/sql/database.sqlのパスワードを合わせて修正し、MySQLに流します。
-```BASH
-sudo mysql -uroot < /path/to/emlauncher/data/sql/database.sql
-sudo mysql -uroot emlauncher < /path/to/emlauncher/data/sql/tables.sql
+保護されていないパッケージを, アプリごとに新しいものから指定数だけ残して削除します. cron などで実行します.
+
+```sh
+/opt/emlauncher/delete-old-packages -config /etc/emlauncher/config.yml -k 100
 ```
 
-### 6. Memcache setup
+## 開発
 
-```BASH
-sudo systemctl start memcached
-sudo systemctl enable memcached
-```
-
-### 7. Setup bundletool for Android App Bundle
-
-```BASH
-sudo yum install java-1.8.0-openjdk-headless
-curl -sLO https://github.com/google/bundletool/releases/download/1.15.1/bundletool-all-1.15.1.jar
-```
-
-APKを再署名するためのキーストアも用意します。
-ここで設定するパスワード、キーストアファイル名、エイリアス名はこの後設定ファイル`emlauncher_config.php`に記載します。
-```BASH
-keytool -genkey -keystore {emlauncher-keystore.jks} -keyalg RSA -keysize 2048 -validity 10000 -alias {key-alias}
-```
-
-#### AARCH64(ARM64)アーキテクチャのプラットホームで動作させる場合
-AARCH64(ARM64)アーキテクチャのプラットホームで動作させる場合にはbundletoolに内包のaapt2がAMD64(x86_64)アーキテクチャ向けでそのままでは動作しないのでARM64アーキテクチャー用のaapt2をgithubからダウンロードします。
-```BASH
-curl -sLO https://github.com/JonForShort/android-tools/raw/master/build/android-9.0.0_r33/aapt2/arm64-v8a/bin/aapt2
-```
-
-### 8. Configuration
-
-#### mfw_serverevn_config.php
-``config/mfw_serverenv_config_sample.php``をコピーし、``$serverenv_config['ec2']['database']['authfile']``を
-5で作成したdbauthファイルのパスに書き換えます。
-
-#### emlauncher_config.php
-``config/emlauncher_config_sample.php``をコピーし、自身の環境に合わせて書き換えます。
-
-S3のbucket名に指定するbucketは予め作成しておきます。
-
-##### AARCH64(ARM64)アーキテクチャのプラットホームで動作させる場合
-APKファイルの設定のaapt2に(6.)でダウンロードしたARM64向けaapt2実行ファイルのパスを指定します。
-
-### 9. Complete
-
-ブラウザでインスタンスにHTTPでアクセスします。
-EMLauncherのログインページが表示されたら完了です。
+- テスト: `go test ./...`. DB や S3 を使うテストは, E2E テストの環境を起動して `EML_TEST_DB_HOST` などを指定したときだけ実行されます.
+- E2E テスト・移行リハーサル: [docs/go-migration/TESTING.md](docs/go-migration/TESTING.md)
+- 設計と移行の経緯: [docs/go-migration/PLAN.md](docs/go-migration/PLAN.md)

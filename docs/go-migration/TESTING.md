@@ -13,13 +13,17 @@ e2e/
   .work/              作業領域 (git 管理外): LocalFile の保存先, メールボックス, 移行状態
 ```
 
-`e2e/` は独立した Go モジュール。リポジトリ直下には composer の `vendor/` があり、ルートに `go.mod` を置くと Go の vendoring と衝突するため。
+`e2e/` は独立した Go モジュール（`emlauncher-e2e`）。テスト専用の依存（AWS SDK など）を本体に持ち込まないため。
+
+### PHP 版のソース
+
+PHP 版はリポジトリから削除したので, `e2e/env/up.sh` が `e2e/env/php-src.sh` で過去のコミットからソースを取り出して `e2e/.work/php-src/` に置く（`git archive`, mfw は当時の submodule のコミットを clone, composer の依存はコンテナで install）。既定は PHP 版の最終版（`4124ca6`）。別のコミットを使うときは `E2E_PHP_REF=<commit>` を指定する。
 
 ## 必要なもの
 
 - Docker（WSL の Ubuntu 上の Docker で動作確認済み。Docker Desktop は使わない）
 - Go 1.23 以上
-- `composer install` と `git submodule update --init` 済みのリポジトリ（PHP 版を動かすため）
+- git と, インターネットへの接続（PHP 版の mfw と composer の依存の取得. 初回のみ）
 
 WSL の Go が古い場合は、公式の方法でホーム以下に追加できる。
 
@@ -134,7 +138,7 @@ migration/rehearse.sh local php   # 移行先を PHP 版にする (リハーサ�
    - 有効なゲストパスと失効したゲストパス、API と画面で発行したインストールトークン（memcached）
    - upload_post されずに残った一時ファイル
 3. **移行**: 移行先が `go` なら [MIGRATION.md](MIGRATION.md) の手順どおりに行う
-   - PHP 版のコンテナで `go/tools/export_php_config.php` を実行して Go 版の設定を書き出す（TZ, memcached の接頭辞, DB, ストレージなど）
+   - PHP 版のコンテナで `tools/export_php_config.php` を実行して Go 版の設定を書き出す（TZ, memcached の接頭辞, DB, ストレージなど）
    - `listen` だけ環境に合わせて書き換える
    - PHP 版を止め, Go 版を **Apache と同じユーザ（www-data）** で起動する。authfile は同じホストにある前提でマウントする
    - 移行先が `php` ならコンテナを作り直すだけ

@@ -36,7 +36,7 @@ case "$target" in
 		# docs/go-migration/MIGRATION.md の手順どおりに行う
 		echo "--- 3-1. PHP 版の設定から Go 版の設定を作る"
 		mkdir -p .work/go-config
-		compose cp ../go/tools/export_php_config.php php:/tmp/export_php_config.php
+		compose cp ../tools/export_php_config.php php:/tmp/export_php_config.php
 		compose exec -T php php /tmp/export_php_config.php /srv/emlauncher "$E2E_ENV" > ".work/go-config/config.${E2E_ENV}.yml"
 		# listen はリバースプロキシの構成に合わせる (コンテナなので全インタフェースで待ち受ける)
 		sed -i 's/"127.0.0.1:8080"/"0.0.0.0:8080"/' ".work/go-config/config.${E2E_ENV}.yml"

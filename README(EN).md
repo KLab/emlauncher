@@ -1,158 +1,99 @@
 EMLauncher
 ==========
 
+An in-house app distribution service. Upload iOS (ipa) / Android (apk, aab) packages and install them on devices.
+
+EMLauncher is implemented in Go. The PHP version has been removed from this repository (the last PHP version is commit `4124ca6`). To migrate from the PHP version, see [docs/go-migration/MIGRATION.md](docs/go-migration/MIGRATION.md) (in Japanese).
+
+## Requirements
+
+- MySQL 5.7+ / MariaDB
+- memcached
+- Storage: Amazon S3 (or S3 compatible storage), or local disk
+- Java (for bundletool and keytool, to build apk from Android App Bundle (aab))
+- A sendmail compatible command (notification and password reset mails)
+- Go 1.23+ to build
+
 ## Setup
 
-This is the process to run EMLauncher in AmazonLinux of EC2.
+### 1. Build
 
-### 1. Launch EC2 instance
-
-Once the instance is established, permit HTTP(80) in the security group setting.
-
-In the case of t1.micro, there are cases of lack of memory, it is necessary to prepare swap file.
-```BASH
-sudo dd if=/dev/zero of=/swapfile bs=1M count=1024
-sudo mkswap /swapfile
-sudo swapon /swapfile
-sudo sh -c "echo '/swapfile swap swap defaults 0 0' >> /etc/fstab"
+```sh
+GOOS=linux GOARCH=amd64 CGO_ENABLED=0 go build -o dist/ ./cmd/emlauncher ./cmd/delete-old-packages
 ```
 
-### 2. Install required packages
+Deploy `dist/emlauncher` (HTTP server) and `dist/delete-old-packages` (batch to delete old packages) to the server. Templates and CSS are embedded in the binary.
 
-```BASH
-sudo amazon-linux-extras install php8.2
-sudo amazon-linux-extras install mariadb10.5
-sudo amazon-linux-extras install memcached1.5
-sudo yum groupinstall "Development Tools"
-sudo yum install httpd php php-gd php-mbstring php-xml git php-devel php-pear zlib-devel libmemcached.x86_64 libmemcached-devel.x86_64 ImageMagick.x86_64 ImageMagick-devel.x86_64 libzip-devel.x86_64
-sudo pecl install igbinary
-sudo pecl install msgpack
-sudo pecl install memcached
-sudo pecl install imagick
-sudo sh -c "echo 'extension=imagick.so' > /etc/php.d/40-imagick.ini"
-sudo sh -c 'cat <<EOF > /etc/php.d/50-memcached.ini
-extension=memcached.so
+### 2. Database
 
-[memcached]
-memcached.sess_locking = On
-memcached.sess_lock_wait_min = 1000
-memcached.sess_lock_wait_max = 2000
-memcached.sess_lock_retries = 5
-memcached.sess_lock_expire = 0
-memcached.sess_prefix = "memc.sess.key."
-memcached.sess_persistent = Off
-memcached.sess_consistent_hash = On
-memcached.sess_remove_failed_servers = Off
-memcached.sess_number_of_replicas = 0
-memcached.sess_binary_protocol = On
-memcached.sess_randomize_replica_read = Off
-memcached.sess_connect_timeout = 1000
-memcached.sess_sasl_username = NULL
-memcached.sess_sasl_password = NULL
-memcached.compression_type = "fastlz"
-memcached.compression_factor = "1.3"
-memcached.compression_threshold = 2000
-memcached.serializer = "igbinary"
-memcached.store_retry_count = 2
-memcached.default_consistent_hash = Off
-memcached.default_binary_protocol = Off
-memcached.default_connect_timeout = 0
-EOF'
-curl -sS https://getcomposer.org/installer | php
-sudo cp composer.phar /usr/local/bin/composer
+Edit the password in [sql/database.sql](sql/database.sql), then create the database and tables.
+
+```sh
+mysql -uroot < sql/database.sql
+mysql -uroot emlauncher < sql/tables.sql
 ```
 
-### 3. Deploy codes
+### 3. bundletool (for Android App Bundle)
 
-```BASH
-git clone https://github.com/KLab/emlauncher.git
-cd emlauncher
-git submodule init
-git submodule update
-composer install
-```
-Please modify the permission so that Apache can access the file.
-
-### 4. Apache setup
-
-Edit /etc/httpd/conf/httpd.conf
-```XML
-DocumentRoot "/path/to/emlauncher/web"
-SetEnv MFW_ENV 'ec2'
-<Directory "/path/to/emlauncher/web">
-  AllowOverride All
-  ...abbreviated..
-</Directory>
+```sh
+curl -sLO https://github.com/google/bundletool/releases/download/1.17.2/bundletool-all-1.17.2.jar
+keytool -genkeypair -keystore emlauncher-keystore.jks -keyalg RSA -keysize 2048 -validity 10000 -alias emlauncherkey
 ```
 
-```BASH
-sudo systemctl start httpd
-sudo systemctl enable httpd
+Set the keystore password, file name and alias in `apkfile` of the config file.
+On ARM64 servers, the aapt2 bundled in bundletool does not work. Prepare an ARM64 aapt2 and set it to `apkfile.aapt2`.
+
+### 4. Configuration
+
+Copy [config.sample.yml](config.sample.yml) and edit it for your environment (e.g. `/etc/emlauncher/config.yml`). Main items:
+
+- `timezone`: time zone of datetimes in the DB (empty: the environment's time zone)
+- `database`, `memcache`
+- `storage_class`: `S3` / `LocalFile`. Create the S3 bucket in advance
+- `session.secret`: a long random string. Use the same value on all servers
+- `login`: password login, Google / AzureAD login
+
+### 5. Run
+
+Example systemd unit:
+
+```ini
+[Unit]
+Description=EMLauncher
+After=network.target
+
+[Service]
+User=emlauncher
+ExecStart=/opt/emlauncher/emlauncher -config /etc/emlauncher/config.yml
+Restart=always
+
+[Install]
+WantedBy=multi-user.target
 ```
 
+EMLauncher listens on `listen` (default `127.0.0.1:8080`). Put it behind a reverse proxy (Apache / nginx) or an ALB. URLs are built from `X-Forwarded-Proto` / `X-Forwarded-Host`. The health check path is `/health`.
 
-### 5. Database setup
+Uploaded files are written to the temporary directory (`TMPDIR`, default `/tmp`) first. Make sure it has enough space for the largest package.
 
-```BASH
-sudo systemctl start mariadb
-sudo systemctl enable mariadb
+### 6. Add users
+
+For password login, register only the mail address in the `user_pass` table, and let the user set the password via "forgot password" on the login page.
+
+```sql
+INSERT INTO user_pass (mail) VALUES ('your-name@example.com');
 ```
 
-Create file with username and password of DB.
+For Google / AzureAD login, accounts matching `login.allowed_mailaddr_pattern` or registered in `user_pass` can log in.
 
-Eg:
-```
-echo 'emlauncher:password' > $HOME/dbauth
-```
+### 7. Delete old packages (optional)
 
-Modify the passwords of data/sql/database.sql, and send to MySQL.
-```BASH
-sudo mysql -uroot < /path/to/emlauncher/data/sql/database.sql
-sudo mysql -uroot emlauncher < /path/to/emlauncher/data/sql/tables.sql
+Deletes unprotected packages, keeping the specified number of newest packages per application. Run it from cron etc.
+
+```sh
+/opt/emlauncher/delete-old-packages -config /etc/emlauncher/config.yml -k 100
 ```
 
-### 6. Memcache setup
+## Development
 
-```BASH
-sudo systemctl start memcached
-sudo systemctl enable memcached
-```
-
-### 7. Setup bundletool for Android App Bundle
-
-```BASH
-sudo yum install java-1.8.0-openjdk-headless
-curl -sLO https://github.com/google/bundletool/releases/download/1.15.1/bundletool-all-1.15.1.jar
-```
-
-Here will also have a keystore for re-signing the generate APK.
-The password, keystore file name, and alias name to be set here will be described later in the configuration file `emlauncher_config.php`.
-```BASH
-keytool -genkey -keystore {emlauncher-keystore.jks} -keyalg RSA -keysize 2048 -validity 10000 -alias {key-alias}
-```
-
-#### When Running on a platform with AARCH64(ARM64) architecture
-When Running on the platform of AARCH64(ARM64) architecture, aapt2 included in bundletool is for AMD64(x86_64) architecture and does not work as it is,
-so download aapt2 for ARM64 architecture from github.
-```BASH
-curl -sLO https://github.com/JonForShort/android-tools/raw/master/build/android-9.0.0_r33/aapt2/arm64-v8a/bin/aapt2
-```
-
-### 8. Configuration
-
-#### mfw_serverevn_config.php
-Copy ``config/mfw_serverenv_config_sample.php``,and rewrite
-``$serverenv_config['ec2']['database']['authfile']`` to the path of dbauth file that was created at 5.
-
-#### emlauncher_config.php
-Copy ``config/emlauncher_config_sample.php``, and rewrite to match your own environment.
-
-Create bucket that will be assigned to bucket name of S3 in advance.
-
-##### When running on a platform with AARCH64(ARM64) architecture
-Specify the path of the aapt2 executable file for ARM64 downloaded at section (6.) in aapt2 of the APK file settings.
-
-### 9. Complete
-
-Access instance with HTTP in browser.
-When the login page of EMLauncher is displayed, it’s complete.
+- Tests: `go test ./...`. Tests using the DB or S3 run only when the E2E environment is up and `EML_TEST_DB_HOST` etc. are set.
+- E2E tests and migration rehearsal: [docs/go-migration/TESTING.md](docs/go-migration/TESTING.md) (in Japanese)
