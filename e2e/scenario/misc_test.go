@@ -1,8 +1,6 @@
 package scenario
 
 import (
-	"bytes"
-	"image/png"
 	"net/http"
 	"testing"
 
@@ -18,22 +16,23 @@ func TestHealth(t *testing.T) {
 
 func TestQRCode(t *testing.T) {
 	e := e2e.New(t)
-	// ログイン不要
-	res := e.NewClient().Get("/qr/code?s=250&q=%2Fpackage%2Finstall%3Ftoken%3Dabc")
-	e2e.ExpectStatus(t, res, http.StatusOK)
-	expectEq(t, "Content-Type", res.Header.Get("Content-Type"), "image/png")
-	img, err := png.Decode(bytes.NewReader(res.Body))
-	if err != nil {
-		t.Fatalf("not png: %v", err)
-	}
-	if w := img.Bounds().Dx(); w < 250 || w > 300 {
-		t.Fatalf("qr width = %d", w)
-	}
-	// サイズの上限は 300 (+余白)
-	res = e.NewClient().Get("/qr/code?s=1000&q=%2F")
-	img, _ = png.Decode(bytes.NewReader(res.Body))
-	if w := img.Bounds().Dx(); w > 320 {
-		t.Fatalf("qr width = %d, want <= 320", w)
+	for _, tc := range []struct {
+		query string // /qr/code のクエリ
+		path  string // QR コードの中身になるパス
+		size  int    // QR コード部分の大きさ (上限 300, 既定 150). 周りに 10px の余白が付く
+	}{
+		{"s=250&q=%2Fpackage%2Finstall%3Ftoken%3Dabc", "/package/install?token=abc", 250},
+		{"s=150&q=%2Fapp%3Fid%3D1", "/app?id=1", 150},
+		{"q=%2Fpackage%3Fid%3D2", "/package?id=2", 150},
+		{"s=1000&q=%2F", "/", 300},
+	} {
+		// ログイン不要
+		res := e.NewClient().Get("/qr/code?" + tc.query)
+		e2e.ExpectStatus(t, res, http.StatusOK)
+		expectEq(t, "Content-Type", res.Header.Get("Content-Type"), "image/png")
+		text, w, h := e2e.DecodeQR(t, res.Body)
+		expectEq(t, "qr content of "+tc.query, text, e.Config.BaseURL+tc.path)
+		expectEq(t, "qr image size of "+tc.query, [2]int{w, h}, [2]int{tc.size + 20, tc.size + 20})
 	}
 }
 

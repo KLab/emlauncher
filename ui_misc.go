@@ -1,15 +1,8 @@
 package emlauncher
 
 import (
-	"bytes"
 	"fmt"
-	"image"
-	"image/color"
-	"image/draw"
-	"image/png"
 	"net/http"
-
-	"github.com/skip2/go-qrcode"
 )
 
 // マイアプリ
@@ -138,7 +131,6 @@ func (s *Server) docKeystore(c *uiContext) {
 const (
 	qrDefaultSize = 150
 	qrMaxSize     = 300
-	qrMargin      = 10
 )
 
 func (s *Server) qrCode(c *uiContext) {
@@ -149,20 +141,13 @@ func (s *Server) qrCode(c *uiContext) {
 	if size <= 0 {
 		size = qrDefaultSize
 	}
-	q, err := qrcode.New(absURL(c.r, c.form.str("q"), ""), qrcode.High)
+	b, err := qrPNG(absURL(c.r, c.form.str("q"), ""), size)
 	if err != nil {
 		s.serverError(c, err)
 		return
 	}
-	q.DisableBorder = true
-	code := q.Image(size)
-	img := image.NewRGBA(image.Rect(0, 0, size+2*qrMargin, size+2*qrMargin))
-	draw.Draw(img, img.Bounds(), image.NewUniform(color.White), image.Point{}, draw.Src)
-	draw.Draw(img, code.Bounds().Add(image.Pt(qrMargin, qrMargin)), code, image.Point{}, draw.Src)
-	var buf bytes.Buffer
-	png.Encode(&buf, img)
 	c.w.Header().Set("Content-Type", "image/png")
-	c.w.Write(buf.Bytes())
+	c.w.Write(b)
 }
 
 // ajax (ログイン必須, JSON)
