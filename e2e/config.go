@@ -24,6 +24,8 @@ type Config struct {
 	Memcached   string // E2E_MEMCACHED
 	CachePrefix string // E2E_CACHE_PREFIX: memcached のキー接頭辞
 	BatchCmd    string // E2E_BATCH_CMD: 古いパッケージ削除バッチ. {keep} が保持数に置き換わる
+	GoExec      string // E2E_GO_EXEC: Go 版のコンテナでコマンドを実行する (無停止の再起動のテスト用)
+	GoConfig    string // E2E_GO_CONFIG: Go 版が読んでいる設定ファイル (ホスト側のパス)
 	TZ          *time.Location
 }
 
@@ -55,6 +57,8 @@ func LoadConfig() Config {
 		Memcached:   env("E2E_MEMCACHED", "localhost:21211"),
 		CachePrefix: env("E2E_CACHE_PREFIX", "emlauncher_e2e_"+storage+"_emlauncher_"),
 		BatchCmd:    env("E2E_BATCH_CMD", batch),
+		GoExec:      env("E2E_GO_EXEC", "docker compose -f "+compose+" exec -T go"),
+		GoConfig:    env("E2E_GO_CONFIG", filepath.Join(root, ".work", "go-runtime-config", "config.e2e_"+storage+".yml")),
 		TZ:          tz,
 	}
 }

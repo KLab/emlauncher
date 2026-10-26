@@ -64,7 +64,12 @@ After=network.target
 
 [Service]
 User=emlauncher
-ExecStart=/opt/emlauncher/emlauncher -config /etc/emlauncher/config.yml
+RuntimeDirectory=emlauncher
+PIDFile=/run/emlauncher/emlauncher.pid
+ExecStart=/opt/emlauncher/emlauncher -config /etc/emlauncher/config.yml -pid-file /run/emlauncher/emlauncher.pid
+ExecReload=/bin/kill -HUP $MAINPID
+# 停止時は処理中のリクエスト (大きなアップロード) を待つ. emlauncher の -drain-timeout (既定 1h) に合わせる
+TimeoutStopSec=1h
 Restart=always
 
 [Install]
@@ -72,6 +77,12 @@ WantedBy=multi-user.target
 ```
 
 `listen`（既定 `127.0.0.1:8080`）で待ち受けます. Apache / nginx のリバースプロキシや ALB の裏に置いてください. `X-Forwarded-Proto` / `X-Forwarded-Host` を見て URL を組み立てます. ヘルスチェックは `/health` です.
+
+#### 更新（無停止の再起動）
+
+バイナリや設定ファイルを置き換えて `systemctl reload emlauncher` すると, 処理中のリクエストを止めずに切り替わります. 新しいプロセスが待ち受けソケットを引き継ぎ, 古いプロセスは処理中のリクエスト（長いアップロードを含む）を終えてから終了します. 新しいプロセスが起動できなかった場合（設定の誤りなど）は, 古いプロセスがそのまま動き続けます（ログに `upgrade failed` が出ます）.
+
+`systemctl restart` は一度停止するので, 処理中のアップロードが終わるまで待ち, その間はサービスが止まります. 更新には `reload` を使ってください.
 
 アップロードされたファイルは一時ディレクトリ（`TMPDIR`, 既定は `/tmp`）にいったん書かれるので, 最大のパッケージを置ける空きを用意してください.
 

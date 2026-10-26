@@ -65,7 +65,12 @@ After=network.target
 
 [Service]
 User=apache
-ExecStart=/opt/emlauncher/emlauncher -config /etc/emlauncher/config.yml
+RuntimeDirectory=emlauncher
+PIDFile=/run/emlauncher/emlauncher.pid
+ExecStart=/opt/emlauncher/emlauncher -config /etc/emlauncher/config.yml -pid-file /run/emlauncher/emlauncher.pid
+ExecReload=/bin/kill -HUP $MAINPID
+# 停止時は処理中のリクエスト (大きなアップロード) を待つ. emlauncher の -drain-timeout (既定 1h) に合わせる
+TimeoutStopSec=1h
 Restart=always
 # timezone を空にした場合は, ここで TZ を指定してもよい
 # Environment=TZ=Asia/Tokyo
@@ -80,6 +85,8 @@ systemctl enable --now emlauncher
 curl -s http://127.0.0.1:8080/health   # OK
 journalctl -u emlauncher | head        # 起動時に timezone / storage / cache_prefix を出力する
 ```
+
+以後の更新（バイナリや設定の差し替え）は `systemctl reload emlauncher` で行う（無停止. README 参照）.
 
 ### 2-3. Apache のリバースプロキシを Go 版に向ける
 

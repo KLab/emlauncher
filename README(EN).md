@@ -64,7 +64,12 @@ After=network.target
 
 [Service]
 User=emlauncher
-ExecStart=/opt/emlauncher/emlauncher -config /etc/emlauncher/config.yml
+RuntimeDirectory=emlauncher
+PIDFile=/run/emlauncher/emlauncher.pid
+ExecStart=/opt/emlauncher/emlauncher -config /etc/emlauncher/config.yml -pid-file /run/emlauncher/emlauncher.pid
+ExecReload=/bin/kill -HUP $MAINPID
+# Wait for in-flight requests (large uploads) on stop. Match -drain-timeout of emlauncher (default 1h)
+TimeoutStopSec=1h
 Restart=always
 
 [Install]
@@ -72,6 +77,12 @@ WantedBy=multi-user.target
 ```
 
 EMLauncher listens on `listen` (default `127.0.0.1:8080`). Put it behind a reverse proxy (Apache / nginx) or an ALB. URLs are built from `X-Forwarded-Proto` / `X-Forwarded-Host`. The health check path is `/health`.
+
+#### Update (zero-downtime restart)
+
+Replace the binary or the config file and run `systemctl reload emlauncher`. A new process takes over the listening socket, and the old process exits after finishing in-flight requests (including long uploads). If the new process fails to start (e.g. a config error), the old process keeps running (`upgrade failed` in the log).
+
+`systemctl restart` stops the service first, so it waits for in-flight uploads and the service is down meanwhile. Use `reload` to update.
 
 Uploaded files are written to the temporary directory (`TMPDIR`, default `/tmp`) first. Make sure it has enough space for the largest package.
 

@@ -58,6 +58,8 @@ cd e2e && E2E_TARGET=go E2E_STORAGE=s3 go test ./scenario/ -count=1
 
 2026-10-23 時点で, PHP 版・Go 版とも LocalFile・S3 の両方で全 36 シナリオが通る。
 
+Go 版だけのシナリオとして, 無停止の再起動（`TestGracefulRestart`, `TestGracefulRestartFailure`）がある（PHP 版ではスキップ）。Go 版のコンテナで `kill -HUP` を送り, 再起動中に送り続けたリクエストが失敗しないこと, 途中まで送っていたアップロードが古いプロセスで完了すること, 古いプロセスが終了すること, 設定を壊したときは古いプロセスが動き続けることを確認する。Go 版の設定は `e2e/.work/go-runtime-config/` のコピーを使い, テストが一時的に書き換える。
+
 ### 主な環境変数
 
 | 変数 | 既定値 | 内容 |

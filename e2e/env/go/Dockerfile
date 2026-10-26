@@ -20,4 +20,6 @@ RUN set -x \
   && chmod 755 /usr/local/bin/capture-mail \
   && mkdir -p /mailbox /var/www/emlauncher
 COPY --from=build /out/ /usr/local/bin/
-CMD ["sh", "-c", "exec emlauncher -config /etc/emlauncher/config.${E2E_ENV}.yml"]
+# 無停止の再起動 (SIGHUP) ではプロセスが入れ替わるので, emlauncher は PID 1 にしない
+# (compose の init: true で tini を PID 1 にする). PID は /tmp/emlauncher.pid に書く.
+CMD ["sh", "-c", "emlauncher -config /etc/emlauncher/config.${E2E_ENV}.yml -pid-file /tmp/emlauncher.pid & while :; do sleep 3600; done"]

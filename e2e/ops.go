@@ -167,3 +167,33 @@ func (e *Env) RunBatch(keep int) string {
 	}
 	return string(out)
 }
+
+// GoExec は Go 版のコンテナでシェルのコマンドを実行する.
+func (e *Env) GoExec(script string) (string, error) {
+	e.t.Helper()
+	cmd := e.Config.GoExec + " sh -c '" + strings.ReplaceAll(script, "'", `'''`) + "'"
+	out, err := exec.Command("sh", "-c", cmd).CombinedOutput()
+	return strings.TrimSpace(string(out)), err
+}
+
+// ServerPID は Go 版のサーバの PID (PID ファイルの値).
+func (e *Env) ServerPID() string {
+	e.t.Helper()
+	out, err := e.GoExec("cat /tmp/emlauncher.pid")
+	if err != nil {
+		e.t.Fatalf("read pid file: %v: %s", err, out)
+	}
+	return out
+}
+
+// ProcessAlive は Go 版のコンテナでプロセスが動いているか.
+func (e *Env) ProcessAlive(pid string) bool {
+	e.t.Helper()
+	// 終了したプロセスはゾンビとして残ることがあるので, 状態も見る
+	out, err := e.GoExec("cat /proc/" + pid + "/stat 2>/dev/null")
+	if err != nil || out == "" {
+		return false
+	}
+	fields := strings.Fields(out[strings.LastIndex(out, ")")+1:])
+	return len(fields) > 0 && fields[0] != "Z"
+}
