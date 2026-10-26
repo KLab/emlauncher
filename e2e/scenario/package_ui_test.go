@@ -1,11 +1,12 @@
 package scenario
 
 import (
-	e2e "emlauncher-e2e"
 	"net/http"
 	"strings"
 	"testing"
 	"time"
+
+	e2e "emlauncher-e2e"
 )
 
 func TestPackageEditUI(t *testing.T) {

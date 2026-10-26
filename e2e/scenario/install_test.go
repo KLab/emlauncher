@@ -2,13 +2,14 @@ package scenario
 
 import (
 	"bytes"
-	e2e "emlauncher-e2e"
 	"fmt"
 	"net/http"
 	"net/url"
 	"regexp"
 	"strings"
 	"testing"
+
+	e2e "emlauncher-e2e"
 )
 
 // expectDownload は URL がキーを指し, 中身が data と一致することを確認する.

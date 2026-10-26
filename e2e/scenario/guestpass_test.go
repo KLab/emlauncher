@@ -1,12 +1,13 @@
 package scenario
 
 import (
-	e2e "emlauncher-e2e"
 	"net/http"
 	"regexp"
 	"strings"
 	"testing"
 	"time"
+
+	e2e "emlauncher-e2e"
 )
 
 var reGuestpassURL = regexp.MustCompile(`https?://[^"<\s]+/package/guestpass_install\?token=([0-9A-Za-z]{32})`)

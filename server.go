@@ -5,9 +5,10 @@
 package emlauncher
 
 import (
-	"emlauncher/storage"
 	"log/slog"
 	"net/http"
+
+	"emlauncher/storage"
 )
 
 type Server struct {

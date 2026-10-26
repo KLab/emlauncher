@@ -8,8 +8,9 @@ import (
 	"regexp"
 	"strings"
 
-	"emlauncher/pkgfile"
 	"github.com/jmoiron/sqlx"
+
+	"emlauncher/pkgfile"
 )
 
 // Upload はアップロードされたファイル (一時ファイルに保存済み).

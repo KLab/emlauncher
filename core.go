@@ -8,9 +8,10 @@ import (
 	"fmt"
 	"log/slog"
 
+	"github.com/jmoiron/sqlx"
+
 	"emlauncher/pkgfile"
 	"emlauncher/storage"
-	"github.com/jmoiron/sqlx"
 )
 
 type Core struct {

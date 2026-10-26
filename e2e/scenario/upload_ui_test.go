@@ -1,11 +1,12 @@
 package scenario
 
 import (
-	e2e "emlauncher-e2e"
 	"net/http"
 	"regexp"
 	"strings"
 	"testing"
+
+	e2e "emlauncher-e2e"
 )
 
 func TestUIUploadIPA(t *testing.T) {

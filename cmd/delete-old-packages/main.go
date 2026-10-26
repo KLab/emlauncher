@@ -6,14 +6,15 @@ package main
 
 import (
 	"context"
-	"emlauncher"
-	"emlauncher/storage"
 	"flag"
 	"fmt"
 	"log/slog"
 	"os"
 	"time"
 	_ "time/tzdata"
+
+	"emlauncher"
+	"emlauncher/storage"
 )
 
 // 1 回の実行でアプリごとに削除する上限 (PHP 版と同じ).

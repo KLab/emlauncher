@@ -1,9 +1,10 @@
 package scenario
 
 import (
-	e2e "emlauncher-e2e"
 	"net/http"
 	"testing"
+
+	e2e "emlauncher-e2e"
 )
 
 func TestComments(t *testing.T) {

@@ -1,10 +1,11 @@
 package scenario
 
 import (
-	e2e "emlauncher-e2e"
 	"net/http"
 	"testing"
 	"time"
+
+	e2e "emlauncher-e2e"
 )
 
 func TestUploadNotification(t *testing.T) {

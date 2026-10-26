@@ -1,7 +1,6 @@
 package migration
 
 import (
-	e2e "emlauncher-e2e"
 	"net/http"
 	"net/url"
 	"reflect"
@@ -9,6 +8,8 @@ import (
 	"sort"
 	"strings"
 	"testing"
+
+	e2e "emlauncher-e2e"
 )
 
 // TestVerify は移行後の環境で, 移行元で作った中間状態がそのまま使えることを確認する.

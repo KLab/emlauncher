@@ -7,11 +7,10 @@ import (
 	"bytes"
 	"fmt"
 	"image"
-	"image/png"
-
 	// 対応する入力形式
 	_ "image/gif"
 	_ "image/jpeg"
+	"image/png"
 
 	"golang.org/x/image/draw"
 	_ "golang.org/x/image/webp"

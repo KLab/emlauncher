@@ -1,13 +1,14 @@
 package scenario
 
 import (
-	e2e "emlauncher-e2e"
 	"image/color"
 	"net/http"
 	"regexp"
 	"sort"
 	"strings"
 	"testing"
+
+	e2e "emlauncher-e2e"
 )
 
 func TestCreateApp(t *testing.T) {

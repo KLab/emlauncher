@@ -1,11 +1,12 @@
 package migration
 
 import (
-	e2e "emlauncher-e2e"
 	"net/http"
 	"net/url"
 	"regexp"
 	"testing"
+
+	e2e "emlauncher-e2e"
 )
 
 var (

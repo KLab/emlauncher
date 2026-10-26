@@ -3,7 +3,6 @@ package scenario
 import (
 	"archive/zip"
 	"bytes"
-	e2e "emlauncher-e2e"
 	"encoding/json"
 	"net/http"
 	"net/url"
@@ -11,6 +10,8 @@ import (
 	"strings"
 	"testing"
 	"time"
+
+	e2e "emlauncher-e2e"
 )
 
 func TestAPIUploadIPA(t *testing.T) {

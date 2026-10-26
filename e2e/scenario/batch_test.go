@@ -1,8 +1,9 @@
 package scenario
 
 import (
-	e2e "emlauncher-e2e"
 	"testing"
+
+	e2e "emlauncher-e2e"
 )
 
 // TestDeleteOldPackagesBatch は古いパッケージ削除バッチを確認する.
