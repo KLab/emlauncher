@@ -104,19 +104,20 @@ PHP のファイルセッション（Cookie 名 `{prefix}seskey`）。内容は�
 
 ### 2.2 ディレクトリ構成
 
-Go のコードはリポジトリ直下に置く（モジュール名 `emlauncher`）。リポジトリには github.com 以外のミラーもあるので、モジュール名にホスト名は含めない。
+Go のコードは `src/` に置く（モジュール名 `emlauncher`）。リポジトリには github.com 以外のミラーもあるので、モジュール名にホスト名は含めない。
 
 パッケージは基本的にフラットにし、独立させる理由があるものだけ分ける。
 
 ```
-./                           package emlauncher: 設定, DB (table*.go), 業務処理 (core*.go), HTTP ハンドラ, セッション, メール
+src/                         package emlauncher: 設定, DB (table*.go), 業務処理 (core*.go), HTTP ハンドラ, セッション, メール
+  config.sample.yml          設定例
   templates/, static/        画面のテンプレートと静的ファイル (バイナリに埋め込む)
   storage/                   S3 / LocalFile. 外部サービスとの境界. 同じテストを両方の実装に流す
   pkgfile/                   IPA / APK / AAB の解析. アプリ本体に依存しない. テストデータを持つ
   cmd/emlauncher/            HTTP サーバ
   cmd/delete-old-packages/   バッチ
-  sql/                       DB スキーマ (PHP 版から変えていない)
-  tools/                     移行用のスクリプト (PHP 版の設定の書き出し)
+sql/                         DB スキーマ (PHP 版から変えていない)
+tools/                       移行用のスクリプト (PHP 版の設定の書き出し)
 e2e/                         package e2e: テスト用のクライアント・フィクスチャ. テスト専用の依存
                              (AWS SDK など) を本体に持ち込まないよう別モジュール (emlauncher-e2e)
   scenario/, migration/      シナリオテストと移行リハーサル (実行の仕方が違うので分ける)

@@ -2,9 +2,9 @@
 # ビルドコンテキストはリポジトリ直下.
 FROM golang:1.23.4-bookworm AS build
 WORKDIR /src
-COPY go.mod go.sum ./
+COPY src/go.mod src/go.sum ./
 RUN go mod download
-COPY . .
+COPY src/ .
 RUN CGO_ENABLED=0 go build -o /out/emlauncher ./cmd/emlauncher \
   && CGO_ENABLED=0 go build -o /out/delete-old-packages ./cmd/delete-old-packages
 

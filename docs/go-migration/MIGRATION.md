@@ -7,7 +7,7 @@ EC2 + Apache + ALB の構成で, PHP 版を Go 版に切り替える手順. DB �
 ## 0. 準備（ビルド）
 
 ```sh
-GOOS=linux GOARCH=amd64 CGO_ENABLED=0 go build -o dist/ ./cmd/emlauncher ./cmd/delete-old-packages
+cd src && GOOS=linux GOARCH=amd64 CGO_ENABLED=0 go build -o ../dist/ ./cmd/emlauncher ./cmd/delete-old-packages
 ```
 
 配置するもの:
