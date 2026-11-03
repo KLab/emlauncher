@@ -25,7 +25,7 @@
           <ul>
             <li><code>api_key</code> - Required (See the application preferences). Not needed if the <code>Authorization: Bearer</code> header is used. See <a href="<?=url('/doc/api')?>">Authentication</a>.</li>
             <li><code>id</code> - Required, the package id</li>
-            <li><code>attached_file_id</code> - Required, the attached file id to delete</li>
+            <li><code>attached_file_id</code> - Required, the attached file id to get the download URL</li>
           </ul>
         </dd>
       </dl>
@@ -66,6 +66,7 @@
     <h3 class="subheader">Caveats</h3>
     <div class="container">
       <p>The type of numeric fields (id, file_size, etc.) are indeterminate and can be either string or number.</p>
+      <p>download_url is valid until expire (60 minutes after the request).</p>
     </div>
  </div>
 
