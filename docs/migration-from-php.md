@@ -2,6 +2,8 @@
 
 EC2 + Apache + ALB の構成で, PHP 版を Go 版に切り替える手順. DB とストレージは変更しない.
 
+切替後は Apache を使わない. Go 版が Apache の代わりに 80 番で待ち受け, ALB から直接受ける（ALB とターゲットグループの設定は変えない）. Apache を止めてから Go 版が起動するまでの数秒間はサービスが止まる.
+
 この手順は移行リハーサル（`e2e/migration/rehearse.sh <local|s3> go`）で検証している. リハーサルは PHP 版で中間状態を作り, 下記 1〜2 の手順で Go 版に切り替え, 状態が引き継がれていること, さらに PHP 版へ切り戻せることを確認する（[e2e/README.md](../e2e/README.md)）.
 
 ## 0. 準備（ビルド）
@@ -40,9 +42,9 @@ php export_php_config.php /path/to/emlauncher <MFW_ENV> > /etc/emlauncher/config
 
 ### 1-2. 環境に合わせて直す
 
-- `listen`: 既定は `127.0.0.1:8080`（Apache のリバースプロキシから受ける）.
+- `listen`: `":80"` にする（Apache の代わりに ALB から受ける. ターゲットグループのポートに合わせる）. 書き出した値は `127.0.0.1:8080`.
 - `session.secret`: 書き出すたびにランダムに作られる. **複数台構成では全台で同じ値にする**（違うとサーバをまたぐたびにログアウトされる）.
-- `local_file.serve`: 既定は `true`（Go 版が `/files` を配信する）. Apache の Alias で配信し続けるなら `false`.
+- `local_file.serve`: `true` のままにする（Apache を使わないので, Go 版が `/files` を配信する）.
 
 ## 2. 切替
 
@@ -54,9 +56,9 @@ Go 版は **Apache と同じユーザ**（例: `apache`, `www-data`）で動か�
 - LocalFile の場合, 保存先（`local_file.path`）以下に, そのユーザで書き込めること（既存のファイルは Apache が作ったもの）.
 - 一時ディレクトリ（`TMPDIR`, 既定は `/tmp`）に, 最大のパッケージ（PHP 版の設定では 7GB）を置ける空きがあること. アップロードされたファイルはいったんここに書かれる.
 
-### 2-2. Go 版を起動する
+### 2-2. Go 版のユニットを置く
 
-systemd のユニットの例（`/etc/systemd/system/emlauncher.service`）:
+ここではまだ起動しない（80 番は Apache が使っている）. systemd のユニットの例（`/etc/systemd/system/emlauncher.service`）:
 
 ```ini
 [Unit]
@@ -69,6 +71,8 @@ RuntimeDirectory=emlauncher
 PIDFile=/run/emlauncher/emlauncher.pid
 ExecStart=/opt/emlauncher/emlauncher -config /etc/emlauncher/config.yml -pid-file /run/emlauncher/emlauncher.pid
 ExecReload=/bin/sh -c 'kill -HUP $MAINPID'
+# apache ユーザのまま 80 番で待ち受けるため
+AmbientCapabilities=CAP_NET_BIND_SERVICE
 # 停止時は処理中のリクエスト (大きなアップロード) を待つ. emlauncher の -drain-timeout (既定 1h) に合わせる
 TimeoutStopSec=1h
 Restart=always
@@ -81,26 +85,23 @@ WantedBy=multi-user.target
 
 ```sh
 systemctl daemon-reload
+```
+
+### 2-3. Apache を止めて Go 版を起動する（ここでサービスが止まる）
+
+```sh
+# Apache は処理中のリクエストを終えてから終了する. 待ち受けはすぐに閉じるので, Go 版を起動できる
+apachectl graceful-stop
+systemctl disable httpd
 systemctl enable --now emlauncher
-curl -s http://127.0.0.1:8080/health   # OK
+curl -s http://127.0.0.1/health        # OK
 journalctl -u emlauncher | head        # 起動時に timezone / storage / cache_prefix を出力する
 ```
 
-以後の更新（バイナリや設定の差し替え）は `systemctl reload emlauncher` で行う（無停止. README 参照）.
-
-### 2-3. Apache のリバースプロキシを Go 版に向ける
-
-```apache
-# mod_proxy, mod_proxy_http を有効にする
-ProxyPreserveHost On
-ProxyTimeout 600
-ProxyPass        / http://127.0.0.1:8080/
-ProxyPassReverse / http://127.0.0.1:8080/
-```
-
-- ALB が付ける `X-Forwarded-Proto` はそのまま Go 版に渡る. Go 版は `X-Forwarded-Proto` / `X-Forwarded-Host` から URL を組み立てる.
-- PHP 版の `DocumentRoot`（`web/`）と `.htaccess` の設定は使わなくなる.
-- ALB のヘルスチェックは `/health` のまま.
+- ALB, ターゲットグループ（80 番, ヘルスチェックは `/health`）は変えない.
+- ALB が付ける `X-Forwarded-Proto` / `X-Forwarded-Host` から URL を組み立てる.
+- PHP 版の `DocumentRoot`（`web/`）, `.htaccess`, Apache の設定は使わなくなる. アクセスログは Apache ではなく Go 版のログ（journald）に出る.
+- 以後の更新（バイナリや設定の差し替え）は `systemctl reload emlauncher` で行う（無停止. README 参照）.
 
 ### 2-4. バッチを差し替える
 
@@ -115,6 +116,7 @@ cron の `batch/delete_old_packages.php -e <env> -k <keep>` を次に置き換�
 - 利用者は再ログインする（セッションは引き継がない）.
 - 移行前に発行したインストールトークン, ゲストパスの URL はそのまま使える.
 - DB のスキーマ変更・データ移行は無い.
+- Apache と PHP 版は, 切り戻しに備えて止めたまま残しておき, 不要になったら削除する.
 
 ### 切替で変わる挙動
 
@@ -140,4 +142,12 @@ PHP 版の不具合を直したもの:
 
 ## 4. 切り戻し
 
-Apache のリバースプロキシの設定を外して PHP 版に戻し, cron も戻す. Go 版で作ったデータ（パッケージ, インストールトークン, パスワード）はそのまま PHP 版で使える（リハーサルで確認している）. 利用者は再ログインが必要.
+Go 版を止めて Apache を起動し, cron も戻す. 切替と同じく数秒間止まる.
+
+```sh
+# Go 版は処理中のリクエストを終えてから終了する. 待ち受けはすぐに閉じるので, Apache を起動できる
+systemctl disable --now emlauncher
+systemctl enable --now httpd
+```
+
+Go 版で作ったデータ（パッケージ, インストールトークン, パスワード）はそのまま PHP 版で使える（リハーサルで確認している）. 利用者は再ログインが必要.
