@@ -3,7 +3,7 @@ EMLauncher
 
 An in-house app distribution service. Upload iOS (ipa) / Android (apk, aab) packages and install them on devices.
 
-EMLauncher is implemented in Go. The PHP version has been removed from this repository (the last PHP version is commit `4124ca6`). To migrate from the PHP version, see [docs/go-migration/MIGRATION.md](docs/go-migration/MIGRATION.md) (in Japanese).
+EMLauncher is implemented in Go. The PHP version has been removed from this repository (the last PHP version is commit `4124ca6`). To migrate from the PHP version, see [docs/migration-from-php.md](docs/migration-from-php.md) (in Japanese).
 
 ## Requirements
 
@@ -108,4 +108,5 @@ Deletes unprotected packages, keeping the specified number of newest packages pe
 ## Development
 
 - Tests: `cd src && go test ./...`. Tests using the DB or S3 run only when the E2E environment is up and `EML_TEST_DB_HOST` etc. are set.
-- E2E tests and migration rehearsal: [docs/go-migration/TESTING.md](docs/go-migration/TESTING.md) (in Japanese)
+- E2E tests and migration rehearsal: [e2e/README.md](e2e/README.md) (in Japanese)
+- Design notes: [docs/design.md](docs/design.md) (in Japanese)

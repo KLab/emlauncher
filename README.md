@@ -3,7 +3,7 @@ EMLauncher
 
 社内向けのアプリ配布サービスです. iOS (ipa) / Android (apk, aab) のパッケージをアップロードし, 端末からインストールできます.
 
-Go で実装しています. PHP 版はリポジトリから削除しました（最終版はコミット `4124ca6`）. PHP 版からの移行手順は [docs/go-migration/MIGRATION.md](docs/go-migration/MIGRATION.md) を参照してください.
+Go で実装しています. PHP 版はリポジトリから削除しました（最終版はコミット `4124ca6`）. PHP 版からの移行手順は [docs/migration-from-php.md](docs/migration-from-php.md) を参照してください.
 
 ## 必要なもの
 
@@ -108,5 +108,5 @@ Google / AzureAD ログインでは, `login.allowed_mailaddr_pattern` に一致�
 ## 開発
 
 - テスト: `cd src && go test ./...`. DB や S3 を使うテストは, E2E テストの環境を起動して `EML_TEST_DB_HOST` などを指定したときだけ実行されます.
-- E2E テスト・移行リハーサル: [docs/go-migration/TESTING.md](docs/go-migration/TESTING.md)
-- 設計と移行の経緯: [docs/go-migration/PLAN.md](docs/go-migration/PLAN.md)
+- E2E テスト・移行リハーサル: [e2e/README.md](e2e/README.md)
+- 設計メモ: [docs/design.md](docs/design.md)

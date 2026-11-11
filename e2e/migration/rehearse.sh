@@ -6,7 +6,7 @@
 #
 # 移行先:
 #   php : 移行手順の代わりに PHP 版のコンテナを作り直す (リハーサルの仕組み自体の確認用)
-#   go  : docs/go-migration/MIGRATION.md の手順で Go 版に切り替え, 最後に PHP 版への切り戻しも確認する
+#   go  : docs/migration-from-php.md の手順で Go 版に切り替え, 最後に PHP 版への切り戻しも確認する
 set -euo pipefail
 
 storage="${1:-local}"
@@ -33,7 +33,7 @@ case "$target" in
 		done
 		;;
 	go)
-		# docs/go-migration/MIGRATION.md の手順どおりに行う
+		# docs/migration-from-php.md の手順どおりに行う
 		echo "--- 3-1. PHP 版の設定から Go 版の設定を作る"
 		mkdir -p .work/go-config
 		compose cp ../tools/export_php_config.php php:/tmp/export_php_config.php

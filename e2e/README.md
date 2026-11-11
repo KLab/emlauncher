@@ -1,4 +1,4 @@
-# Go 移植のテスト
+# E2E テスト
 
 PHP 版に対して作ったシナリオテストを、そのまま Go 版にも流す。テストは HTTP で EMLauncher を操作し、DB・ストレージ（LocalFile / S3）・memcached・送信メールを直接確認する。URL、リクエストパラメータ名、DB の内容、ストレージのキーを「仕様」として固定するためのもの。
 
@@ -150,7 +150,7 @@ migration/rehearse.sh local php   # 移行先を PHP 版にする (リハーサ�
    - インストール履歴（Android / iOS / PC）、通知を切ったユーザ、コメント
    - 有効なゲストパスと失効したゲストパス、API と画面で発行したインストールトークン（memcached）
    - upload_post されずに残った一時ファイル
-3. **移行**: 移行先が `go` なら [MIGRATION.md](MIGRATION.md) の手順どおりに行う
+3. **移行**: 移行先が `go` なら [docs/migration-from-php.md](../docs/migration-from-php.md) の手順どおりに行う
    - PHP 版のコンテナで `tools/export_php_config.php` を実行して Go 版の設定を書き出す（TZ, memcached の接頭辞, DB, ストレージなど）
    - `listen` だけ環境に合わせて書き換える
    - PHP 版を止め, Go 版を **Apache と同じユーザ（www-data）** で起動する。authfile は同じホストにある前提でマウントする
