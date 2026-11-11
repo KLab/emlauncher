@@ -2,6 +2,7 @@
 # 1 環境 1 ファイル. キー名は PHP 版の config/emlauncher_config.php, config/mfw_serverenv_config.php に揃えている.
 
 # HTTP サーバの待ち受けアドレス. Apache のリバースプロキシや ALB から受ける.
+# ALB から 80 番で直接受けるなら ":80" (systemd のユニットに AmbientCapabilities=CAP_NET_BIND_SERVICE が必要. README 参照).
 listen: 127.0.0.1:8080
 
 # DB の DATETIME を読み書きするときの TZ. 空なら実行環境の TZ (環境変数 TZ, /etc/localtime).
