@@ -192,7 +192,13 @@ func (s *Server) apiUpload(c *apiContext) {
 		return
 	}
 
-	an, err := s.Core.Analyze(ctx, file.Name, file.Path)
+	// AAB と一緒に APK が送られたら, AAB から生成せずにそれを添付する
+	apk := c.form.file("apk")
+	if apk == nil && c.form.has("apk") {
+		writeJSON(c.w, http.StatusBadRequest, map[string]string{"error": "upload apk file error: apk is not a file"})
+		return
+	}
+	an, err := s.Core.Analyze(ctx, file.Name, file.Path, apk)
 	if err != nil {
 		s.apiError(c.w, c.r, err)
 		return

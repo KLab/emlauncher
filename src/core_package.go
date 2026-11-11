@@ -22,11 +22,13 @@ type Upload struct {
 }
 
 // GeneratedFile はパッケージから生成した添付ファイル (AAB の universal APK).
+// 利用者が APK も一緒にアップロードした場合は, 生成せずにそれを使う (keep).
 type GeneratedFile struct {
 	Name string
 	Type string
 	Path string
 	Size int64
+	keep bool // Cleanup で消さない
 }
 
 // Analysis はパッケージの判別結果.
@@ -40,12 +42,15 @@ type Analysis struct {
 // Cleanup は生成した一時ファイルを消す.
 func (a *Analysis) Cleanup() {
 	for _, g := range a.Generated {
-		os.Remove(g.Path)
+		if !g.keep {
+			os.Remove(g.Path)
+		}
 	}
 }
 
 // Analyze はプラットフォームと識別子を調べる. AAB なら universal APK を生成する.
-func (c *Core) Analyze(ctx context.Context, name, filePath string) (*Analysis, error) {
+// apk を指定すると, AAB の場合は生成せずにそれを APK として添付し, 識別子もそれから読む.
+func (c *Core) Analyze(ctx context.Context, name, filePath string, apk *Upload) (*Analysis, error) {
 	platform, ext, err := pkgfile.Detect(name, filePath)
 	if err != nil {
 		return nil, err
@@ -58,6 +63,15 @@ func (c *Core) Analyze(ctx context.Context, name, filePath string) (*Analysis, e
 			return nil, err
 		}
 		a.Identifier = sql.NullString{String: id, Valid: true}
+	case platform == pkgfile.PlatformAndroid && ext == "aab" && apk != nil:
+		id, err := pkgfile.AndroidPackageName(apk.Path)
+		if err != nil {
+			return nil, err
+		}
+		a.Identifier = sql.NullString{String: id, Valid: true}
+		a.Generated = append(a.Generated, GeneratedFile{
+			Name: apk.Name, Type: AttachedTypeAPK, Path: apk.Path, Size: apk.Size, keep: true,
+		})
 	case platform == pkgfile.PlatformAndroid && ext == "aab":
 		apk, err := c.Bundletool.UniversalAPK(ctx, filePath)
 		if err != nil {
@@ -207,7 +221,7 @@ func (c *Core) UploadTemp(ctx context.Context, file Upload) (*TempUpload, error)
 	if err != nil {
 		return nil, err
 	}
-	an, err := c.Analyze(ctx, file.Name, file.Path)
+	an, err := c.Analyze(ctx, file.Name, file.Path, nil)
 	if err != nil {
 		return nil, err
 	}

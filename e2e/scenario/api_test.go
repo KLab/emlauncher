@@ -120,6 +120,40 @@ func TestAPIUploadAABAndDSYM(t *testing.T) {
 	checkStored(t, e, e2e.AttachedKey(ds), dsym, mimeStored, false)
 }
 
+// AAB と一緒に APK を送ると, AAB から生成せずにその APK を添付する.
+func TestAPIUploadAABWithAPK(t *testing.T) {
+	e := e2e.New(t)
+	if e.Config.Target == "php" {
+		t.Skip("PHP 版 (4124ca6) には無い機能")
+	}
+	owner := e.NewUser("owner")
+	app := e.CreateApp(owner, e2e.Unique("app"))
+
+	aab := e2e.AAB("com.example.e2e.bundle")
+	// 識別子は送った APK から読む
+	apk := e2e.APK("com.example.e2e.prebuilt")
+	res := e.APIUpload(app.APIKey, form("title", "aab with apk"),
+		e2e.File{Field: "file", Name: "sample.aab", Data: aab},
+		e2e.File{Field: "apk", Name: "prebuilt.apk", Data: apk})
+	e2e.ExpectStatus(t, res, http.StatusOK)
+	m := res.JSONObject(t)
+	pkg := e.Package(e2e.QueryInt(t, jsonStr(t, m, "package_url"), "id"))
+	checkPackageJSON(t, e, m, pkg)
+
+	expectEq(t, "platform", pkg.Str("platform"), "Android")
+	expectEq(t, "identifier", pkg.Str("identifier"), "com.example.e2e.prebuilt")
+	checkStored(t, e, e2e.PackageKey(pkg), aab, mimeStored, false)
+
+	afs := e.DB.Rows("SELECT * FROM attached_file WHERE package_id = ? ORDER BY id", pkg.Str("id"))
+	expectEq(t, "attached files", len(afs), 1)
+	af := afs[0]
+	expectEq(t, "apk.original_file_name", af.Str("original_file_name"), "prebuilt.apk")
+	expectEq(t, "apk.file_type", af.Str("file_type"), "apk")
+	expectEq(t, "apk.file_size", af.Int("file_size"), int64(len(apk)))
+	expectMatch(t, "apk.file_name", regexp.MustCompile(`^[0-9A-Za-z]{16}\.apk$`), af.Str("file_name"))
+	checkStored(t, e, e2e.AttachedKey(af), apk, mimeStored, false)
+}
+
 func TestAPIUploadUnknownFile(t *testing.T) {
 	e := e2e.New(t)
 	owner := e.NewUser("owner")

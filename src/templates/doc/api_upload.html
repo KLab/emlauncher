@@ -32,6 +32,7 @@
             <li><code>protect</code> - Optional, protect from auto delete (default to False)</li>
             <li><code>notify</code> - Optional, notify application-installed users (defaults to False)</li>
             <li><code>dsym</code> - Optional, attach dSYM file</li>
+            <li><code>apk</code> - Optional, attach APK file for AAB upload (skips server-side AAB to APK conversion)</li>
           </ul>
         </dd>
       </dl>
@@ -87,6 +88,17 @@
   -F file=@Application.aab \
   -F title='aab upload' \
   -F description='upload aab package via upload api' \
+  -F tags='test,upload-api,aab' \
+  -F protect=True \
+  -F notify=False
+
+# AAB upload with pre-built APK:
+curl {{$.URL "/api/upload"}} \
+  -F api_key='{application_api_key}' \
+  -F file=@Application.aab \
+  -F apk=@Application.apk \
+  -F title='aab upload with apk' \
+  -F description='upload aab package with pre-built apk' \
   -F tags='test,upload-api,aab' \
   -F protect=True \
   -F notify=False</code></pre>
