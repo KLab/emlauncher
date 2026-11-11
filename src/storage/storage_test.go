@@ -135,6 +135,56 @@ func TestS3(t *testing.T) {
 	})
 }
 
+// 大きなファイルの Rename はマルチパートコピーになる (CopyObject は 5GB まで).
+func TestS3RenameMultipart(t *testing.T) {
+	endpoint := os.Getenv("EML_TEST_S3_ENDPOINT")
+	if endpoint == "" {
+		t.Skip("EML_TEST_S3_ENDPOINT is not set")
+	}
+	ctx := context.Background()
+	s, err := NewS3(ctx, S3Config{
+		Key: "test", Secret: "test", Region: "ap-northeast-1", BucketName: "emlauncher-e2e",
+		BaseURL: endpoint,
+	})
+	if err != nil {
+		t.Fatal(err)
+	}
+	// 5MB のパート 2 つと端数 1 つ (パートの最小は 5MB)
+	s.copyThreshold = 1
+	s.copyPartSize = 5 << 20
+	data := make([]byte, 11<<20)
+	for i := range data {
+		data[i] = byte(i % 251)
+	}
+	src := filepath.Join(t.TempDir(), "upload")
+	os.WriteFile(src, data, 0o600)
+	prefix := "go-test/" + randomName() + "/"
+	temp := prefix + "temp-data/" + randomName() + ".apk"
+	file := prefix + "package/1/2_" + randomName() + ".apk"
+	if err := s.SaveFile(ctx, temp, src); err != nil {
+		t.Fatal(err)
+	}
+	if err := s.Rename(ctx, temp, file); err != nil {
+		t.Fatal(err)
+	}
+	defer s.Delete(ctx, file)
+	if _, err := s.client.HeadObject(ctx, &s3.HeadObjectInput{Bucket: &s.bucket, Key: &temp}); err == nil {
+		t.Error("temp file remains after rename")
+	}
+	out, err := s.client.GetObject(ctx, &s3.GetObjectInput{Bucket: &s.bucket, Key: &file})
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer out.Body.Close()
+	got, _ := io.ReadAll(out.Body)
+	if string(got) != string(data) {
+		t.Errorf("copied data differs: %d bytes, want %d", len(got), len(data))
+	}
+	if ct := aws.ToString(out.ContentType); ct != FileContentType {
+		t.Errorf("ContentType = %q", ct)
+	}
+}
+
 // testStorage は Storage の実装に共通の動作を確認する. check は削除前に呼ばれる.
 func testStorage(t *testing.T, s Storage, get func(key string) ([]byte, bool), fetch func(rawURL string) *http.Response, check func(icon, file string)) {
 	t.Helper()

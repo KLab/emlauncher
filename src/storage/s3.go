@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"os"
 	"strings"
+	"sync"
 	"time"
 
 	"github.com/aws/aws-sdk-go-v2/aws"
@@ -24,7 +25,18 @@ type S3 struct {
 	region      string
 	baseURL     string
 	externalURL string
+
+	// copyThreshold 以上のオブジェクトは, Rename でマルチパートコピーにする
+	// (CopyObject は 5GB まで). copyPartSize はその 1 パートの大きさ.
+	copyThreshold int64
+	copyPartSize  int64
 }
+
+const (
+	defaultCopyThreshold = 5 << 30   // CopyObject の上限
+	defaultCopyPartSize  = 512 << 20 // 25GB で 50 パート. パートは最大 10000
+	copyConcurrency      = 5
+)
 
 func NewS3(ctx context.Context, c S3Config) (*S3, error) {
 	opts := []func(*awsconfig.LoadOptions) error{awsconfig.WithRegion(c.Region)}
@@ -54,6 +66,9 @@ func NewS3(ctx context.Context, c S3Config) (*S3, error) {
 		region:      c.Region,
 		baseURL:     baseURL,
 		externalURL: externalURL,
+
+		copyThreshold: defaultCopyThreshold,
+		copyPartSize:  defaultCopyPartSize,
 	}, nil
 }
 
@@ -86,16 +101,98 @@ func (s *S3) SaveFile(ctx context.Context, key, srcPath string) error {
 }
 
 func (s *S3) Rename(ctx context.Context, srcKey, dstKey string) error {
-	_, err := s.client.CopyObject(ctx, &s3.CopyObjectInput{
-		Bucket:     &s.bucket,
-		Key:        &dstKey,
-		CopySource: aws.String(s.bucket + "/" + escapeKey(srcKey)),
-		ACL:        types.ObjectCannedACLPrivate,
-	})
+	head, err := s.client.HeadObject(ctx, &s3.HeadObjectInput{Bucket: &s.bucket, Key: &srcKey})
+	if err != nil {
+		return err
+	}
+	if size := aws.ToInt64(head.ContentLength); size >= s.copyThreshold {
+		err = s.multipartCopy(ctx, srcKey, dstKey, size)
+	} else {
+		_, err = s.client.CopyObject(ctx, &s3.CopyObjectInput{
+			Bucket:     &s.bucket,
+			Key:        &dstKey,
+			CopySource: aws.String(s.copySource(srcKey)),
+			ACL:        types.ObjectCannedACLPrivate,
+		})
+	}
 	if err != nil {
 		return err
 	}
 	return s.Delete(ctx, srcKey)
+}
+
+func (s *S3) copySource(key string) string {
+	return s.bucket + "/" + escapeKey(key)
+}
+
+// multipartCopy は size バイトのオブジェクトを UploadPartCopy でコピーする.
+func (s *S3) multipartCopy(ctx context.Context, srcKey, dstKey string, size int64) error {
+	created, err := s.client.CreateMultipartUpload(ctx, &s3.CreateMultipartUploadInput{
+		Bucket:      &s.bucket,
+		Key:         &dstKey,
+		ACL:         types.ObjectCannedACLPrivate,
+		ContentType: aws.String(FileContentType),
+	})
+	if err != nil {
+		return err
+	}
+	uploadID := created.UploadId
+
+	n := int((size + s.copyPartSize - 1) / s.copyPartSize)
+	parts := make([]types.CompletedPart, n)
+	ctx, cancel := context.WithCancel(ctx)
+	defer cancel()
+	var (
+		wg       sync.WaitGroup
+		mu       sync.Mutex
+		firstErr error
+		sem      = make(chan struct{}, copyConcurrency)
+	)
+	for i := range n {
+		start := int64(i) * s.copyPartSize
+		end := min(start+s.copyPartSize, size) - 1
+		wg.Add(1)
+		sem <- struct{}{}
+		go func() {
+			defer func() { <-sem; wg.Done() }()
+			num := int32(i + 1)
+			out, err := s.client.UploadPartCopy(ctx, &s3.UploadPartCopyInput{
+				Bucket:          &s.bucket,
+				Key:             &dstKey,
+				UploadId:        uploadID,
+				PartNumber:      &num,
+				CopySource:      aws.String(s.copySource(srcKey)),
+				CopySourceRange: aws.String(fmt.Sprintf("bytes=%d-%d", start, end)),
+			})
+			if err != nil {
+				mu.Lock()
+				if firstErr == nil {
+					firstErr = err
+					cancel()
+				}
+				mu.Unlock()
+				return
+			}
+			parts[i] = types.CompletedPart{ETag: out.CopyPartResult.ETag, PartNumber: &num}
+		}()
+	}
+	wg.Wait()
+	if firstErr == nil {
+		_, firstErr = s.client.CompleteMultipartUpload(ctx, &s3.CompleteMultipartUploadInput{
+			Bucket:          &s.bucket,
+			Key:             &dstKey,
+			UploadId:        uploadID,
+			MultipartUpload: &types.CompletedMultipartUpload{Parts: parts},
+		})
+	}
+	if firstErr != nil {
+		// 途中のパートが残らないよう中止する
+		s.client.AbortMultipartUpload(context.WithoutCancel(ctx), &s3.AbortMultipartUploadInput{
+			Bucket: &s.bucket, Key: &dstKey, UploadId: uploadID,
+		})
+		return fmt.Errorf("multipart copy %s: %w", srcKey, firstErr)
+	}
+	return nil
 }
 
 func (s *S3) Delete(ctx context.Context, key string) error {
