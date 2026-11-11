@@ -35,6 +35,11 @@ login:
   azuread_app_id: xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
   azuread_app_secret: xxxxxxxx
 
+# アップロード時の DB のロック待ちのタイムアウト (秒).
+# 大きなファイルを並列にアップロードしてロック待ちがタイムアウトする場合に設定する.
+# 0 または未設定なら DB の設定 (innodb_lock_wait_timeout) のまま.
+upload_lock_wait_timeout: 0
+
 # AppStore, GooglePlay での制限ファイルサイズ (MB).
 package:
   file_size_warning_ios: 150

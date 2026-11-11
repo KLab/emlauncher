@@ -34,6 +34,11 @@ type Config struct {
 	MailSender  string `yaml:"mail_sender"`
 	MailBccTo   string `yaml:"mail_bcc_to"`
 
+	// UploadLockWaitTimeout はアップロード時の DB のロック待ちのタイムアウト (秒).
+	// 大きなファイルを並列にアップロードしてロック待ちがタイムアウトする場合に設定する.
+	// 0 なら DB の設定 (innodb_lock_wait_timeout) のまま.
+	UploadLockWaitTimeout int `yaml:"upload_lock_wait_timeout"`
+
 	Mail     MailConfig     `yaml:"mail"`
 	Login    LoginConfig    `yaml:"login"`
 	Package  PackageConfig  `yaml:"package"`

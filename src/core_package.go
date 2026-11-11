@@ -102,70 +102,47 @@ type AttachUpload struct {
 }
 
 // UploadPackage は API からのアップロード. file は Analyze 済みのもの.
+// ファイルはトランザクションの外で temp-data/ に保存し, トランザクション内では移動だけにする
+// (大きなファイルの保存中に, アプリの行のロックを持ち続けないため).
 func (c *Core) UploadPackage(ctx context.Context, appID int64, info PackageInfo, file Upload, an *Analysis, extra []AttachUpload) (*Package, error) {
-	type src struct {
-		af   *AttachedFile
-		path string
+	var temps []string
+	defer func() { c.deleteKeys(context.WithoutCancel(ctx), temps...) }()
+	t := TempPackage{
+		Platform:     an.Platform,
+		Identifier:   an.Identifier,
+		OriginalName: file.Name,
+		FileSize:     sql.NullInt64{Int64: file.Size, Valid: true},
+		Attached:     []TempAttached{},
 	}
-	var uploaded []string
-	var pkg *Package
-	err := c.tx(ctx, func(tx *sqlx.Tx) error {
-		app, err := GetApplicationForUpdate(ctx, tx, appID)
+	var err error
+	if t.TempName, err = c.saveTemp(ctx, file.Path, an.Ext); err != nil {
+		return nil, err
+	}
+	temps = append(temps, TempDir+t.TempName)
+	attach := func(name, typ, path string, size int64) error {
+		temp, err := c.saveTemp(ctx, path, pkgfile.Ext(name))
 		if err != nil {
 			return err
 		}
-		if app == nil {
-			return notFound("application", appID)
-		}
-		now := c.Clock.Now()
-		pkg = &Package{
-			AppID:            appID,
-			Platform:         an.Platform,
-			FileName:         randomString(16) + "." + an.Ext,
-			Title:            info.Title,
-			Description:      NullString(info.Description),
-			Identifier:       an.Identifier,
-			OriginalFileName: sql.NullString{String: file.Name, Valid: true},
-			FileSize:         sql.NullInt64{Int64: file.Size, Valid: true},
-			Protect:          info.Protect,
-			Created:          now,
-		}
-		if err := c.insertPackage(ctx, tx, pkg, info.Tags); err != nil {
-			return err
-		}
-		var srcs []src
-		for _, g := range an.Generated {
-			af, err := c.insertAttached(ctx, tx, pkg, g.Name, g.Size, g.Type)
-			if err != nil {
-				return err
-			}
-			srcs = append(srcs, src{af, g.Path})
-		}
-		for _, e := range extra {
-			af, err := c.insertAttached(ctx, tx, pkg, e.Name, e.Size, e.Type)
-			if err != nil {
-				return err
-			}
-			srcs = append(srcs, src{af, e.Path})
-		}
-
-		if err := c.Storage.SaveFile(ctx, pkg.FileKey(), file.Path); err != nil {
-			return err
-		}
-		uploaded = append(uploaded, pkg.FileKey())
-		for _, s := range srcs {
-			if err := c.Storage.SaveFile(ctx, s.af.FileKey(), s.path); err != nil {
-				return err
-			}
-			uploaded = append(uploaded, s.af.FileKey())
-		}
-		return app.UpdateLastUpload(ctx, tx, sql.NullTime{Time: pkg.Created, Valid: true})
-	})
-	if err != nil {
-		c.deleteKeys(context.WithoutCancel(ctx), uploaded...)
-		return nil, err
+		temps = append(temps, TempDir+temp)
+		t.Attached = append(t.Attached, TempAttached{FileName: name, TempName: temp, Type: typ, Size: size})
+		return nil
 	}
-	return pkg, nil
+	for _, g := range an.Generated {
+		if err := attach(g.Name, g.Type, g.Path, g.Size); err != nil {
+			return nil, err
+		}
+	}
+	for _, e := range extra {
+		if err := attach(e.Name, e.Type, e.Path, e.Size); err != nil {
+			return nil, err
+		}
+	}
+	pkg, err := c.commitTemp(ctx, appID, info, t)
+	if err == nil {
+		temps = nil // 移動済み
+	}
+	return pkg, err
 }
 
 func (c *Core) insertPackage(ctx context.Context, tx *sqlx.Tx, pkg *Package, tagNames []string) error {
@@ -264,7 +241,7 @@ var tempNameRe = regexp.MustCompile(`^[0-9A-Za-z]{16}\.[^/\\]*$`)
 type TempPackage struct {
 	TempName     string
 	Platform     string
-	Identifier   string
+	Identifier   sql.NullString
 	OriginalName string
 	FileSize     sql.NullInt64
 	Attached     []TempAttached
@@ -280,9 +257,14 @@ func (c *Core) CommitTempPackage(ctx context.Context, appID int64, info PackageI
 			return nil, fmt.Errorf("%w: invalid temp_name %q", ErrBadRequest, a.TempName)
 		}
 	}
+	return c.commitTemp(ctx, appID, info, t)
+}
+
+// commitTemp は temp-data/ のファイルをパッケージ (と添付ファイル) として登録する.
+func (c *Core) commitTemp(ctx context.Context, appID int64, info PackageInfo, t TempPackage) (*Package, error) {
 	var renamed []string
 	var pkg *Package
-	err := c.tx(ctx, func(tx *sqlx.Tx) error {
+	err := c.uploadTx(ctx, func(tx *sqlx.Tx) error {
 		app, err := GetApplicationForUpdate(ctx, tx, appID)
 		if err != nil {
 			return err
@@ -297,7 +279,7 @@ func (c *Core) CommitTempPackage(ctx context.Context, appID int64, info PackageI
 			FileName:         randomString(16) + "." + pkgfile.Ext(t.TempName),
 			Title:            info.Title,
 			Description:      NullString(info.Description),
-			Identifier:       sql.NullString{String: t.Identifier, Valid: true},
+			Identifier:       t.Identifier,
 			OriginalFileName: sql.NullString{String: t.OriginalName, Valid: true},
 			FileSize:         t.FileSize,
 			Protect:          info.Protect,

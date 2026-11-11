@@ -64,6 +64,7 @@ $out = array(
 	'enable_https' => (bool)v($c, 'enable_https', false),
 	'mail_sender' => (string)v($c, 'mail_sender', ''),
 	'mail_bcc_to' => (string)v($c, 'mail_bcc_to', ''),
+	'upload_lock_wait_timeout' => (int)v($c, 'upload_lock_wait_timeout', 0),
 	'mail' => array(
 		'sendmail' => ini_get('sendmail_path') ?: '/usr/sbin/sendmail -t -i',
 	),

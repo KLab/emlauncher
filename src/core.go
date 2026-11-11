@@ -4,6 +4,8 @@ package emlauncher
 
 import (
 	"context"
+	"database/sql"
+	"database/sql/driver"
 	"errors"
 	"fmt"
 	"log/slog"
@@ -31,8 +33,40 @@ var (
 )
 
 // tx はトランザクション内で fn を実行する. fn がエラーを返したらロールバックする.
-func (c *Core) tx(ctx context.Context, fn func(tx *sqlx.Tx) error) (err error) {
-	tx, err := c.DB.BeginTxx(ctx, nil)
+func (c *Core) tx(ctx context.Context, fn func(tx *sqlx.Tx) error) error {
+	return runTx(ctx, c.DB, fn)
+}
+
+// uploadTx はパッケージのアップロード用の tx. 設定 upload_lock_wait_timeout があれば,
+// その接続のロック待ちのタイムアウトを変える. 接続はプールに戻るので, 終わったら元に戻す.
+func (c *Core) uploadTx(ctx context.Context, fn func(tx *sqlx.Tx) error) error {
+	timeout := c.Config.UploadLockWaitTimeout
+	if timeout <= 0 {
+		return c.tx(ctx, fn)
+	}
+	conn, err := c.DB.Connx(ctx)
+	if err != nil {
+		return err
+	}
+	defer conn.Close()
+	if _, err := conn.ExecContext(ctx, fmt.Sprintf("SET SESSION innodb_lock_wait_timeout = %d", timeout)); err != nil {
+		return err
+	}
+	defer func() {
+		if _, err := conn.ExecContext(context.WithoutCancel(ctx), "SET SESSION innodb_lock_wait_timeout = DEFAULT"); err != nil {
+			// 戻せなかった接続はプールに戻さない
+			conn.Raw(func(any) error { return driver.ErrBadConn })
+		}
+	}()
+	return runTx(ctx, conn, fn)
+}
+
+type txBeginner interface {
+	BeginTxx(ctx context.Context, opts *sql.TxOptions) (*sqlx.Tx, error)
+}
+
+func runTx(ctx context.Context, db txBeginner, fn func(tx *sqlx.Tx) error) (err error) {
+	tx, err := db.BeginTxx(ctx, nil)
 	if err != nil {
 		return err
 	}

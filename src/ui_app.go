@@ -1,6 +1,7 @@
 package emlauncher
 
 import (
+	"database/sql"
 	"encoding/base64"
 	"errors"
 	"fmt"
@@ -484,7 +485,7 @@ func (s *Server) appUploadPost(c *appContext) {
 	t := TempPackage{
 		TempName:     tempName,
 		Platform:     c.form.str("platform"),
-		Identifier:   c.form.str("identifier"),
+		Identifier:   sql.NullString{String: c.form.str("identifier"), Valid: true},
 		OriginalName: c.form.str("file_name"),
 	}
 	if n, err := strconv.ParseInt(c.form.str("file_size"), 10, 64); err == nil {
