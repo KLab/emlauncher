@@ -12,6 +12,7 @@ import (
 	"testing"
 
 	"github.com/aws/aws-sdk-go-v2/aws"
+	awsconfig "github.com/aws/aws-sdk-go-v2/config"
 	"github.com/aws/aws-sdk-go-v2/credentials"
 	"github.com/aws/aws-sdk-go-v2/service/s3"
 	"github.com/aws/aws-sdk-go-v2/service/s3/types"
@@ -33,6 +34,14 @@ func newStorage(t testing.TB, cfg Config) Storage {
 	case "local":
 		return &localStorage{t: t, dir: cfg.LocalDir}
 	case "s3":
+		if cfg.S3Endpoint == "" {
+			// AWS の S3
+			awsCfg, err := awsconfig.LoadDefaultConfig(context.Background(), awsconfig.WithRegion(cfg.S3Region))
+			if err != nil {
+				t.Fatalf("aws config: %v", err)
+			}
+			return &s3Storage{t: t, client: s3.NewFromConfig(awsCfg), bucket: cfg.S3Bucket}
+		}
 		client := s3.New(s3.Options{
 			Region:       "ap-northeast-1",
 			BaseEndpoint: aws.String(cfg.S3Endpoint),

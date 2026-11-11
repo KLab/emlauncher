@@ -31,6 +31,10 @@ func (e *Env) KeyFromURL(rawURL string) string {
 		prefix = "/files/"
 	case "s3":
 		prefix = "/" + e.Config.S3Bucket + "/"
+		// AWS の S3 は仮想ホスト形式 (https://{bucket}.s3.{region}.amazonaws.com/{key})
+		if strings.HasPrefix(u.Host, e.Config.S3Bucket+".") {
+			prefix = "/"
+		}
 	}
 	if !strings.HasPrefix(u.Path, prefix) {
 		e.t.Fatalf("download url %q does not start with %q", rawURL, prefix)

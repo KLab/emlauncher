@@ -18,7 +18,8 @@ type Config struct {
 	DBDSN       string // E2E_DB_DSN
 	Storage     string // E2E_STORAGE: local | s3
 	LocalDir    string // E2E_LOCAL_DIR: LocalFile の保存先 (ホスト側のパス)
-	S3Endpoint  string // E2E_S3_ENDPOINT
+	S3Endpoint  string // E2E_S3_ENDPOINT: S3 互換ストレージ (LocalStack). 空なら AWS の S3
+	S3Region    string // E2E_S3_REGION: AWS の S3 のリージョン. 指定すると E2E_S3_ENDPOINT の既定値は空になる
 	S3Bucket    string // E2E_S3_BUCKET
 	MailboxDir  string // E2E_MAILBOX: 送信メールが 1 通 1 ファイルで置かれるディレクトリ
 	Memcached   string // E2E_MEMCACHED
@@ -60,13 +61,20 @@ func LoadConfig() Config {
 		reload = "systemctl reload emlauncher"
 		mainPID = "systemctl show -p MainPID --value emlauncher"
 	}
+	// AWS の S3 を使うときは E2E_S3_REGION を指定する (認証情報は AWS SDK の既定の方法で取得する)
+	s3Region := os.Getenv("E2E_S3_REGION")
+	s3Endpoint := env("E2E_S3_ENDPOINT", "http://localhost:14566")
+	if s3Region != "" {
+		s3Endpoint = os.Getenv("E2E_S3_ENDPOINT")
+	}
 	return Config{
 		Target:      target,
 		BaseURL:     strings.TrimRight(env("E2E_BASE_URL", baseURL), "/"),
 		DBDSN:       env("E2E_DB_DSN", "emlauncher:emlauncher@tcp(localhost:13306)/emlauncher?charset=utf8mb4"),
 		Storage:     storage,
 		LocalDir:    env("E2E_LOCAL_DIR", filepath.Join(root, ".work", "files")),
-		S3Endpoint:  env("E2E_S3_ENDPOINT", "http://localhost:14566"),
+		S3Endpoint:  s3Endpoint,
+		S3Region:    s3Region,
 		S3Bucket:    env("E2E_S3_BUCKET", "emlauncher-e2e"),
 		MailboxDir:  env("E2E_MAILBOX", filepath.Join(root, ".work", "mailbox")),
 		Memcached:   env("E2E_MEMCACHED", "localhost:21211"),
