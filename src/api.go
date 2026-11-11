@@ -49,7 +49,7 @@ func (s *Server) api(w http.ResponseWriter, r *http.Request) {
 		s.apiDelete(c)
 	case "create_token":
 		s.apiCreateToken(c)
-	case "package_edit", "package_attach", "package_detach":
+	case "package_edit", "package_attach", "package_detach", "package_attach_download":
 		pkg, ok := s.apiTargetPackage(c)
 		if !ok {
 			return
@@ -61,6 +61,8 @@ func (s *Server) api(w http.ResponseWriter, r *http.Request) {
 			s.apiPackageAttach(c, pkg)
 		case "package_detach":
 			s.apiPackageDetach(c, pkg)
+		case "package_attach_download":
+			s.apiPackageAttachDownload(c, pkg)
 		}
 	default:
 		writeJSON(w, http.StatusNotFound, map[string]string{"error": "404 Not Found"})
@@ -414,20 +416,29 @@ func (s *Server) apiPackageAttach(c *apiContext, pkg *Package) {
 	writeJSON(c.w, http.StatusOK, s.attachedJSON(af))
 }
 
-func (s *Server) apiPackageDetach(c *apiContext, pkg *Package) {
+// apiTargetAttached は package_detach / attach_download の対象の添付ファイル.
+func (s *Server) apiTargetAttached(c *apiContext, pkg *Package) (*AttachedFile, bool) {
 	if !c.form.has("attached_file_id") {
 		writeJSON(c.w, http.StatusBadRequest, map[string]string{"error": "attached_file_id required"})
-		return
+		return nil, false
 	}
 	id := c.form.int("attached_file_id", 0)
 	af, err := GetAttachedFile(c.r.Context(), s.Core.DB, id)
 	if err != nil {
 		s.apiError(c.w, c.r, err)
-		return
+		return nil, false
 	}
 	if af == nil || af.PackageID != pkg.ID {
 		writeJSON(c.w, http.StatusNotFound, map[string]string{
 			"error": fmt.Sprintf("the attached file (id=%d) not found in the package (id=%d)", id, pkg.ID)})
+		return nil, false
+	}
+	return af, true
+}
+
+func (s *Server) apiPackageDetach(c *apiContext, pkg *Package) {
+	af, ok := s.apiTargetAttached(c, pkg)
+	if !ok {
 		return
 	}
 	if err := s.Core.DetachFile(c.r.Context(), af); err != nil {
@@ -435,4 +446,25 @@ func (s *Server) apiPackageDetach(c *apiContext, pkg *Package) {
 		return
 	}
 	writeJSON(c.w, http.StatusOK, s.attachedJSON(af))
+}
+
+// apiPackageAttachDownload は添付ファイルの期限付きのダウンロード URL を返す.
+func (s *Server) apiPackageAttachDownload(c *apiContext, pkg *Package) {
+	af, ok := s.apiTargetAttached(c, pkg)
+	if !ok {
+		return
+	}
+	logAttr(c.r, "pkg_id", pkg.ID)
+	logAttr(c.r, "attached_id", af.ID)
+	expire := s.Core.Clock.Now().Add(downloadURLExpire)
+	u, err := s.downloadURL(c.r.Context(), c.r, af.FileKey(), af.OriginalFileName)
+	if err != nil {
+		s.apiError(c.w, c.r, err)
+		return
+	}
+	writeJSON(c.w, http.StatusOK, map[string]any{
+		"attached_file": s.attachedJSON(af),
+		"download_url":  u,
+		"expire":        s.Core.Clock.Format(expire),
+	})
 }

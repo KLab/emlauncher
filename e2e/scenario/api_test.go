@@ -348,6 +348,44 @@ func TestAPIAttachDetach(t *testing.T) {
 	checkNotStored(t, e, e2e.AttachedKey(af))
 }
 
+func TestAPIAttachDownload(t *testing.T) {
+	e := e2e.New(t)
+	if e.Config.Target == "php" {
+		t.Skip("PHP 版 (4124ca6) には無い機能")
+	}
+	owner := e.NewUser("owner")
+	app := e.CreateApp(owner, e2e.Unique("app"))
+	id := e.MustAPIUpload(app.APIKey, "p", "a.apk", e2e.APK("com.example.a"), nil)
+	other := e.MustAPIUpload(app.APIKey, "q", "b.apk", e2e.APK("com.example.a"), nil)
+
+	data := []byte("mapping file contents")
+	res := e.NewClient().PostMultipart("/api/package_attach", form("api_key", app.APIKey, "id", itoa(id)),
+		e2e.File{Field: "file", Name: "mapping.txt", Data: data, ContentType: "text/plain"})
+	e2e.ExpectStatus(t, res, http.StatusOK)
+	af := e.DB.Row("SELECT * FROM attached_file WHERE id = ?", jsonNum(t, res.JSONObject(t), "id"))
+
+	res = e.APICall("package_attach_download", app.APIKey, form("id", itoa(id)))
+	e2e.ExpectStatus(t, res, http.StatusBadRequest)
+	// 別のパッケージの添付ファイルは見つからない
+	res = e.APICall("package_attach_download", app.APIKey, form("id", itoa(other), "attached_file_id", af.Str("id")))
+	e2e.ExpectStatus(t, res, http.StatusNotFound)
+
+	res = e.APICall("package_attach_download", app.APIKey, form("id", itoa(id), "attached_file_id", af.Str("id")))
+	e2e.ExpectStatus(t, res, http.StatusOK)
+	m := res.JSONObject(t)
+	expectEq(t, "keys", strings.Join(jsonKeys(m), ","), "attached_file,download_url,expire")
+	checkAttachedJSON(t, m["attached_file"].(map[string]any), af)
+	exp := e.ParseLocalTime(jsonStr(t, m, "expire"))
+	if d := time.Until(exp); d < 58*time.Minute || d > 62*time.Minute {
+		t.Fatalf("expire = %v (in %v), want about 60 minutes later", m["expire"], d)
+	}
+	dl := e.Download(jsonStr(t, m, "download_url"))
+	e2e.ExpectStatus(t, dl, http.StatusOK)
+	if !bytes.Equal(dl.Body, data) {
+		t.Fatal("downloaded content mismatch")
+	}
+}
+
 func TestAPIDelete(t *testing.T) {
 	e := e2e.New(t)
 	owner := e.NewUser("owner")
