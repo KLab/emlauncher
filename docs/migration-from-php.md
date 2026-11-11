@@ -4,7 +4,7 @@ EC2 + Apache + ALB の構成で, PHP 版を Go 版に切り替える手順. DB �
 
 切替後は Apache を使わない. Go 版が Apache の代わりに 80 番で待ち受け, ALB から直接受ける（ALB とターゲットグループの設定は変えない）. Apache を止めてから Go 版が起動するまでの数秒間はサービスが止まる.
 
-この手順は移行リハーサル（`e2e/migration/rehearse.sh <local|s3> go`）で検証している. リハーサルは PHP 版で中間状態を作り, 下記 1〜2 の手順で Go 版に切り替え, 状態が引き継がれていること, さらに PHP 版へ切り戻せることを確認する（[e2e/README.md](../e2e/README.md)）.
+この手順は移行リハーサル（`e2e/migration/rehearse.sh <local|s3> go`）で検証している. リハーサルは PHP 版で中間状態を作り, 下記 1〜2 の手順で Go 版に切り替え, 状態が引き継がれていること, さらに PHP 版へ切り戻せることを確認する（[e2e/README.md](../e2e/README.md)）. ただしリハーサルは Docker で動かすため, 2-3 の Apache と systemd の操作はコンテナの入れ替えで代えている.
 
 ## 0. 準備（ビルド）
 
@@ -145,9 +145,13 @@ PHP 版の不具合を直したもの:
 Go 版を止めて Apache を起動し, cron も戻す. 切替と同じく数秒間止まる.
 
 ```sh
-# Go 版は処理中のリクエストを終えてから終了する. 待ち受けはすぐに閉じるので, Apache を起動できる
-systemctl disable --now emlauncher
-systemctl enable --now httpd
+# Go 版は待ち受けをすぐに閉じ, 処理中のリクエストを終えてから終了する.
+# 終了を待つと大きなアップロードの間ずっと止まるので, 待たずに Apache を起動する
+systemctl disable emlauncher
+systemctl stop --no-block emlauncher
+systemctl enable httpd
+until systemctl start httpd; do sleep 1; done   # 80 番が空くまで再試行する
+curl -s http://127.0.0.1/health
 ```
 
 Go 版で作ったデータ（パッケージ, インストールトークン, パスワード）はそのまま PHP 版で使える（リハーサルで確認している）. 利用者は再ログインが必要.
