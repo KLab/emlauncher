@@ -49,13 +49,15 @@
   "identifier": "org.klab.emlauncher.sample",
   "original_file_name": "emlauncher.apk",
   "file_size": "5776313",
+  "protect": false,
   "created": "2013-11-29 12:26:19",
   "tags": [
     "test",
     "upload-api",
     "android"
   ],
-  "install_count": 0
+  "install_count": 0,
+  "attached_files": []
 }</code></pre>
         </dd>
       </dl>
@@ -73,6 +75,7 @@
     <h3 class="subheader">Caveats</h3>
     <div class="container">
       <p>The type of numeric fields (id, file_size, etc.) are indeterminate and can be either string or number.</p>
+      <p>attached_files lists the attached files that were deleted together with the package.</p>
     </div>
  </div>
 
