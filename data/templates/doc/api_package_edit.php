@@ -23,7 +23,7 @@
         <dt>Fields:</dt>
         <dd>
           <ul>
-            <li><code>api_key</code> - Required (See the application preferences)</li>
+            <li><code>api_key</code> - Required (See the application preferences). Not needed if the <code>Authorization: Bearer</code> header is used. See <a href="<?=url('/doc/api')?>">Authentication</a>.</li>
             <li><code>id</code> - Required, Package id to edit</li>
             <li><code>title</code> - Optional, New title of the package.</li>
             <li><code>description</code> - Optional, New description of the package.</li>
@@ -79,7 +79,7 @@
     <h3 class="subheader">Sample Curl</h3>
     <div class="container">
       <pre><code>curl <?=url('/api/package_edit')?> \
-  -F api_key='{application_api_key}' \
+  -H "Authorization: Bearer {application_api_key}" \
   -F id=176825 \
   -F tags=Android,aab,test \
   -F protect=False \

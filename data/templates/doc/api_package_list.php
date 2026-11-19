@@ -23,7 +23,7 @@
         <dt>Fields:</dt>
         <dd>
           <ul>
-            <li><code>api_key</code> - Required (See the application preferences)</li>
+            <li><code>api_key</code> - Required (See the application preferences). Not needed if the <code>Authorization: Bearer</code> header is used. See <a href="<?=url('/doc/api')?>">Authentication</a>.</li>
             <li><code>limit</code> - Optional, The limit length of package list. (default = 20, max = 100)</li>
             <li><code>offset</code> - Optional, The offset of package list. (default = 0)</li>
             <li><code>platform</code> - Optional, The platform type string, e.g. "Android" and "iOS".</li>
@@ -117,7 +117,7 @@
  <div>
     <h3 class="subheader">Sample Curl</h3>
     <div class="container">
-      <pre><code>curl "<?=url('/api/package_list?api_key={application_api_key}')?>"</code></pre>
+      <pre><code>curl -H "Authorization: Bearer {application_api_key}" "<?=url('/api/package_list')?>"</code></pre>
     </div>
  </div>
 
