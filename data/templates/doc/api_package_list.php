@@ -44,7 +44,7 @@
         <dd>
           <pre><code>[
   {
-    "package_url": "<?=url("/package?id=176825")?>"
+    "package_url": "<?=url("/package?id=176825")?>",
     "application_url": "<?=url("/app?id=1")?>",
     "id": "176825",
     "platform": "Android",
@@ -125,6 +125,7 @@
     <h3 class="subheader">Caveats</h3>
     <div class="container">
       <p>The type of numeric fields (id, file_size, etc.) are indeterminate and can be either string or number.</p>
+      <p>Packages are sorted by id in descending order (newest first). If any of the specified tags does not exist, an empty array is returned.</p>
     </div>
  </div>
 
