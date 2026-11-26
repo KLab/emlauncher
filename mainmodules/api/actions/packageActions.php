@@ -169,4 +169,37 @@ class packageActions extends apiActions
 			self::HTTP_200_OK,
 			self::makeAttachedFileArray($attached));
 	}
+
+	public function executePackage_attach_download()
+	{
+		if(!mfwRequest::has('attached_file_id')) {
+			return $this->jsonResponse(
+				self::HTTP_400_BADREQUEST,
+				array('error'=>'attached_file_id required')
+			);
+		}
+
+		$id = (int)mfwRequest::param('attached_file_id');
+		$con = $this->getPDO();
+		$attached = AttachedFileDb::retrieveByPK($id, $con);
+
+		if(!$attached || $attached->getPackageId()!=$this->pkg->getId()){
+			return $this->jsonResponse(
+				self::HTTP_404_NOTFOUND,
+				array(
+					'error'=>
+					"the attached file (id=$id) not found in the package (id={$this->pkg->getId()})"));
+		}
+
+		apache_log('pkg_id', $this->pkg->getId());
+		apache_log('attached_id', $attached->getId());
+
+		// $expires 引数は DateTime などを渡してもいい
+		$expire_at = new DateTime('+60 min');
+		$url = $attached->getFileUrl($expire_at);
+
+		return $this->jsonResponse(
+			self::HTTP_200_OK,
+			self::makeAttachedFileLinkArray($attached, $url, $expire_at));
+	}
 }

@@ -23,7 +23,7 @@
         <dt>Fields:</dt>
         <dd>
           <ul>
-            <li><code>api_key</code> - Required (See the application preferences)</li>
+            <li><code>api_key</code> - Required (See the application preferences). Not needed if the <code>Authorization: Bearer</code> header is used. See <a href="<?=url('/doc/api')?>">Authentication</a>.</li>
             <li><code>id</code> - Required, the package id</li>
             <li><code>file</code> - Required, the file to attach</li>
           </ul>
@@ -55,7 +55,7 @@
     <h3 class="subheader">Sample Curl</h3>
     <div class="container">
       <pre><code>curl <?=url('/api/package_attach')?> \
-  -F api_key='{application_api_key}' \
+  -H "Authorization: Bearer {application_api_key}" \
   -F id=1 \
   -F file=@testfile.txt</code></pre>
     </div>

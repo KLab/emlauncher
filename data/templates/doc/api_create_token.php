@@ -23,9 +23,9 @@
         <dt>Fields:</dt>
         <dd>
           <ul>
-            <li><code>api_key</code> - Required (See the application preferences)</li>
-            <li><code>id</code> - Required, package id  to create a token </li>
-            <li><code>mail</code> - Required, owner mail address </li>
+            <li><code>api_key</code> - Required (See the application preferences). Not needed if the <code>Authorization: Bearer</code> header is used. See <a href="<?=url('/doc/api')?>">Authentication</a>.</li>
+            <li><code>id</code> - Required, package id to create a token</li>
+            <li><code>mail</code> - Required, mail address of an owner of the application. The token installs the package as this user.</li>
             <li><code>expire_hour</code> - Optional, expiration time specified in units of hour</li>
           </ul>
         </dd>
@@ -51,6 +51,7 @@
   "identifier": "org.klab.emlauncher.sample",
   "original_file_name": "emlauncher.apk",
   "file_size": "5776313",
+  "protect": false,
   "created": "2013-11-29 12:26:19",
   "tags": [
     "test",
@@ -58,7 +59,8 @@
     "android"
   ],
   "install_count": 0,
-  "install_token": {install_token}
+  "attached_files": [],
+  "install_url": "<?=url("/package/install?token={install_token}")?>"
 }</code></pre>
         </dd>
       </dl>
@@ -68,7 +70,7 @@
  <div>
     <h3 class="subheader">Sample Curl</h3>
     <div class="container">
-      <pre><code>curl "<?=url('/api/create_token?api_key={application_api_key}&id={package_id}&mail={mail_address}&expire_hour={expire_hour}')?>"</code></pre>
+      <pre><code>curl -H "Authorization: Bearer {application_api_key}" "<?=url('/api/create_token?id={package_id}&mail={mail_address}&expire_hour={expire_hour}')?>"</code></pre>
     </div>
  </div>
 

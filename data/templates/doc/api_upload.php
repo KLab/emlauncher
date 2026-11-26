@@ -23,7 +23,7 @@
         <dt>Fields:</dt>
         <dd>
           <ul>
-            <li><code>api_key</code> - Required (See the application preferences)</li>
+            <li><code>api_key</code> - Required (See the application preferences). Not needed if the <code>Authorization: Bearer</code> header is used. See <a href="<?=url('/doc/api')?>">Authentication</a>.</li>
             <li><code>file</code> - Required, package file data</li>
             <li><code>title</code> - Required, title of the package</li>
             <li><code>description</code> - Optional, description of the package</li>
@@ -31,6 +31,7 @@
             <li><code>protect</code> - Optional, protect from auto delete (default to False)</li>
             <li><code>notify</code> - Optional, notify application-installed users (defaults to False)</li>
             <li><code>dsym</code> - Optional, attach dSYM file</li>
+            <li><code>apk</code> - Optional, attach APK file for AAB upload (skips server-side AAB to APK conversion)</li>
           </ul>
         </dd>
       </dl>
@@ -82,10 +83,21 @@
     <h3 class="subheader">Sample Curl</h3>
     <div class="container">
       <pre><code>curl <?=url('/api/upload')?> \
-  -F api_key='{application_api_key}' \
+  -H "Authorization: Bearer {application_api_key}" \
   -F file=@Application.aab \
   -F title='aab upload' \
   -F description='upload aab package via upload api' \
+  -F tags='test,upload-api,aab' \
+  -F protect=True \
+  -F notify=False
+
+# AAB upload with pre-built APK:
+curl <?=url('/api/upload')?> \
+  -H "Authorization: Bearer {application_api_key}" \
+  -F file=@Application.aab \
+  -F apk=@Application.apk \
+  -F title='aab upload with apk' \
+  -F description='upload aab package with pre-built apk' \
   -F tags='test,upload-api,aab' \
   -F protect=True \
   -F notify=False</code></pre>

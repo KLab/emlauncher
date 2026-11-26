@@ -12,16 +12,51 @@ class apiActions extends MainActions
 		}
 
 		// API Keyによる認証
-		$api_key = mfwRequest::param('api_key');
+		$api_key = self::getRequestApiKey();
 		$this->app = ApplicationDb::selectByApiKey($api_key);
 		if(!$this->app){
+			$error = 'Invalid api_key';
+			if($api_key===null && !self::isApiKeyParamEnabled() && mfwRequest::has('api_key')){
+				$error = 'api_key request parameter is disabled. Use the Authorization: Bearer header.';
+			}
 			return $this->jsonResponse(
 				self::HTTP_400_BADREQUEST,
-				array('error'=>'Invalid api_key'));
+				array('error'=>$error));
 		}
 
 		apache_log('app_id',$this->app->getId());
 		return null;
+	}
+
+	/**
+	 * リクエストからAPI Keyを取り出す.
+	 * `Authorization: Bearer {api_key}` ヘッダを優先し、
+	 * なければリクエストパラメータ api_key (GET/POST) を使う.
+	 * URLのクエリはアクセスログ等に残るため、ヘッダでの指定を推奨する.
+	 * 設定 api_key_param_enabled が false の場合、パラメータは使わない.
+	 * @return string|null API Key. 指定がなければnull.
+	 */
+	protected static function getRequestApiKey()
+	{
+		foreach(mfwRequest::allHeaders() as $name => $value){
+			if(strcasecmp($name,'Authorization')===0
+				&& preg_match('/^Bearer +(\S+) *$/i',$value,$m)){
+				return $m[1];
+			}
+		}
+		if(!self::isApiKeyParamEnabled()){
+			return null;
+		}
+		return mfwRequest::param('api_key');
+	}
+
+	/**
+	 * リクエストパラメータ api_key での認証を許可するか.
+	 * 設定 api_key_param_enabled が未設定の場合は許可する (後方互換).
+	 */
+	protected static function isApiKeyParamEnabled()
+	{
+		return Config::get('api_key_param_enabled')!==false;
 	}
 
 	public function executeDefaultAction()
@@ -78,6 +113,15 @@ class apiActions extends MainActions
 			'original_file_name' => $attached->getOriginalFileName(),
 			'file_size' => $attached->getFileSize(),
 			'created' => $attached->getCreated(),
+			);
+	}
+
+	protected static function makeAttachedFileLinkArray(AttachedFile $attached, string $url, DateTime $expire_at)
+	{
+		return array(
+			'attached_file' => self::makeAttachedFileArray($attached),
+			'download_url' => $url,
+			'expire' => $expire_at->format('Y-m-d H:i:s'),
 			);
 	}
 }

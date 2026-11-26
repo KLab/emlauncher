@@ -27,7 +27,11 @@
         </h3>
 
         <h4>GuestPass URL</h4>
-        <p><a href="<?=$guestpass_url?>"><?=$guestpass_url?></a></p>
+        <p>
+            <a href="<?=$guestpass_url?>"><?=$guestpass_url?></a>
+            <button class="btn btn-default copy"><i class="fa fa-copy"></i></button>
+            <span style="position:relative;top:-3em;left:-4.8em;display:none" class="label label-info">Copied!</span>
+        </p>
         <dl class="dl-horizontal">
             <dt>Expired at</dt>
             <dd><?=$expire?></dd>
@@ -44,3 +48,24 @@
 <div class="visible-xs">
     <?=block('pkg_infopanel')?>
 </div>
+
+<script type="text/javascript">
+$('button.copy').on('click', function(event){
+    var area = document.createElement('textarea');
+    area.style.border = '0';
+    area.style.padding = '0';
+    area.style.height = '1px';
+    area.style.width = '1px';
+    area.style.position = 'relative';
+    area.style.left = '-1px';
+    area.style.overflow = 'hidden';
+    area.innerText = $(this).prev().text();
+    this.appendChild(area);
+    area.focus();
+    area.select();
+    document.execCommand("copy");
+    this.removeChild(area);
+
+    $(this).next().show().delay(500).fadeOut("slow");
+});
+</script>

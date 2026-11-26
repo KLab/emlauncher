@@ -23,7 +23,7 @@
         <dt>Fields:</dt>
         <dd>
           <ul>
-            <li><code>api_key</code> - Required (See the application preferences)</li>
+            <li><code>api_key</code> - Required (See the application preferences). Not needed if the <code>Authorization: Bearer</code> header is used. See <a href="<?=url('/doc/api')?>">Authentication</a>.</li>
             <li><code>limit</code> - Optional, The limit length of package list. (default = 20, max = 100)</li>
             <li><code>offset</code> - Optional, The offset of package list. (default = 0)</li>
             <li><code>platform</code> - Optional, The platform type string, e.g. "Android" and "iOS".</li>
@@ -44,7 +44,7 @@
         <dd>
           <pre><code>[
   {
-    "package_url": "<?=url("/package?id=176825")?>"
+    "package_url": "<?=url("/package?id=176825")?>",
     "application_url": "<?=url("/app?id=1")?>",
     "id": "176825",
     "platform": "Android",
@@ -117,7 +117,7 @@
  <div>
     <h3 class="subheader">Sample Curl</h3>
     <div class="container">
-      <pre><code>curl "<?=url('/api/package_list?api_key={application_api_key}')?>"</code></pre>
+      <pre><code>curl -H "Authorization: Bearer {application_api_key}" "<?=url('/api/package_list')?>"</code></pre>
     </div>
  </div>
 
@@ -125,6 +125,7 @@
     <h3 class="subheader">Caveats</h3>
     <div class="container">
       <p>The type of numeric fields (id, file_size, etc.) are indeterminate and can be either string or number.</p>
+      <p>Packages are sorted by id in descending order (newest first). If any of the specified tags does not exist, an empty array is returned.</p>
     </div>
  </div>
 

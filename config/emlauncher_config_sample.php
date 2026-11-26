@@ -64,6 +64,22 @@ $emlauncher_config = array(
 			'azuread_app_secret' => 'xxxxxxxx',
 			),
 
+		/**
+		 * APIのapi_keyをリクエストパラメータ(クエリ文字列/フォームデータ)で渡すことを許可する.
+		 * クエリ文字列はアクセスログ等にapi_keyが残るため、
+		 * 呼び出し側が`Authorization: Bearer`ヘッダに移行したらfalseにすることを推奨.
+		 * falseの場合、ヘッダ以外で渡されたapi_keyは400エラーになる.
+		 * 未設定の場合はtrue.
+		 */
+		'api_key_param_enabled' => true,
+
+		/**
+		 * アップロード時のDBロック待ちタイムアウト(秒).
+		 * 大きなファイルの並列アップロード時にロックタイムアウトする場合に設定する.
+		 * 未設定の場合はMySQLのデフォルト値(innodb_lock_wait_timeout)が使われる.
+		 */
+		'upload_lock_wait_timeout' => 600,
+
 		/** AppStore, GooglePlayでの制限ファイルサイズ(MB) */
 		'package' => array(
 			'file_size_warning_ios' => 150,

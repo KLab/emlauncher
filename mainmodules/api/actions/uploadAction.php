@@ -12,6 +12,7 @@ class uploadAction extends apiActions
 	{
 		$con = null;
 		$apkfile = null;
+		$temp_names = array(); // S3 tempファイル名 (エラー時の掃除用)
 		try{
 			if(mfwRequest::method()!=='POST'){
 				return $this->jsonResponse(
@@ -26,6 +27,7 @@ class uploadAction extends apiActions
 			$tag_names = explode(',',mfwRequest::param('tags'));
 			$protect = self::parseBool(mfwRequest::param('protect'));
 			$dsymfile = mfwRequest::param('dsym');
+			$apkfile_param = mfwRequest::param('apk');
 			if(!$file_info||!$title){
 				$fields = array();
 				if(!$file_info){
@@ -57,14 +59,31 @@ class uploadAction extends apiActions
 			}
 			if($platform===Package::PF_ANDROID){
 				if($ext==="aab"){
-					$apkfile = APKFile::extractFromAppBundle($file_info['tmp_name']);
-					$identifier = APKFile::getPackageName($apkfile);
-					$attached_files[] = array(
-						'filepath' => $apkfile,
-						'original_name' => substr($file_info['name'], 0, -3).'apk',
-						'type' => AttachedFile::TYPE_APK,
-						'mime' => Package::MIME_ANDROID_APK,
-						);
+					if($apkfile_param){
+						if(!isset($apkfile_param['error'])||$apkfile_param['error']!==UPLOAD_ERR_OK){
+							error_log(__METHOD__.'('.__LINE__.'): upload apk file error: $_FILES[apk]='.json_encode($apkfile_param));
+							return $this->jsonResponse(
+								self::HTTP_400_BADREQUEST,
+								array('error'=>'upload apk file error: $_FILES[apk]='.json_encode($apkfile_param)));
+						}
+						$identifier = APKFile::getPackageName($apkfile_param['tmp_name']);
+						$attached_files[] = array(
+							'filepath' => $apkfile_param['tmp_name'],
+							'original_name' => $apkfile_param['name'],
+							'type' => AttachedFile::TYPE_APK,
+							'mime' => Package::MIME_ANDROID_APK,
+							);
+					}
+					else{
+						$apkfile = APKFile::extractFromAppBundle($file_info['tmp_name']);
+						$identifier = APKFile::getPackageName($apkfile);
+						$attached_files[] = array(
+							'filepath' => $apkfile,
+							'original_name' => substr($file_info['name'], 0, -3).'apk',
+							'type' => AttachedFile::TYPE_APK,
+							'mime' => Package::MIME_ANDROID_APK,
+							);
+					}
 				}
 				else{
 					$identifier = APKFile::getPackageName($file_info['tmp_name']);
@@ -80,8 +99,23 @@ class uploadAction extends apiActions
 					);
 			}
 
-			// DBへ保存
+			// トランザクション外でtempにアップロード
+			$pkg_temp_name = Package::uploadTempFile($file_info['tmp_name'],$ext,$mime);
+			$temp_names[] = $pkg_temp_name;
+
+			foreach($attached_files as $k => $afile){
+				$afile_ext = pathinfo($afile['original_name'],PATHINFO_EXTENSION);
+				$afile_temp = AttachedFile::uploadTempFile($afile['filepath'],$afile_ext,$afile['mime']);
+				$attached_files[$k]['temp_name'] = $afile_temp;
+				$temp_names[] = $afile_temp;
+			}
+
+			// DB トランザクション開始
 			$con = $this->getPDO();
+			$lock_wait_timeout = Config::get('upload_lock_wait_timeout');
+			if($lock_wait_timeout){
+				$con->exec("SET innodb_lock_wait_timeout = ".(int)$lock_wait_timeout);
+			}
 			$con->beginTransaction();
 
 			$app = ApplicationDb::retrieveByPKForUpdate($this->app->getId(),$con);
@@ -99,20 +133,29 @@ class uploadAction extends apiActions
 					$pkg,$afile['original_name'],filesize($afile['filepath']),$afile['type'],$con);
 			}
 
-			// S3へアップロード
-			$pkg->uploadFile($file_info['tmp_name'],$mime);
-
+			// tempから正しい場所へ移動
+			$pkg->renameTempFile($pkg_temp_name);
 			foreach($attached_files as $afile){
-				$afile['obj']->uploadFile($afile['filepath'],$afile['mime']);
+				$afile['obj']->renameTempFile($afile['temp_name']);
 			}
+
+			$temp_names = array(); // rename成功、掃除不要
 
 			$app->updateLastUpload($pkg->getCreated(),$con);
 
+			// DB トランザクション終了
 			$con->commit();
 		}
 		catch(Exception $e){
 			if($con) $con->rollback();
 			error_log(__METHOD__.'('.__LINE__.'): '.get_class($e).":{$e->getMessage()}");
+			// tempファイルの掃除
+			foreach($temp_names as $tmp){
+				try{ Storage::delete(Package::TEMP_DIR.$tmp); }
+				catch(Exception $de){
+					error_log(__METHOD__.'('.__LINE__.'): failed to delete temp file: '.$tmp.' : '.get_class($de).":{$de->getMessage()}");
+				}
+			}
 			return $this->jsonResponse(
 				self::HTTP_500_INTERNALSERVERERROR,
 				array('error'=>$e->getMessage(),'exception'=>get_class($e)));
