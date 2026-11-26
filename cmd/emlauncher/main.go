@@ -22,7 +22,6 @@ import (
 
 	"github.com/cloudflare/tableflip"
 
-	"emlauncher"
 	"emlauncher/internal/bootstrap"
 	"emlauncher/internal/config"
 	"emlauncher/internal/web"
@@ -114,11 +113,11 @@ func newServer(cfg *config.Config, log *slog.Logger) (*http.Server, func(), erro
 	if err != nil {
 		return nil, nil, err
 	}
-	templates, err := fs.Sub(emlauncher.Templates, "templates")
+	templates, err := fs.Sub(web.Templates, "templates")
 	if err != nil {
 		return nil, nil, err
 	}
-	static, err := fs.Sub(emlauncher.Static, "static")
+	static, err := fs.Sub(web.Static, "static")
 	if err != nil {
 		return nil, nil, err
 	}

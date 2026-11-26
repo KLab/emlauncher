@@ -1,6 +1,5 @@
 # ローカルの設定
 /config.yml
-/src/config.yml
 
 #intelliJ
 .idea/

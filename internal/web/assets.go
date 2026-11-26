@@ -1,6 +1,6 @@
-// Package emlauncher は画面のテンプレートと静的ファイルを埋め込む.
-// プログラムの本体は internal/ 以下, コマンドは cmd/ 以下にある.
-package emlauncher
+package web
+
+// 画面のテンプレートと静的ファイルを埋め込む.
 
 import "embed"
 

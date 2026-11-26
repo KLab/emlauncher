@@ -19,7 +19,7 @@ Go で実装しています. PHP 版はリポジトリから削除しました�
 ### 1. ビルド
 
 ```sh
-cd src && GOOS=linux GOARCH=amd64 CGO_ENABLED=0 go build -o ../dist/ ./cmd/emlauncher ./cmd/delete-old-packages
+GOOS=linux GOARCH=amd64 CGO_ENABLED=0 go build -o dist/ ./cmd/emlauncher ./cmd/delete-old-packages
 ```
 
 `dist/emlauncher`（HTTP サーバ）と `dist/delete-old-packages`（古いパッケージの削除バッチ）をサーバに配置します. テンプレートや CSS はバイナリに含まれています.
@@ -46,7 +46,7 @@ bundletool は内蔵の aapt2 を Java の一時ディレクトリ（既定は `
 
 ### 4. 設定
 
-[src/config.sample.yml](src/config.sample.yml) をコピーして環境に合わせて書き換えます（例: `/etc/emlauncher/config.yml`）. 主な項目:
+[config.sample.yml](config.sample.yml) をコピーして環境に合わせて書き換えます（例: `/etc/emlauncher/config.yml`）. 主な項目:
 
 - `timezone`: DB の日時の TZ（空なら実行環境の TZ）
 - `database`, `memcache`
@@ -113,6 +113,6 @@ Google / AzureAD ログインでは, `login.allowed_mailaddr_pattern` に一致�
 
 ## 開発
 
-- テスト: `cd src && go test ./...`. DB や S3 を使うテストは, E2E テストの環境を起動して `EML_TEST_DB_HOST` などを指定したときだけ実行されます.
+- テスト: `go test ./...`. DB や S3 を使うテストは, E2E テストの環境を起動して `EML_TEST_DB_HOST` などを指定したときだけ実行されます.
 - E2E テスト・移行リハーサル: [e2e/README.md](e2e/README.md)
 - 設計メモ: [docs/design.md](docs/design.md)

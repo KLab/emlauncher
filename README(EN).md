@@ -19,7 +19,7 @@ EMLauncher is implemented in Go. The PHP version has been removed from this repo
 ### 1. Build
 
 ```sh
-cd src && GOOS=linux GOARCH=amd64 CGO_ENABLED=0 go build -o ../dist/ ./cmd/emlauncher ./cmd/delete-old-packages
+GOOS=linux GOARCH=amd64 CGO_ENABLED=0 go build -o dist/ ./cmd/emlauncher ./cmd/delete-old-packages
 ```
 
 Deploy `dist/emlauncher` (HTTP server) and `dist/delete-old-packages` (batch to delete old packages) to the server. Templates and CSS are embedded in the binary.
@@ -46,7 +46,7 @@ bundletool extracts its aapt2 into the Java temporary directory (default `/tmp`)
 
 ### 4. Configuration
 
-Copy [src/config.sample.yml](src/config.sample.yml) and edit it for your environment (e.g. `/etc/emlauncher/config.yml`). Main items:
+Copy [config.sample.yml](config.sample.yml) and edit it for your environment (e.g. `/etc/emlauncher/config.yml`). Main items:
 
 - `timezone`: time zone of datetimes in the DB (empty: the environment's time zone)
 - `database`, `memcache`
@@ -113,6 +113,6 @@ Deletes unprotected packages, keeping the specified number of newest packages pe
 
 ## Development
 
-- Tests: `cd src && go test ./...`. Tests using the DB or S3 run only when the E2E environment is up and `EML_TEST_DB_HOST` etc. are set.
+- Tests: `go test ./...`. Tests using the DB or S3 run only when the E2E environment is up and `EML_TEST_DB_HOST` etc. are set.
 - E2E tests and migration rehearsal: [e2e/README.md](e2e/README.md) (in Japanese)
 - Design notes: [docs/design.md](docs/design.md) (in Japanese)

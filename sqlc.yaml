@@ -1,10 +1,10 @@
-# DB アクセスのコード (internal/db) は sqlc で生成する. スキーマは PHP 版から変えていない ../sql/tables.sql.
+# DB アクセスのコード (internal/db) は sqlc で生成する. スキーマは PHP 版から変えていない sql/tables.sql.
 # リポジトリ直下から:
-#   docker run --rm -v "$PWD":/w -w /w/src sqlc/sqlc:1.27.0 generate
+#   docker run --rm -v "$PWD":/w -w /w sqlc/sqlc:1.27.0 generate
 version: "2"
 sql:
   - engine: mysql
-    schema: ../sql/tables.sql
+    schema: sql/tables.sql
     queries: internal/db/query
     gen:
       go:

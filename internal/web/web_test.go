@@ -14,7 +14,6 @@ import (
 	"testing"
 	"time"
 
-	"emlauncher"
 	"emlauncher/internal/config"
 )
 
@@ -163,7 +162,7 @@ func TestParseFormMultipart(t *testing.T) {
 
 // テンプレートがすべて読める.
 func TestLoadTemplates(t *testing.T) {
-	sub, err := fs.Sub(emlauncher.Templates, "templates")
+	sub, err := fs.Sub(Templates, "templates")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -188,8 +187,8 @@ func TestPHPInt(t *testing.T) {
 
 func newTestServer(t *testing.T) http.Handler {
 	t.Helper()
-	tmpl, _ := fs.Sub(emlauncher.Templates, "templates")
-	static, _ := fs.Sub(emlauncher.Static, "static")
+	tmpl, _ := fs.Sub(Templates, "templates")
+	static, _ := fs.Sub(Static, "static")
 	s, err := New(Options{
 		Config:    &config.Config{Session: config.Session{Secret: "0123456789abcdef"}, Location: time.UTC},
 		Templates: tmpl, Static: static,
