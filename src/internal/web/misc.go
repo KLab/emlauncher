@@ -10,7 +10,8 @@ import (
 	"strconv"
 
 	"github.com/go-chi/chi/v5"
-	"github.com/skip2/go-qrcode"
+	"github.com/makiuchi-d/gozxing"
+	"github.com/makiuchi-d/gozxing/qrcode"
 
 	"emlauncher/internal/db"
 )
@@ -30,13 +31,15 @@ func (s *Server) qrCode(w http.ResponseWriter, r *http.Request) {
 		size = qrDefaultSize
 	}
 	size = min(size, qrMaxSize)
-	q, err := qrcode.New(baseURL(r)+f.Get("q"), qrcode.High)
+	hints := map[gozxing.EncodeHintType]any{
+		gozxing.EncodeHintType_ERROR_CORRECTION: "H",
+		gozxing.EncodeHintType_MARGIN:           0,
+	}
+	code, err := qrcode.NewQRCodeWriter().Encode(baseURL(r)+f.Get("q"), gozxing.BarcodeFormat_QR_CODE, size, size, hints)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
-	q.DisableBorder = true
-	code := q.Image(size)
 	b := code.Bounds()
 	img := image.NewRGBA(image.Rect(0, 0, b.Dx()+2*qrMargin, b.Dy()+2*qrMargin))
 	draw.Draw(img, img.Bounds(), image.NewUniform(color.White), image.Point{}, draw.Src)
