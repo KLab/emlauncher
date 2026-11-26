@@ -129,6 +129,10 @@ type APKFile struct {
 	KeyAlias   string `yaml:"keyalias"`
 	KeyPass    string `yaml:"keypass"`
 	AAPT2      string `yaml:"aapt2"`
+	// MaxConcurrency は同時に動かす Java (bundletool, keytool) の数の上限. 0 なら上限なし.
+	MaxConcurrency int `yaml:"max_concurrency"`
+	// Timeout は bundletool の実行時間の上限 (秒). 0 なら上限なし.
+	Timeout int `yaml:"timeout"`
 }
 
 // Load は設定ファイルを読み, 既定値を補って検証する.

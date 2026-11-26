@@ -30,6 +30,8 @@ const (
 	sessionCookie = "emlauncher_session"
 	// sessionLifetime を過ぎたセッションは無効 (Cookie を盗まれたときの影響を限る).
 	sessionLifetime = 30 * 24 * time.Hour
+	// clockSkew は複数台のサーバの時計のずれとして許す範囲 (発行時刻が未来でもこの範囲なら有効)
+	clockSkew = 5 * time.Minute
 )
 
 type sessionCodec struct {
@@ -93,7 +95,7 @@ func (c *sessionCodec) decode(v string) (*session, bool) {
 		return nil, false
 	}
 	issued := time.Unix(s.Issued, 0)
-	if now := c.now(); issued.After(now.Add(time.Minute)) || now.Sub(issued) > sessionLifetime {
+	if now := c.now(); issued.After(now.Add(clockSkew)) || now.Sub(issued) > sessionLifetime {
 		return nil, false
 	}
 	return &s, true

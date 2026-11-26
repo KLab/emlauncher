@@ -101,3 +101,8 @@ apkfile:
   keyalias: emlauncherkey
   keypass: pass:xxxxxxxx
   # aapt2: /path/to/aapt2
+  # 同時に動かす Java (bundletool, keytool) の数の上限. 0 または未設定なら上限なし.
+  # Java は 1 つあたり java の -Xmx 程度のメモリを使うので, メモリが足りない場合に設定する.
+  # max_concurrency: 2
+  # bundletool の実行時間の上限 (秒). 0 または未設定なら上限なし.
+  # timeout: 600

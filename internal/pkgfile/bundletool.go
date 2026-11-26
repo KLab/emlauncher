@@ -11,6 +11,7 @@ import (
 	"os/exec"
 	"path/filepath"
 	"strings"
+	"sync"
 	"time"
 )
 
@@ -25,23 +26,33 @@ type Bundletool struct {
 	KeyPass  string
 	AAPT2    string // 空なら bundletool 内蔵のもの
 	Keytool  string // keytool コマンド. 空なら "keytool"
+	// MaxConcurrency は同時に動かす Java のプロセスの数の上限 (メモリを大きく使うため). 0 なら上限なし.
+	MaxConcurrency int
+	// Timeout は bundletool の実行時間の上限. 0 なら上限なし.
+	Timeout time.Duration
+
+	slotsOnce sync.Once
+	slots     chan struct{}
 }
 
 const (
-	// bundletoolTimeout / keytoolTimeout は Java のプロセスを待つ上限.
-	bundletoolTimeout = 10 * time.Minute
-	keytoolTimeout    = time.Minute
-	// maxJavaProcesses は同時に動かす Java のプロセスの数 (メモリを大きく使うため).
-	maxJavaProcesses = 2
+	// keytoolTimeout は keytool (キーストアの表示) を待つ上限.
+	keytoolTimeout = time.Minute
 )
 
-var javaSlots = make(chan struct{}, maxJavaProcesses)
-
-// acquireJava は Java のプロセスを動かす枠を取る. 返す関数で返す.
-func acquireJava(ctx context.Context) (func(), error) {
+// acquireJava は Java のプロセスを動かす枠を取る (MaxConcurrency が 0 なら取らない). 返す関数で返す.
+func (b *Bundletool) acquireJava(ctx context.Context) (func(), error) {
+	b.slotsOnce.Do(func() {
+		if b.MaxConcurrency > 0 {
+			b.slots = make(chan struct{}, b.MaxConcurrency)
+		}
+	})
+	if b.slots == nil {
+		return func() {}, nil
+	}
 	select {
-	case javaSlots <- struct{}{}:
-		return func() { <-javaSlots }, nil
+	case b.slots <- struct{}{}:
+		return func() { <-b.slots }, nil
 	case <-ctx.Done():
 		return nil, ctx.Err()
 	}
@@ -66,13 +77,16 @@ func (b *Bundletool) UniversalAPK(ctx context.Context, aabPath, outPath string) 
 	if len(b.Java) == 0 || b.Jar == "" {
 		return errors.New("bundletool: apkfile.java / apkfile.bundletool is not configured")
 	}
-	release, err := acquireJava(ctx)
+	release, err := b.acquireJava(ctx)
 	if err != nil {
 		return err
 	}
 	defer release()
-	ctx, cancel := context.WithTimeout(ctx, bundletoolTimeout)
-	defer cancel()
+	if b.Timeout > 0 {
+		var cancel context.CancelFunc
+		ctx, cancel = context.WithTimeout(ctx, b.Timeout)
+		defer cancel()
+	}
 
 	// MkdirTemp は 0700 で作る. パスワードのファイルもここに置く
 	dir, err := os.MkdirTemp("", "emlauncher-apks-")
@@ -143,7 +157,7 @@ func (b *Bundletool) KeystoreInfo(ctx context.Context) (string, error) {
 	if keytool == "" {
 		keytool = "keytool"
 	}
-	release, err := acquireJava(ctx)
+	release, err := b.acquireJava(ctx)
 	if err != nil {
 		return "", err
 	}

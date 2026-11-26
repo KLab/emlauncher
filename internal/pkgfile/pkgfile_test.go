@@ -9,6 +9,7 @@ import (
 	"runtime"
 	"strings"
 	"testing"
+	"time"
 
 	"howett.net/plist"
 )
@@ -168,5 +169,31 @@ func TestPasswordArg(t *testing.T) {
 	}
 	if got, _ := passwordArg(dir, "x", "file:/etc/pass"); got != "file:/etc/pass" {
 		t.Errorf("file: = %q", got)
+	}
+}
+
+// MaxConcurrency が 0 なら上限なし, 正ならその数までしか枠を取れない.
+func TestAcquireJava(t *testing.T) {
+	ctx := context.Background()
+	unlimited := &Bundletool{}
+	for i := 0; i < 10; i++ {
+		if _, err := unlimited.acquireJava(ctx); err != nil {
+			t.Fatalf("unlimited: %v", err)
+		}
+	}
+
+	limited := &Bundletool{MaxConcurrency: 2}
+	r1, _ := limited.acquireJava(ctx)
+	if _, err := limited.acquireJava(ctx); err != nil {
+		t.Fatal(err)
+	}
+	tctx, cancel := context.WithTimeout(ctx, 50*time.Millisecond)
+	defer cancel()
+	if _, err := limited.acquireJava(tctx); err == nil {
+		t.Fatal("third slot acquired with MaxConcurrency 2")
+	}
+	r1()
+	if _, err := limited.acquireJava(ctx); err != nil {
+		t.Fatalf("after release: %v", err)
 	}
 }

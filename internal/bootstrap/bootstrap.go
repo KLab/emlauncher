@@ -71,6 +71,9 @@ func New(ctx context.Context, cfg *config.Config, log *slog.Logger) (*App, error
 		KeyAlias: cfg.APKFile.KeyAlias,
 		KeyPass:  cfg.APKFile.KeyPass,
 		AAPT2:    cfg.APKFile.AAPT2,
+
+		MaxConcurrency: cfg.APKFile.MaxConcurrency,
+		Timeout:        time.Duration(cfg.APKFile.Timeout) * time.Second,
 	}
 	a.Service = service.New(service.Deps{
 		DB:         db,
