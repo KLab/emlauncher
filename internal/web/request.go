@@ -4,6 +4,7 @@ import (
 	"context"
 	"net"
 	"net/http"
+	"net/url"
 	"strconv"
 	"strings"
 )
@@ -57,6 +58,36 @@ func redirect(w http.ResponseWriter, r *http.Request, path string) error {
 }
 
 // remoteIP はクライアントの IP アドレス. X-Forwarded-For があればその値 (PHP 版と同じ).
+// secretParams はログに値を出さないクエリパラメータ (API キー, トークン, パスワードなど).
+var secretParams = map[string]bool{
+	"api_key": true, "api-key": true, "token": true, "key": true, "t": true, "password": true, "code": true,
+}
+
+// logURI はログに出す URI (パスとクエリ). secretParams の値は *** にする.
+func logURI(u *url.URL) string {
+	if u.RawQuery == "" {
+		return u.RequestURI()
+	}
+	q, err := url.ParseQuery(u.RawQuery)
+	if err != nil {
+		return u.EscapedPath() + "?(invalid query)"
+	}
+	redacted := false
+	for k, vs := range q {
+		if secretParams[k] {
+			for i := range vs {
+				vs[i] = "***"
+			}
+			redacted = true
+		}
+	}
+	if !redacted {
+		return u.RequestURI()
+	}
+	// Encode は * をエスケープするので, 読みやすいように戻す
+	return u.EscapedPath() + "?" + strings.ReplaceAll(q.Encode(), "=%2A%2A%2A", "=***")
+}
+
 func remoteIP(r *http.Request) string {
 	if f := r.Header.Get("X-Forwarded-For"); f != "" {
 		return f

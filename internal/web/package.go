@@ -153,7 +153,7 @@ func (s *Server) packageInstall(w http.ResponseWriter, r *http.Request) error {
 	if f.has("token") {
 		t, err := s.svc.InstallTokenByToken(ctx, f.Get("token"))
 		if errors.Is(err, service.ErrNotFound) {
-			s.log.Warn("invalid install token", "token", f.Get("token"))
+			s.log.Warn("invalid install token")
 			return errorStatus(http.StatusForbidden, "invalid token")
 		}
 		if err != nil {
@@ -303,7 +303,7 @@ func (s *Server) guestpassInstall(w http.ResponseWriter, r *http.Request) error 
 	}
 	logAttr(r, "guestpass_id", gp.ID)
 	if s.svc.Expired(gp) {
-		s.log.Warn("expired guest pass", "token", token, "app_id", gp.AppID, "package_id", gp.PackageID)
+		s.log.Warn("expired guest pass", "guestpass_id", gp.ID, "app_id", gp.AppID, "package_id", gp.PackageID)
 		return errorStatus(http.StatusForbidden, "Invalid token")
 	}
 	pkg, _, err := s.loadPackage(r, gp.PackageID)

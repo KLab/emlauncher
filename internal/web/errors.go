@@ -73,7 +73,7 @@ func (s *Server) api(h handlerFunc) http.HandlerFunc {
 func (s *Server) pageError(w http.ResponseWriter, r *http.Request, err error) {
 	he, known := asHTTPError(err)
 	if !known {
-		s.log.Error("request failed", "method", r.Method, "url", r.URL.String(), "err", err)
+		s.log.Error("request failed", "method", r.Method, "uri", logURI(r.URL), "err", err)
 	}
 	s.renderError(w, r, he.status, he.msg)
 }
@@ -83,7 +83,7 @@ func (s *Server) pageError(w http.ResponseWriter, r *http.Request, err error) {
 func (s *Server) jsonError(w http.ResponseWriter, r *http.Request, err error) {
 	he, known := asHTTPError(err)
 	if !known {
-		s.log.Error("request failed", "method", r.Method, "url", r.URL.String(), "err", err)
+		s.log.Error("request failed", "method", r.Method, "uri", logURI(r.URL), "err", err)
 		writeJSON(w, http.StatusInternalServerError, map[string]string{"error": err.Error(), "exception": "Exception"})
 		return
 	}

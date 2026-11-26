@@ -9,6 +9,7 @@ import (
 	"io/fs"
 	"log/slog"
 	"net/http"
+	"runtime/debug"
 	"strings"
 	"sync"
 	"time"
@@ -67,7 +68,6 @@ func New(o Options) (*Server, error) {
 // Handler は URL とハンドラの対応.
 func (s *Server) Handler() http.Handler {
 	r := chi.NewRouter()
-	r.Use(middleware.Recoverer)
 	r.Use(s.accessLog)
 	r.Use(s.canonicalPath)
 	r.NotFound(notFoundText)
@@ -237,10 +237,10 @@ func (s *Server) passThrough(p string) bool {
 func (s *Server) accessLog(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		start := time.Now()
-		uri := r.URL.RequestURI()
+		uri := logURI(r.URL)
 		la := &logAttrs{}
 		ww := middleware.NewWrapResponseWriter(w, r.ProtoMajor)
-		next.ServeHTTP(ww, r.WithContext(context.WithValue(r.Context(), ctxLog, la)))
+		s.serveRecovering(ww, r.WithContext(context.WithValue(r.Context(), ctxLog, la)), next, uri)
 		args := []any{"method", r.Method, "uri", uri, "status", ww.Status(),
 			"bytes", ww.BytesWritten(), "duration", time.Since(start).Round(time.Millisecond),
 			"remote", remoteIP(r), "user_agent", r.UserAgent()}
@@ -251,6 +251,25 @@ func (s *Server) accessLog(next http.Handler) http.Handler {
 		args = append(args, "user", user)
 		s.log.Info("access", append(args, extra...)...)
 	})
+}
+
+// serveRecovering は next を呼び, panic したらエラーとしてログに出して 500 を返す.
+// アクセスログの内側で拾うので, panic したリクエストもアクセスログに 500 として残る.
+func (s *Server) serveRecovering(w middleware.WrapResponseWriter, r *http.Request, next http.Handler, uri string) {
+	defer func() {
+		v := recover()
+		if v == nil {
+			return
+		}
+		if v == http.ErrAbortHandler { // 応答を打ち切るための panic. net/http に任せる
+			panic(v)
+		}
+		s.log.Error("panic", "method", r.Method, "uri", uri, "panic", v, "stack", string(debug.Stack()))
+		if w.Status() == 0 {
+			http.Error(w, "500 Internal Server Error", http.StatusInternalServerError)
+		}
+	}()
+	next.ServeHTTP(w, r)
 }
 
 // logAttrs はアクセスログに足す項目.
