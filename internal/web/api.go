@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"net/http"
+	"regexp"
 	"slices"
 	"strconv"
 	"strings"
@@ -17,10 +18,14 @@ import (
 // API (/api/...) は api_key でアプリを特定する. 応答は JSON. JSON のキーは PHP 版と同じで,
 // DB の数値 (id, file_size) は文字列で返す (API ドキュメントの Caveats のとおり型は不定としている).
 
-// requireAPIKey は api_key のアプリを context に入れる. 無効なキーなら 400.
+// requireAPIKey は API キーのアプリを context に入れる. 無効なキーなら 400.
 func (s *Server) requireAPIKey(next http.Handler) http.Handler {
 	return s.api(func(w http.ResponseWriter, r *http.Request) error {
-		app, err := s.svc.GetAppByAPIKey(r.Context(), formOf(r).Get("api_key"))
+		key, ok := s.requestAPIKey(r)
+		if !ok && !s.cfg.APIKeyParamEnabled && formOf(r).has("api_key") {
+			return badRequest("api_key request parameter is disabled. Use the Authorization: Bearer header.")
+		}
+		app, err := s.svc.GetAppByAPIKey(r.Context(), key)
 		if errors.Is(err, service.ErrNotFound) {
 			return badRequest("Invalid api_key")
 		}
@@ -31,6 +36,23 @@ func (s *Server) requireAPIKey(next http.Handler) http.Handler {
 		next.ServeHTTP(w, r.WithContext(context.WithValue(r.Context(), ctxApp{}, app)))
 		return nil
 	})
+}
+
+var bearerRe = regexp.MustCompile(`(?i)^Bearer +(\S+) *$`)
+
+// requestAPIKey は API キー. Authorization: Bearer ヘッダを優先し, 無ければ
+// (api_key_param_enabled なら) リクエストパラメータ api_key を使う.
+func (s *Server) requestAPIKey(r *http.Request) (string, bool) {
+	for _, v := range r.Header.Values("Authorization") {
+		if m := bearerRe.FindStringSubmatch(v); m != nil {
+			return m[1], true
+		}
+	}
+	if !s.cfg.APIKeyParamEnabled {
+		return "", false
+	}
+	f := formOf(r)
+	return f.Get("api_key"), f.has("api_key")
 }
 
 func apiApp(r *http.Request) db.Application {

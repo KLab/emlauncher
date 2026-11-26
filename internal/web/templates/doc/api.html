@@ -10,6 +10,18 @@
     <h2><i class="fa fa-puzzle-piece"></i> API</h2>
   </div>
 
+  <div>
+    <h3 class="subheader">Authentication</h3>
+    <div class="container">
+      <p>All APIs require the API key of the application (See the application preferences).</p>
+      <p>Send it in the <code>Authorization</code> request header (recommended):</p>
+      <pre><code>Authorization: Bearer {application_api_key}</code></pre>
+      <p>Sending it as the <code>api_key</code> request field (query string or form data) is still accepted for backward compatibility, but deprecated. A query string is recorded in the access logs of web servers and proxies, and the API key may be exposed.</p>
+      <p>If both are specified, the header takes precedence.</p>
+      <p>The administrator can reject the <code>api_key</code> request field by setting <code>api_key_param_enabled</code> to <code>false</code> in the configuration. In that case, a request without the header results in a 400 error.</p>
+    </div>
+  </div>
+
   <div class="list-group">
     <a href="{{$.URL "/doc/api_upload"}}" class="list-group-item">
       <h3 class="list-group-item-heading">Upload API</h3>

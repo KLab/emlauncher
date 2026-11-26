@@ -499,3 +499,35 @@ func sortedTagNames(e *e2e.Env, pkgID int64) []string {
 	return names
 }
 
+// API キーは Authorization: Bearer ヘッダでも渡せる. ヘッダがあればパラメータより優先する.
+func TestAPIKeyHeader(t *testing.T) {
+	e := e2e.New(t)
+	owner := e.NewUser("owner")
+	app := e.CreateApp(owner, e2e.Unique("app"))
+	id := e.MustAPIUpload(app.APIKey, "p", "a.apk", e2e.APK("com.example.a"), nil)
+
+	c := e.NewClient()
+	call := func(query, auth string) *e2e.Response {
+		t.Helper()
+		req, err := http.NewRequest("GET", c.URL("/api/package_list"+query), nil)
+		if err != nil {
+			t.Fatal(err)
+		}
+		if auth != "" {
+			req.Header.Set("Authorization", auth)
+		}
+		return c.Do(req)
+	}
+
+	res := call("", "Bearer "+app.APIKey)
+	e2e.ExpectStatus(t, res, http.StatusOK)
+	list, _ := res.JSON(t).([]any)
+	if len(list) != 1 || jsonNum(t, list[0].(map[string]any), "id") != itoa(id) {
+		t.Fatalf("package_list with header: %s", res.Body)
+	}
+	// ヘッダを優先する
+	e2e.ExpectStatus(t, call("?api_key=invalid", "Bearer "+app.APIKey), http.StatusOK)
+	e2e.ExpectStatus(t, call("?api_key="+app.APIKey, "Bearer invalid"), http.StatusBadRequest)
+	// Bearer 以外はパラメータを使う
+	e2e.ExpectStatus(t, call("?api_key="+app.APIKey, "Basic xxx"), http.StatusOK)
+}

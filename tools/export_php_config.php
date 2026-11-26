@@ -65,6 +65,7 @@ $out = array(
 	'mail_sender' => (string)v($c, 'mail_sender', ''),
 	'mail_bcc_to' => (string)v($c, 'mail_bcc_to', ''),
 	'upload_lock_wait_timeout' => (int)v($c, 'upload_lock_wait_timeout', 0),
+	'api_key_param_enabled' => v($c, 'api_key_param_enabled', true) !== false,
 	'mail' => array(
 		'sendmail' => ini_get('sendmail_path') ?: '/usr/sbin/sendmail -t -i',
 	),

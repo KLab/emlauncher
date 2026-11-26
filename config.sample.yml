@@ -41,6 +41,11 @@ login:
 # 0 または未設定なら DB の設定 (innodb_lock_wait_timeout) のまま.
 upload_lock_wait_timeout: 0
 
+# API の api_key をリクエストパラメータ (クエリ文字列, フォーム) で受け付けるか.
+# クエリ文字列はアクセスログなどに残るので, 呼び出し側が Authorization: Bearer ヘッダに
+# 移行したら false にすることを勧める. false ならヘッダ以外で渡された api_key は 400 になる.
+api_key_param_enabled: true
+
 # AppStore, GooglePlay での制限ファイルサイズ (MB).
 package:
   file_size_warning_ios: 150

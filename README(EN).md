@@ -53,6 +53,7 @@ Copy [config.sample.yml](config.sample.yml) and edit it for your environment (e.
 - `storage_class`: `S3` / `LocalFile`. Create the S3 bucket in advance
 - `session.secret`: a long random string. Use the same value on all servers
 - `login`: password login, Google / AzureAD login
+- `api_key_param_enabled`: whether to accept the API key as the `api_key` request parameter (default `true`). The API key can also be sent in the `Authorization: Bearer` header. Since an API key in a query string is recorded in access logs, setting this to `false` is recommended once clients have moved to the header
 
 ### 5. Run
 

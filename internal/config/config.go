@@ -33,6 +33,9 @@ type Config struct {
 	MailBccTo   string `yaml:"mail_bcc_to"`
 	// UploadLockWaitTimeout はアップロード時の DB のロック待ちのタイムアウト (秒). 0 なら DB の設定のまま.
 	UploadLockWaitTimeout int `yaml:"upload_lock_wait_timeout"`
+	// APIKeyParamEnabled が false なら, API の api_key をリクエストパラメータでは受け付けない
+	// (Authorization: Bearer ヘッダだけ). クエリの api_key はアクセスログに残るため.
+	APIKeyParamEnabled bool `yaml:"api_key_param_enabled"`
 
 	Mail     Mail     `yaml:"mail"`
 	Login    Login    `yaml:"login"`
@@ -141,13 +144,14 @@ func Load(path string) (*Config, error) {
 // Parse は設定ファイルの内容を読む. Load と同じく既定値を補って検証する.
 func Parse(b []byte) (*Config, error) {
 	c := &Config{
-		Listen:       "127.0.0.1:8080",
-		StorageClass: StorageS3,
-		Mail:         Mail{Sendmail: "/usr/sbin/sendmail -t -i"},
-		Database:     Database{Host: "localhost", Port: 3306, Name: "emlauncher"},
-		Memcache:     Memcache{Host: "localhost", Port: 11211},
-		LocalFile:    LocalFile{URLPrefix: "/files", Serve: true},
-		APKFile:      APKFile{Java: "java"},
+		Listen:             "127.0.0.1:8080",
+		APIKeyParamEnabled: true,
+		StorageClass:       StorageS3,
+		Mail:               Mail{Sendmail: "/usr/sbin/sendmail -t -i"},
+		Database:           Database{Host: "localhost", Port: 3306, Name: "emlauncher"},
+		Memcache:           Memcache{Host: "localhost", Port: 11211},
+		LocalFile:          LocalFile{URLPrefix: "/files", Serve: true},
+		APKFile:            APKFile{Java: "java"},
 	}
 	dec := yaml.NewDecoder(bytes.NewReader(b))
 	dec.KnownFields(true)

@@ -53,6 +53,7 @@ bundletool は内蔵の aapt2 を Java の一時ディレクトリ（既定は `
 - `storage_class`: `S3` / `LocalFile`. S3 のバケットは予め作成しておきます
 - `session.secret`: 長いランダムな文字列. 複数台で動かす場合は全台で同じ値にします
 - `login`: パスワードログイン, Google / AzureAD ログイン
+- `api_key_param_enabled`: API キーをリクエストパラメータ `api_key` でも受け付けるか（既定 `true`）. API キーは `Authorization: Bearer` ヘッダでも渡せます. クエリの API キーはアクセスログに残るので, 呼び出し側がヘッダに移行したら `false` にすることを勧めます
 
 ### 5. 起動
 
