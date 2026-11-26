@@ -11,16 +11,29 @@
 
 ## ディレクトリ構成
 
-パッケージは基本的にフラットにし, 独立させる理由があるものだけ分ける.
+業務処理 (service) と HTTP (web) を分け, 外部サービスとの境界 (DB, ストレージ, memcached, メール) と, アプリ本体に依存しない処理 (パッケージの解析, アイコンの変換など) は小さなパッケージにする.
 
 ```
-src/                         package emlauncher: 設定, DB (table*.go), 業務処理 (core*.go), HTTP ハンドラ, セッション, メール
+src/
+  assets.go                  package emlauncher: 画面のテンプレートと静的ファイルを埋め込む (embed)
+  templates/, static/        画面のテンプレート (html/template) と静的ファイル
   config.sample.yml          設定例
-  templates/, static/        画面のテンプレートと静的ファイル (バイナリに埋め込む)
-  storage/                   S3 / LocalFile. 外部サービスとの境界. 同じテストを両方の実装に流す
-  pkgfile/                   IPA / APK / AAB の解析. アプリ本体に依存しない. テストデータを持つ
-  cmd/emlauncher/            HTTP サーバ
-  cmd/delete-old-packages/   バッチ
+  sqlc.yaml                  DB アクセスのコードの生成 (sqlc v1.27.0)
+  cmd/emlauncher/            HTTP サーバ (tableflip による無停止の再起動)
+  cmd/delete-old-packages/   古いパッケージの削除バッチ
+  internal/
+    config/                  設定ファイル (YAML. 知らないキーはエラー), preg 形式の正規表現
+    db/                      sqlc が生成したコード. SQL は db/query/*.sql に書く
+    service/                 業務処理 (アプリ, パッケージ, アップロード, インストール, コメント, ゲストパス,
+                             ユーザ, 通知メール, バッチ). トランザクションとロックはここで扱う
+    web/                     HTTP のハンドラ. URL とハンドラの対応 (chi), 画面・API・ajax, セッション,
+                             multipart の受信 (ファイルは一時ファイルへ), OAuth
+    bootstrap/               設定から DB・ストレージなどを用意して service を作る (サーバとバッチで共通)
+    storage/                 S3 / LocalFile. 同じテストを両方の実装に流す
+    pkgfile/                 IPA / APK / AAB の解析と bundletool. アプリ本体に依存しない. テストデータを持つ
+    cache/                   memcached (キーの接頭辞, 30 日を超える有効期限)
+    mailer/                  sendmail でのメール送信
+    icon/, passhash/, randstr/  アイコンの変換, パスワードハッシュ (PHP 版と互換), ランダム文字列
 sql/                         DB スキーマ (PHP 版から変えていない)
 tools/                       移行用のスクリプト (PHP 版の設定の書き出し)
 e2e/                         E2E テストと移行リハーサル. テスト専用の依存 (AWS SDK など) を本体に
