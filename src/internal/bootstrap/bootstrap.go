@@ -101,9 +101,9 @@ func OpenDB(cfg *config.Config) (*sql.DB, error) {
 		return nil, err
 	}
 	db := sql.OpenDB(connector)
+	// 再起動中は 2 プロセス分になるので max_connections (既定 151) の半分未満にする
 	db.SetMaxOpenConns(50)
-	db.SetMaxIdleConns(10)
-	db.SetConnMaxLifetime(time.Hour)
-	db.SetConnMaxIdleTime(5 * time.Minute)
+	db.SetMaxIdleConns(50)                 // go-sql-driver/mysql の推奨 (MaxOpenConns と同じ)
+	db.SetConnMaxLifetime(3 * time.Minute) // go-sql-driver/mysql の推奨 (5 分未満)
 	return db, nil
 }
