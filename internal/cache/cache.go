@@ -6,6 +6,7 @@ package cache
 
 import (
 	"errors"
+	"math"
 	"time"
 
 	"github.com/bradfitz/gomemcache/memcache"
@@ -56,13 +57,14 @@ func (c *Cache) Delete(key string) error {
 }
 
 // expiration は memcached に渡す有効期限. 30 日以下は秒数, それを超えるものは UNIX 時刻.
+// memcached の有効期限は 32 ビットなので, 2038 年以降になるものはその上限にする.
 func (c *Cache) expiration(ttl time.Duration) int32 {
 	secs := int64((ttl + time.Second - 1) / time.Second)
 	if secs < 1 {
 		secs = 1
 	}
 	if ttl > maxRelativeExpiration {
-		return int32(c.now().Unix() + secs)
+		return int32(min(c.now().Unix()+secs, math.MaxInt32))
 	}
 	return int32(secs)
 }

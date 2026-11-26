@@ -115,10 +115,18 @@ func (s *Server) loginPassword(w http.ResponseWriter, r *http.Request) error {
 }
 
 func (s *Server) passwordReminder(w http.ResponseWriter, r *http.Request) error {
+	if !s.cfg.Login.EnablePassword {
+		// パスワードログインを無効にしていれば, リセット (メールの送信) もしない
+		return errNotFound
+	}
 	return s.renderOK(w, r, "login/password_reminder", nil)
 }
 
 func (s *Server) passwordConfirm(w http.ResponseWriter, r *http.Request) error {
+	if !s.cfg.Login.EnablePassword {
+		// パスワードログインを無効にしていれば, リセット (メールの送信) もしない
+		return errNotFound
+	}
 	err := s.svc.SendPasswordReset(r.Context(), formOf(r).Get("email"), func(key string) string {
 		return baseURL(r) + "/login/password_reset?key=" + key
 	})
@@ -129,6 +137,10 @@ func (s *Server) passwordConfirm(w http.ResponseWriter, r *http.Request) error {
 }
 
 func (s *Server) passwordReset(w http.ResponseWriter, r *http.Request) error {
+	if !s.cfg.Login.EnablePassword {
+		// パスワードログインを無効にしていれば, リセット (メールの送信) もしない
+		return errNotFound
+	}
 	key := formOf(r).Get("key")
 	if _, err := s.svc.PasswordResetMail(r.Context(), key); err != nil {
 		if errors.Is(err, service.ErrNotFound) {
@@ -140,6 +152,10 @@ func (s *Server) passwordReset(w http.ResponseWriter, r *http.Request) error {
 }
 
 func (s *Server) passwordCommit(w http.ResponseWriter, r *http.Request) error {
+	if !s.cfg.Login.EnablePassword {
+		// パスワードログインを無効にしていれば, リセット (メールの送信) もしない
+		return errNotFound
+	}
 	f := formOf(r)
 	if err := s.svc.ResetPassword(r.Context(), f.Get("key"), f.Get("password")); err != nil {
 		if errors.Is(err, service.ErrNotFound) {

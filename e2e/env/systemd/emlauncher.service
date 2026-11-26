@@ -1,7 +1,10 @@
 # README のユニット例と同じ内容 (User とパスだけテスト環境に合わせている).
 [Unit]
 Description=EMLauncher
-After=network.target
+Wants=network-online.target
+After=network-online.target
+# 起動時に DB に繋がらなくても, 諦めずに再起動し続ける
+StartLimitIntervalSec=0
 
 [Service]
 User=www-data
@@ -12,6 +15,7 @@ ExecReload=/bin/sh -c 'kill -HUP $MAINPID'
 # 停止時は処理中のリクエスト (大きなアップロード) を待つ. emlauncher の -drain-timeout (既定 1h) に合わせる
 TimeoutStopSec=1h
 Restart=always
+RestartSec=5s
 
 [Install]
 WantedBy=multi-user.target

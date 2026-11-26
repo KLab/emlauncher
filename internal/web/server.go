@@ -69,6 +69,7 @@ func New(o Options) (*Server, error) {
 func (s *Server) Handler() http.Handler {
 	r := chi.NewRouter()
 	r.Use(s.accessLog)
+	r.Use(s.withBaseURL)
 	r.Use(s.canonicalPath)
 	r.NotFound(notFoundText)
 	r.MethodNotAllowed(notFoundText)
@@ -85,7 +86,9 @@ func (s *Server) Handler() http.Handler {
 	}
 
 	r.Route("/api", func(r chi.Router) {
-		r.Use(s.withForm(s.jsonError))
+		// 認証できないアップロードは, なるべく本文を読む (ディスクに書く) 前に断る
+		r.Use(s.checkBearerKey)
+		r.Use(s.withForm(s.jsonError, s.apiFileCheck))
 		r.Use(s.requireAPIKey)
 		r.NotFound(s.api(func(http.ResponseWriter, *http.Request) error {
 			return errorStatus(http.StatusNotFound, "404 Not Found")
@@ -103,8 +106,8 @@ func (s *Server) Handler() http.Handler {
 		})
 	})
 	r.Route("/ajax", func(r chi.Router) {
-		r.Use(s.withForm(s.jsonError))
 		r.Use(s.requireLoginJSON)
+		r.Use(s.withForm(s.jsonError, nil))
 		r.NotFound(s.api(func(http.ResponseWriter, *http.Request) error {
 			return errorStatus(http.StatusNotFound, "404 Not Found")
 		}))
@@ -113,32 +116,34 @@ func (s *Server) Handler() http.Handler {
 	})
 
 	r.Group(func(r chi.Router) {
-		r.Use(s.withForm(s.pageError))
-
 		// ログイン不要
-		r.HandleFunc("/qr/code", s.qrCode)
-		r.Route("/login", func(r chi.Router) {
-			r.Use(s.redirectIfLoggedIn)
-			r.HandleFunc("/", s.page(s.loginIndex))
-			r.HandleFunc("/password", s.page(s.loginPassword))
-			r.HandleFunc("/password_reminder", s.page(s.passwordReminder))
-			r.HandleFunc("/password_confirm", s.page(s.passwordConfirm))
-			r.HandleFunc("/password_reset", s.page(s.passwordReset))
-			r.HandleFunc("/password_commit", s.page(s.passwordCommit))
-			for name := range s.oauth {
-				r.HandleFunc("/"+name, s.page(s.oauthStart(name)))
-				r.HandleFunc("/"+name+"_callback", s.page(s.oauthCallback(name)))
-				r.HandleFunc("/"+name+"_error", s.page(s.oauthError(name)))
-			}
+		r.Group(func(r chi.Router) {
+			r.Use(s.withForm(s.pageError, nil))
+			r.HandleFunc("/qr/code", s.qrCode)
+			r.Route("/login", func(r chi.Router) {
+				r.Use(s.redirectIfLoggedIn)
+				r.HandleFunc("/", s.page(s.loginIndex))
+				r.HandleFunc("/password", s.page(s.loginPassword))
+				r.HandleFunc("/password_reminder", s.page(s.passwordReminder))
+				r.HandleFunc("/password_confirm", s.page(s.passwordConfirm))
+				r.HandleFunc("/password_reset", s.page(s.passwordReset))
+				r.HandleFunc("/password_commit", s.page(s.passwordCommit))
+				for name := range s.oauth {
+					r.HandleFunc("/"+name, s.page(s.oauthStart(name)))
+					r.HandleFunc("/"+name+"_callback", s.page(s.oauthCallback(name)))
+					r.HandleFunc("/"+name+"_error", s.page(s.oauthError(name)))
+				}
+			})
+			// トークンで認証する (インストーラやゲストはセッションを持たない)
+			r.HandleFunc("/package/install", s.page(s.packageInstall))
+			r.HandleFunc("/package/install_plist", s.page(s.installPlist))
+			r.HandleFunc("/package/guestpass_install", s.page(s.guestpassInstall))
 		})
-		// トークンで認証する (インストーラやゲストはセッションを持たない)
-		r.HandleFunc("/package/install", s.page(s.packageInstall))
-		r.HandleFunc("/package/install_plist", s.page(s.installPlist))
-		r.HandleFunc("/package/guestpass_install", s.page(s.guestpassInstall))
 
-		// ログインが必要な画面
+		// ログインが必要な画面. 本文 (アップロード) はログインを確かめてから読む
 		r.Group(func(r chi.Router) {
 			r.Use(s.requireLogin)
+			r.Use(s.withForm(s.pageError, nil))
 			r.HandleFunc("/", s.page(s.top))
 			r.HandleFunc("/logout", s.page(s.logout))
 			r.Route("/app", func(r chi.Router) {

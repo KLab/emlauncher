@@ -136,7 +136,7 @@ func TestParseFormMultipart(t *testing.T) {
 	r := httptest.NewRequest(http.MethodPost, "/api/upload?api_key=k&title=query", &body)
 	r.Header.Set("Content-Type", mw.FormDataContentType())
 
-	f, err := parseForm(httptest.NewRecorder(), r)
+	f, err := parseForm(httptest.NewRecorder(), r, nil)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -227,5 +227,117 @@ func TestRouting(t *testing.T) {
 	}
 	if w := do(http.MethodPost, "/ajax/upload_package_temporary/x"); w.Code != http.StatusForbidden {
 		t.Errorf("ajax without login: %d", w.Code)
+	}
+}
+
+// fileCheck がエラーを返したら, ファイルを一時ファイルに書かずにやめる.
+func TestParseFormFileCheck(t *testing.T) {
+	var body bytes.Buffer
+	mw := multipart.NewWriter(&body)
+	mw.WriteField("api_key", "bad")
+	fw, _ := mw.CreateFormFile("file", "a.apk")
+	fw.Write([]byte("data"))
+	mw.Close()
+	r := httptest.NewRequest(http.MethodPost, "/api/upload", &body)
+	r.Header.Set("Content-Type", mw.FormDataContentType())
+	var seen string
+	f, err := parseForm(httptest.NewRecorder(), r, func(_ *http.Request, value func(string) (string, bool)) error {
+		seen, _ = value("api_key")
+		return badRequest("Invalid api_key")
+	})
+	if err == nil || err.Error() != "Invalid api_key" || f != nil {
+		t.Fatalf("parseForm = %v, %v", f, err)
+	}
+	if seen != "bad" {
+		t.Errorf("api_key seen by the check = %q", seen)
+	}
+}
+
+// ファイルの数は名前ではなくパートの数で数える.
+func TestParseFormTooManyFiles(t *testing.T) {
+	var body bytes.Buffer
+	mw := multipart.NewWriter(&body)
+	for range maxFormFiles + 1 {
+		fw, _ := mw.CreateFormFile("file", "a.apk")
+		fw.Write([]byte("x"))
+	}
+	mw.Close()
+	r := httptest.NewRequest(http.MethodPost, "/api/upload", &body)
+	r.Header.Set("Content-Type", mw.FormDataContentType())
+	if _, err := parseForm(httptest.NewRecorder(), r, nil); err == nil {
+		t.Fatal("too many files accepted")
+	}
+}
+
+type countingReader struct {
+	r io.Reader
+	n int
+}
+
+func (c *countingReader) Read(p []byte) (int, error) {
+	n, err := c.r.Read(p)
+	c.n += n
+	return n, err
+}
+
+// ログインしていなければ, 画面・ajax へのアップロードの本文を読まない.
+func TestUnauthenticatedUploadIsNotRead(t *testing.T) {
+	h := newTestServer(t)
+	for _, p := range []string{"/app/upload_post?id=1", "/package/attach", "/ajax/upload_package_temporary"} {
+		var body bytes.Buffer
+		mw := multipart.NewWriter(&body)
+		fw, _ := mw.CreateFormFile("file", "a.apk")
+		fw.Write(bytes.Repeat([]byte("x"), 1<<20))
+		mw.Close()
+		cr := &countingReader{r: &body}
+		r := httptest.NewRequest(http.MethodPost, p, cr)
+		r.Header.Set("Content-Type", mw.FormDataContentType())
+		w := httptest.NewRecorder()
+		h.ServeHTTP(w, r)
+		if w.Code != http.StatusFound && w.Code != http.StatusForbidden {
+			t.Errorf("%s: status %d", p, w.Code)
+		}
+		if cr.n != 0 {
+			t.Errorf("%s: %d bytes of the body were read", p, cr.n)
+		}
+	}
+}
+
+func TestSitePath(t *testing.T) {
+	for p, want := range map[string]bool{
+		"/": true, "/app?id=1": true, "/package/install?token=abc": true,
+		"": false, "//evil.example/": false, `/\evil.example`: false, "@evil.example": false,
+		"evil.example": false, "/a\nb": false,
+	} {
+		if got := sitePath(p); got != want {
+			t.Errorf("sitePath(%q) = %v", p, got)
+		}
+	}
+}
+
+// base_url を設定すると, Host / X-Forwarded-Host ではなくそれで URL を作る.
+func TestConfiguredBaseURL(t *testing.T) {
+	s := &Server{cfg: &config.Config{BaseURL: "https://emlauncher.example.com"}}
+	var got string
+	h := s.withBaseURL(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		got = absURL(r, "", "/login") + " " + requestURL(r)
+	}))
+	r := httptest.NewRequest(http.MethodGet, "http://internal:8080/app?id=1", nil)
+	r.Header.Set("X-Forwarded-Host", "evil.example")
+	h.ServeHTTP(httptest.NewRecorder(), r)
+	if want := "https://emlauncher.example.com/login https://emlauncher.example.com/app?id=1"; got != want {
+		t.Errorf("got %q, want %q", got, want)
+	}
+}
+
+// パスワードログインを無効にしていれば, パスワードリセットも 404 (メールを送らない).
+func TestPasswordResetDisabled(t *testing.T) {
+	h := newTestServer(t) // login.enable_password は false
+	for _, p := range []string{"/login/password_reminder", "/login/password_confirm", "/login/password_reset?key=x", "/login/password_commit"} {
+		w := httptest.NewRecorder()
+		h.ServeHTTP(w, httptest.NewRequest(http.MethodPost, p, nil))
+		if w.Code != http.StatusNotFound {
+			t.Errorf("%s: status %d", p, w.Code)
+		}
 	}
 }

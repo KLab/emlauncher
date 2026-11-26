@@ -3,6 +3,7 @@ package mailer
 import (
 	"bytes"
 	"encoding/base64"
+	"fmt"
 	"io"
 	"mime"
 	"net/mail"
@@ -15,10 +16,14 @@ func TestMessageBytes(t *testing.T) {
 		From:    "EMLauncher <no-reply@example.com>",
 		To:      []string{"EMLauncher <bcc@example.com>"},
 		Bcc:     []string{"a@example.com", "b@example.com"},
-		Subject: "New Comment to アプリ",
+		Subject: "New Comment to アプリ\r\nBcc: evil@example.com",
 		Body:    strings.Repeat("本文 body\n", 20),
 	}
-	msg, err := mail.ReadMessage(bytes.NewReader(m.Bytes()))
+	b, err := m.Bytes()
+	if err != nil {
+		t.Fatal(err)
+	}
+	msg, err := mail.ReadMessage(bytes.NewReader(b))
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -33,6 +38,44 @@ func TestMessageBytes(t *testing.T) {
 	body, err := base64.StdEncoding.DecodeString(strings.Join(strings.Fields(string(raw)), ""))
 	if err != nil || string(body) != m.Body {
 		t.Errorf("body = %q, %v", body, err)
+	}
+}
+
+// 宛先が多くても 1 行が長くならないよう折り返し, 読むと元のアドレスに戻る.
+func TestMessageBytesFoldsAddresses(t *testing.T) {
+	var bcc []string
+	for i := range 100 {
+		bcc = append(bcc, fmt.Sprintf("user%03d@example.com", i))
+	}
+	b, err := Message{From: "a@example.com", To: []string{"b@example.com"}, Bcc: bcc, Body: "x"}.Bytes()
+	if err != nil {
+		t.Fatal(err)
+	}
+	for _, line := range strings.Split(string(b), "\r\n") {
+		if len(line) > 78 {
+			t.Fatalf("line too long (%d): %q", len(line), line)
+		}
+	}
+	msg, err := mail.ReadMessage(bytes.NewReader(b))
+	if err != nil {
+		t.Fatal(err)
+	}
+	addrs, err := msg.Header.AddressList("Bcc")
+	if err != nil || len(addrs) != len(bcc) || addrs[99].Address != bcc[99] {
+		t.Fatalf("Bcc = %v, %v", addrs, err)
+	}
+}
+
+// アドレスに改行があればヘッダを差し込めるので送らない.
+func TestMessageBytesRejectsControlChars(t *testing.T) {
+	for _, m := range []Message{
+		{From: "a@example.com", To: []string{"b@example.com\r\nBcc: evil@example.com"}},
+		{From: "a@example.com", Bcc: []string{"b@example.com\nX: y"}},
+		{From: "a@example.com\r\n", To: []string{"b@example.com"}},
+	} {
+		if _, err := m.Bytes(); err == nil {
+			t.Errorf("accepted %+v", m)
+		}
 	}
 }
 

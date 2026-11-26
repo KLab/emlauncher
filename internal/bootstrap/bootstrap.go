@@ -43,7 +43,7 @@ func New(ctx context.Context, cfg *config.Config, log *slog.Logger) (*App, error
 	case config.StorageS3:
 		s, err := storage.NewS3(ctx, storage.S3Config{
 			Key: cfg.AWS.Key, Secret: cfg.AWS.Secret, Region: cfg.AWS.Region, Bucket: cfg.AWS.BucketName,
-			BaseURL: cfg.AWS.BaseURL, ExternalURL: cfg.AWS.ExternalURL,
+			BaseURL: cfg.AWS.BaseURL, ExternalURL: cfg.AWS.ExternalURL, Logger: log,
 		})
 		if err != nil {
 			db.Close()

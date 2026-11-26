@@ -48,6 +48,16 @@ foreach (explode(';', preg_replace('/^mysql:/', '', $dsn)) as $kv) {
 if (isset($dsnParams['unix_socket'])) {
 	fwrite(STDERR, "warning: unix_socket is not supported. set database.host / port manually.\n");
 }
+elseif (!isset($dsnParams['host']) || $dsnParams['host'] === 'localhost') {
+	// PDO の mysql は host=localhost (省略時を含む) なら Unix ソケットで繋ぐが, Go 版は TCP で繋ぐ
+	fwrite(STDERR, "warning: PHP connects to MySQL on localhost through a Unix socket, but the Go version uses TCP (localhost:3306). "
+		. "make sure MySQL accepts TCP connections and the grants for the user allow it (e.g. 'user'@'127.0.0.1').\n");
+}
+if (!empty($s['http_proxy'])) {
+	// PHP 版は http_proxy の設定で外部 (OAuth) に繋いでいた. Go 版は環境変数 HTTPS_PROXY を使う
+	fwrite(STDERR, "warning: http_proxy is set in the PHP config. the Go version uses the HTTPS_PROXY environment variable "
+		. "for outgoing requests (Google / AzureAD login). set it in the systemd unit (Environment=HTTPS_PROXY=...).\n");
+}
 
 $id = str_replace(' ', '_', v($serverenv_config, 'application_identifier', ''));
 $login = v($c, 'login', array());

@@ -4,6 +4,7 @@ import (
 	"context"
 	"database/sql"
 	"errors"
+	"fmt"
 	"time"
 
 	"github.com/KLab/emlauncher-go/internal/db"
@@ -167,6 +168,15 @@ func setPackageTags(ctx context.Context, q *db.Queries, pkgID int64, tags []db.T
 // 消したのがアプリの最新のアップロードなら, last_upload を残っている最新のパッケージのものに戻す.
 // 消す前の内容を返す.
 func (s *Service) DeletePackage(ctx context.Context, pkgID int64) (PackageDetail, error) {
+	return s.deletePackage(ctx, pkgID, false)
+}
+
+// ErrProtected は保護されたパッケージを (古いパッケージの削除で) 消そうとしたことを表す.
+var ErrProtected = errors.New("package is protected")
+
+// deletePackage はパッケージを消す. unprotectedOnly なら, ロックを取った後に保護されていれば
+// ErrProtected を返して消さない.
+func (s *Service) deletePackage(ctx context.Context, pkgID int64, unprotectedOnly bool) (PackageDetail, error) {
 	var deleted PackageDetail
 	err := s.inTx(ctx, func(q *db.Queries) error {
 		p, err := q.GetPackage(ctx, pkgID)
@@ -179,6 +189,9 @@ func (s *Service) DeletePackage(ctx context.Context, pkgID int64) (PackageDetail
 		}
 		if p, err = q.GetPackageForUpdate(ctx, pkgID); err != nil {
 			return notFound(err, "package")
+		}
+		if unprotectedOnly && p.Protect != 0 {
+			return ErrProtected
 		}
 		if deleted, err = s.detailIn(ctx, q, p); err != nil {
 			return err
@@ -282,10 +295,17 @@ func (s *Service) AttachFile(ctx context.Context, pkg db.Package, file Attachmen
 	var af db.AttachedFile
 	err := s.inUploadTx(ctx, func(q *db.Queries) error {
 		if _, err := q.GetApplicationForUpdate(ctx, pkg.AppID); err != nil {
-			return err
+			return notFound(err, "application")
 		}
-		var err error
-		af, err = insertAttachedFile(ctx, q, pkg, file.Name, file.Size, file.Type, s.Now())
+		// 同時に消されたパッケージに添付しない (行とファイルが残ってしまう)
+		p, err := q.GetPackageForUpdate(ctx, pkg.ID)
+		if err != nil {
+			return notFound(err, "package")
+		}
+		if p.AppID != pkg.AppID {
+			return fmt.Errorf("package: %w", ErrNotFound)
+		}
+		af, err = insertAttachedFile(ctx, q, p, file.Name, file.Size, file.Type, s.Now())
 		if err != nil {
 			return err
 		}

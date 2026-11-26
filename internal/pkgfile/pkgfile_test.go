@@ -6,6 +6,8 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
+	"runtime"
+	"strings"
 	"testing"
 
 	"howett.net/plist"
@@ -144,4 +146,27 @@ func writeZip(t *testing.T, files map[string][]byte) string {
 	}
 	f.Close()
 	return path
+}
+
+// パスワードはコマンドラインに出さず, 0600 のファイルで渡す.
+func TestPasswordArg(t *testing.T) {
+	dir := t.TempDir()
+	got, err := passwordArg(dir, "ks-pass", "pass:secret")
+	if err != nil {
+		t.Fatal(err)
+	}
+	path, ok := strings.CutPrefix(got, "file:")
+	if !ok || strings.Contains(got, "secret") {
+		t.Fatalf("passwordArg = %q", got)
+	}
+	b, err := os.ReadFile(path)
+	if err != nil || string(b) != "secret" {
+		t.Fatalf("password file = %q, %v", b, err)
+	}
+	if st, _ := os.Stat(path); runtime.GOOS != "windows" && st.Mode().Perm() != 0o600 {
+		t.Errorf("mode = %v", st.Mode())
+	}
+	if got, _ := passwordArg(dir, "x", "file:/etc/pass"); got != "file:/etc/pass" {
+		t.Errorf("file: = %q", got)
+	}
 }

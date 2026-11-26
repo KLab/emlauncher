@@ -1,6 +1,7 @@
 package cache
 
 import (
+	"math"
 	"testing"
 	"time"
 )
@@ -21,5 +22,15 @@ func TestExpiration(t *testing.T) {
 		if got := c.expiration(tc.ttl); got != tc.want {
 			t.Errorf("expiration(%v) = %d, want %d", tc.ttl, got, tc.want)
 		}
+	}
+}
+
+func TestExpirationOverflow(t *testing.T) {
+	c := &Cache{now: func() time.Time { return time.Unix(2_100_000_000, 0) }}
+	if got := c.expiration(10 * 366 * 24 * time.Hour); got != math.MaxInt32 {
+		t.Errorf("expiration = %d, want MaxInt32", got)
+	}
+	if got := c.expiration(time.Duration(math.MaxInt64)); got <= 0 {
+		t.Errorf("expiration of a huge ttl = %d", got)
 	}
 }

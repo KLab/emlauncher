@@ -9,6 +9,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"regexp"
 	"time"
 
 	"github.com/KLab/emlauncher-go/internal/cache"
@@ -48,6 +49,13 @@ func (s *Service) CanLogin(ctx context.Context, mail string) (bool, error) {
 	return err == nil, err
 }
 
+// passwordResetPrefix はパスワードリセットのキーの memcached のキーの接頭辞. インストールトークン
+// など別の用途の値をリセットのキーとして使わせないため, 専用の接頭辞を付ける.
+const passwordResetPrefix = "password_reset_"
+
+// resetKeyPattern はパスワードリセットのキーの形式 (sha1 の 16 進 40 文字).
+var resetKeyPattern = regexp.MustCompile(`^[0-9a-f]{40}$`)
+
 type passwordReset struct {
 	Mail string `json:"mail"`
 }
@@ -65,7 +73,7 @@ func (s *Service) SendPasswordReset(ctx context.Context, mail string, resetURL f
 	sum := sha1.Sum(b)
 	key := hex.EncodeToString(sum[:])
 	v, _ := json.Marshal(passwordReset{Mail: mail})
-	if err := s.cache.Set(key, v, passwordResetTTL); err != nil {
+	if err := s.cache.Set(passwordResetPrefix+key, v, passwordResetTTL); err != nil {
 		return err
 	}
 	return s.mailer.Send(ctx, mailer.Message{
@@ -78,10 +86,10 @@ func (s *Service) SendPasswordReset(ctx context.Context, mail string, resetURL f
 
 // PasswordResetMail はパスワードリセットのキーのメールアドレス. 無効なキーなら ErrNotFound.
 func (s *Service) PasswordResetMail(ctx context.Context, key string) (string, error) {
-	if key == "" {
+	if !resetKeyPattern.MatchString(key) {
 		return "", ErrNotFound
 	}
-	v, err := s.cache.Get(key)
+	v, err := s.cache.Get(passwordResetPrefix + key)
 	if errors.Is(err, cache.ErrNotFound) {
 		return "", ErrNotFound
 	}
@@ -110,5 +118,5 @@ func (s *Service) ResetPassword(ctx context.Context, key, password string) error
 	if err := s.q.UpdatePasshash(ctx, db.UpdatePasshashParams{Passhash: nullString(passhash.New(password)), Mail: mail}); err != nil {
 		return err
 	}
-	return s.cache.Delete(key)
+	return s.cache.Delete(passwordResetPrefix + key)
 }

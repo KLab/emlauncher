@@ -9,6 +9,7 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"net/url"
 	"os"
 	"regexp"
 	"strings"
@@ -24,7 +25,10 @@ const (
 )
 
 type Config struct {
-	Listen      string `yaml:"listen"`
+	Listen string `yaml:"listen"`
+	// BaseURL はブラウザから見たサイトの URL ("https://emlauncher.example.com"). 指定すると, メールや
+	// リダイレクト, API の応答などの絶対 URL をこれで作る (Host / X-Forwarded-Host ヘッダを使わない).
+	BaseURL     string `yaml:"base_url"`
 	Timezone    string `yaml:"timezone"`
 	CachePrefix string `yaml:"cache_prefix"`
 	TitlePrefix string `yaml:"title_prefix"`
@@ -168,6 +172,12 @@ func Parse(b []byte) (*Config, error) {
 func (c *Config) prepare() error {
 	var errs []error
 
+	if c.BaseURL != "" {
+		if err := c.prepareBaseURL(); err != nil {
+			errs = append(errs, fmt.Errorf("base_url: %w", err))
+		}
+	}
+
 	if c.Timezone == "" {
 		c.Location = time.Local
 	} else {
@@ -194,6 +204,10 @@ func (c *Config) prepare() error {
 	case StorageS3:
 		if c.AWS.BucketName == "" {
 			errs = append(errs, errors.New("aws.bucket_name: required for storage_class S3"))
+		}
+		// 無いと起動はできてもアップロードなどがすべて失敗するので, 起動時に止める
+		if c.AWS.Region == "" {
+			errs = append(errs, errors.New("aws.region: required for storage_class S3"))
 		}
 	case StorageLocalFile:
 		if c.LocalFile.Path == "" {
@@ -259,4 +273,23 @@ func (c *Config) FileSizeWarningMB(platform string) int {
 		return c.Package.FileSizeWarningAndroid
 	}
 	return 0
+}
+
+// prepareBaseURL は base_url を検証し, 末尾の "/" を除く. スキームとホストだけを書く.
+func (c *Config) prepareBaseURL() error {
+	u, err := url.Parse(c.BaseURL)
+	if err != nil {
+		return err
+	}
+	if u.Scheme != "http" && u.Scheme != "https" || u.Host == "" {
+		return errors.New(`must be "http(s)://host[:port]"`)
+	}
+	if strings.Trim(u.Path, "/") != "" || u.RawQuery != "" || u.Fragment != "" || u.User != nil {
+		return errors.New("must not have a path, query, fragment or user info")
+	}
+	if c.EnableHTTPS && u.Scheme != "https" {
+		return errors.New("must be https when enable_https is true")
+	}
+	c.BaseURL = u.Scheme + "://" + u.Host
+	return nil
 }

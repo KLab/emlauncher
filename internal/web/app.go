@@ -458,7 +458,13 @@ func (s *Server) appUpdateOwners(w http.ResponseWriter, r *http.Request) error {
 	if err != nil {
 		return err
 	}
-	if err := s.svc.SetOwners(r.Context(), app.ID, loginUser(r), formOf(r).Values["owners[]"]); err != nil {
+	// オーナーは POST の本文で送られたものだけ受け付ける (別のサイトからの GET のリンクで変えさせない).
+	// 画面のフォームは追加用の欄 owners[] を必ず送る
+	owners, ok := formOf(r).post["owners[]"]
+	if !ok {
+		return errBadRequest
+	}
+	if err := s.svc.SetOwners(r.Context(), app.ID, loginUser(r), owners); err != nil {
 		return err
 	}
 	return redirect(w, r, fmt.Sprintf("/app/preferences?id=%d#owners", app.ID))

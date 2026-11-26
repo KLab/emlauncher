@@ -133,11 +133,8 @@ func (s *Service) inTxWithLockTimeout(ctx context.Context, lockWaitTimeout int, 
 	if err != nil {
 		return err
 	}
-	defer func() {
-		if err != nil {
-			tx.Rollback()
-		}
-	}()
+	// Commit の後の Rollback は何もしない (sql.ErrTxDone). fn が panic しても行ロックと接続を残さない
+	defer tx.Rollback()
 	if err := fn(db.New(tx)); err != nil {
 		return err
 	}

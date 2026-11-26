@@ -81,6 +81,7 @@ func TestParseErrors(t *testing.T) {
 		{"bad tz", minimal + "timezone: Nowhere/City\n", "timezone"},
 		{"bad pattern", minimal + "login:\n  allowed_mailaddr_pattern: '/a/x'\n", "allowed_mailaddr_pattern"},
 		{"s3 without bucket", strings.Replace(minimal, "LocalFile", "S3", 1), "aws.bucket_name"},
+		{"s3 without region", strings.Replace(minimal, "LocalFile", "S3", 1) + "aws:\n  bucket_name: b\n", "aws.region"},
 	} {
 		_, err := Parse([]byte(tc.yaml))
 		if err == nil || !strings.Contains(err.Error(), tc.want) {
@@ -152,6 +153,18 @@ func TestReadAuthFile(t *testing.T) {
 		u, pw, err := readAuthFile(p)
 		if err != nil || [2]string{u, pw} != want {
 			t.Errorf("readAuthFile(%q) = %q, %q, %v", content, u, pw, err)
+		}
+	}
+}
+
+func TestBaseURL(t *testing.T) {
+	c, err := Parse([]byte(minimal + "base_url: https://emlauncher.example.com/\n"))
+	if err != nil || c.BaseURL != "https://emlauncher.example.com" {
+		t.Fatalf("base_url = %q, %v", c.BaseURL, err)
+	}
+	for _, bad := range []string{"emlauncher.example.com", "ftp://x", "https://x/path", "https://x?q=1", "http://x\nenable_https: true"} {
+		if _, err := Parse([]byte(minimal + "base_url: " + bad + "\n")); err == nil {
+			t.Errorf("base_url %q accepted", bad)
 		}
 	}
 }

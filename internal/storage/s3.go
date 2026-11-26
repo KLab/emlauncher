@@ -5,6 +5,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"log/slog"
 	"net/url"
 	"os"
 	"strings"
@@ -42,9 +43,12 @@ type S3Config struct {
 	BaseURL string
 	// ExternalURL は返す URL の BaseURL の部分を置き換えるもの (ブラウザから見たエンドポイント).
 	ExternalURL string
+	// Logger は失敗しても処理を続けるもの (移動元の削除) を記録する. nil なら記録しない.
+	Logger *slog.Logger
 }
 
 type S3 struct {
+	log      *slog.Logger
 	client   *s3.Client
 	presign  *s3.PresignClient
 	uploader *manager.Uploader
@@ -78,6 +82,7 @@ func NewS3(ctx context.Context, c S3Config) (*S3, error) {
 		}
 	})
 	return &S3{
+		log:     c.Logger,
 		client:  client,
 		presign: s3.NewPresignClient(client),
 		uploader: manager.NewUploader(client, func(u *manager.Uploader) {
@@ -145,7 +150,13 @@ func (s *S3) Move(ctx context.Context, src, dst string) error {
 	if err != nil {
 		return fmt.Errorf("storage: copy %s to %s: %w", src, dst, err)
 	}
-	return s.Delete(ctx, src)
+	// コピーできたら移動は成功とする. 移動元を消せなくても失敗にしない: 失敗にすると呼び出し側は
+	// DB をロールバックするが, コピー先は既にあるので行の無いファイルが残る. 消せなかった移動元
+	// (一時ファイル) は使われないだけで害は無い.
+	if err := s.Delete(ctx, src); err != nil && s.log != nil {
+		s.log.Warn("storage: moved, but could not delete the source", "src", src, "dst", dst, "err", err)
+	}
+	return nil
 }
 
 func (s *S3) copySource(key string) string {

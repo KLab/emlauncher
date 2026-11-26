@@ -11,6 +11,7 @@ import (
 	"os/exec"
 	"path/filepath"
 	"strings"
+	"time"
 )
 
 // Bundletool は bundletool (Java) で Android App Bundle から universal APK を作る.
@@ -26,26 +27,77 @@ type Bundletool struct {
 	Keytool  string // keytool コマンド. 空なら "keytool"
 }
 
+const (
+	// bundletoolTimeout / keytoolTimeout は Java のプロセスを待つ上限.
+	bundletoolTimeout = 10 * time.Minute
+	keytoolTimeout    = time.Minute
+	// maxJavaProcesses は同時に動かす Java のプロセスの数 (メモリを大きく使うため).
+	maxJavaProcesses = 2
+)
+
+var javaSlots = make(chan struct{}, maxJavaProcesses)
+
+// acquireJava は Java のプロセスを動かす枠を取る. 返す関数で返す.
+func acquireJava(ctx context.Context) (func(), error) {
+	select {
+	case javaSlots <- struct{}{}:
+		return func() { <-javaSlots }, nil
+	case <-ctx.Done():
+		return nil, ctx.Err()
+	}
+}
+
+// passwordArg は "pass:xxx" のパスワードを dir の中のファイル (0600) に書き, "file:{path}" にする
+// (パスワードをコマンドラインに出さないため). "file:..." などはそのまま.
+func passwordArg(dir, name, v string) (string, error) {
+	pass, ok := strings.CutPrefix(v, "pass:")
+	if !ok {
+		return v, nil
+	}
+	p := filepath.Join(dir, name)
+	if err := os.WriteFile(p, []byte(pass), 0o600); err != nil {
+		return "", err
+	}
+	return "file:" + p, nil
+}
+
 // UniversalAPK は aabPath から universal APK を作り, outPath に書く.
 func (b *Bundletool) UniversalAPK(ctx context.Context, aabPath, outPath string) error {
 	if len(b.Java) == 0 || b.Jar == "" {
 		return errors.New("bundletool: apkfile.java / apkfile.bundletool is not configured")
 	}
+	release, err := acquireJava(ctx)
+	if err != nil {
+		return err
+	}
+	defer release()
+	ctx, cancel := context.WithTimeout(ctx, bundletoolTimeout)
+	defer cancel()
+
+	// MkdirTemp は 0700 で作る. パスワードのファイルもここに置く
 	dir, err := os.MkdirTemp("", "emlauncher-apks-")
 	if err != nil {
 		return err
 	}
 	defer os.RemoveAll(dir)
 	apks := filepath.Join(dir, "out.apks")
+	ksPass, err := passwordArg(dir, "ks-pass", b.KSPass)
+	if err != nil {
+		return err
+	}
+	keyPass, err := passwordArg(dir, "key-pass", b.KeyPass)
+	if err != nil {
+		return err
+	}
 
 	args := append(append([]string{}, b.Java[1:]...),
 		"-jar", b.Jar, "build-apks", "--mode=universal",
 		"--bundle="+aabPath,
 		"--output="+apks,
 		"--ks="+b.Keystore,
-		"--ks-pass="+b.KSPass,
+		"--ks-pass="+ksPass,
 		"--ks-key-alias="+b.KeyAlias,
-		"--key-pass="+b.KeyPass,
+		"--key-pass="+keyPass,
 	)
 	if b.AAPT2 != "" {
 		args = append(args, "--aapt2="+b.AAPT2)
@@ -91,6 +143,13 @@ func (b *Bundletool) KeystoreInfo(ctx context.Context) (string, error) {
 	if keytool == "" {
 		keytool = "keytool"
 	}
+	release, err := acquireJava(ctx)
+	if err != nil {
+		return "", err
+	}
+	defer release()
+	ctx, cancel := context.WithTimeout(ctx, keytoolTimeout)
+	defer cancel()
 	args := []string{"-list", "-v", "-keystore", b.Keystore, "-alias", b.KeyAlias}
 	var env []string
 	switch kind, value, _ := strings.Cut(b.KSPass, ":"); kind {

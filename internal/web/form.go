@@ -59,7 +59,12 @@ func (f *form) cleanup() {
 // parseForm はリクエストのパラメータを読む. multipart のファイルはメモリに載せず,
 // 一時ディレクトリ (TMPDIR) のファイルに書く (数 GB のパッケージを受けるため).
 // 呼び出し側は使い終わったら cleanup を呼ぶ.
-func parseForm(w http.ResponseWriter, r *http.Request) (*form, error) {
+// fileCheck は multipart のファイルを一時ファイルに書く前に呼ばれ, それまでに読んだパラメータ
+// (value) で受け付けてよいか確かめる. エラーを返すとそこで読むのをやめる
+// (API キーが無効なアップロードをディスクに書かないため).
+type fileCheck func(r *http.Request, value func(name string) (string, bool)) error
+
+func parseForm(w http.ResponseWriter, r *http.Request, check fileCheck) (*form, error) {
 	f := &form{Values: r.URL.Query(), post: url.Values{}, files: map[string]*uploadedFile{}}
 	ct, params, _ := mime.ParseMediaType(r.Header.Get("Content-Type"))
 	if r.Method != http.MethodPost && r.Method != http.MethodPut || ct != "multipart/form-data" {
@@ -76,16 +81,26 @@ func parseForm(w http.ResponseWriter, r *http.Request) (*form, error) {
 	if params["boundary"] == "" {
 		return nil, badRequest("multipart boundary is missing")
 	}
-	if err := f.readMultipart(multipart.NewReader(r.Body, params["boundary"])); err != nil {
+	if err := f.readMultipart(r, multipart.NewReader(r.Body, params["boundary"]), check); err != nil {
 		f.cleanup()
 		return nil, err
 	}
 	return f, nil
 }
 
-func (f *form) readMultipart(mr *multipart.Reader) error {
+func (f *form) readMultipart(r *http.Request, mr *multipart.Reader, check fileCheck) error {
 	body := url.Values{}
 	valueBytes := 0
+	nfiles := 0
+	value := func(name string) (string, bool) {
+		if v, ok := body[name]; ok && len(v) > 0 {
+			return v[0], true
+		}
+		if v, ok := f.Values[name]; ok && len(v) > 0 {
+			return v[0], true
+		}
+		return "", false
+	}
 	for {
 		p, err := mr.NextPart()
 		if errors.Is(err, io.EOF) {
@@ -116,8 +131,14 @@ func (f *form) readMultipart(mr *multipart.Reader) error {
 			p.Close()
 			continue
 		}
-		if len(f.files) >= maxFormFiles {
+		// 同じ名前のファイルが何度来ても上限を超えないよう, パートの数で数える
+		if nfiles++; nfiles > maxFormFiles {
 			return badRequest("too many files")
+		}
+		if check != nil {
+			if err := check(r, value); err != nil {
+				return err
+			}
 		}
 		uf, err := f.saveFile(p)
 		if err != nil {

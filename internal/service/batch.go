@@ -65,7 +65,13 @@ func (s *Service) deleteOldPackage(ctx context.Context, id int64, dryRun bool, w
 	}
 	fmt.Fprint(w, "...")
 	if !dryRun {
-		if _, err := s.DeletePackage(ctx, id); err != nil && !errors.Is(err, ErrNotFound) {
+		// 保護されたかはロックを取った後に確かめ直す
+		_, err := s.deletePackage(ctx, id, true)
+		if errors.Is(err, ErrNotFound) || errors.Is(err, ErrProtected) {
+			fmt.Fprintln(w, " skipped")
+			return nil
+		}
+		if err != nil {
 			fmt.Fprintln(w)
 			return fmt.Errorf("delete package %d: %w", id, err)
 		}

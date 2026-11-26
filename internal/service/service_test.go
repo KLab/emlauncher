@@ -271,11 +271,28 @@ func TestInstallToken(t *testing.T) {
 		t.Fatalf("token = %+v, %v", got, err)
 	}
 	// PHP 版が書いた形式 (package_id が数値) も読める
-	if err := e.cache.Set(installTokenPrefix+"php", []byte(`{"mail":"b@example.com","package_id":12,"expire":"2099-01-01 00:00:00"}`), time.Minute); err != nil {
+	phpToken := randstr.New(32)
+	if err := e.cache.Set(installTokenPrefix+phpToken, []byte(`{"mail":"b@example.com","package_id":12,"expire":"2099-01-01 00:00:00"}`), time.Minute); err != nil {
 		t.Fatal(err)
 	}
-	if got, err := e.InstallTokenByToken(ctx, "php"); err != nil || got.PackageID != 12 {
+	if got, err := e.InstallTokenByToken(ctx, phpToken); err != nil || got.PackageID != 12 {
 		t.Fatalf("php token = %+v, %v", got, err)
+	}
+	// インストールトークンをパスワードリセットのキーとして使えない
+	if _, err := e.PasswordResetMail(ctx, installTokenPrefix+tok.Token); !errors.Is(err, ErrNotFound) {
+		t.Fatalf("install token accepted as a reset key: %v", err)
+	}
+	if err := e.ResetPassword(ctx, installTokenPrefix+tok.Token, "x"); !errors.Is(err, ErrNotFound) {
+		t.Fatalf("ResetPassword with install token: %v", err)
+	}
+	// 形式の違うトークン (memcached のキーにできない値を含む) は見つからない扱い
+	for _, bad := range []string{"nosuch", "a b", strings.Repeat("a", 300), "x\r\n" + randstr.New(28)} {
+		if _, err := e.InstallTokenByToken(ctx, bad); !errors.Is(err, ErrNotFound) {
+			t.Fatalf("token %q: %v", bad, err)
+		}
+		if ok, err := e.CheckPlistToken(ctx, bad, 1); ok || err != nil {
+			t.Fatalf("plist token %q: %v %v", bad, ok, err)
+		}
 	}
 	if _, err := e.InstallTokenByToken(ctx, "nosuch"); !errors.Is(err, ErrNotFound) {
 		t.Fatalf("unknown token: %v", err)

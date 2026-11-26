@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"regexp"
 	"strconv"
 	"time"
 
@@ -54,6 +55,12 @@ func (id *flexibleID) UnmarshalJSON(b []byte) error {
 	return err
 }
 
+// tokenPattern はインストールトークンと plist のトークンの形式 (randstr.New(32)).
+// 形式の違うものは memcached に問い合わせない (キーとして不正な値でエラーにしないため).
+var tokenPattern = regexp.MustCompile(`^[0-9A-Za-z]{32}$`)
+
+func validToken(token string) bool { return tokenPattern.MatchString(token) }
+
 // InstallToken はログインせずにインストールできるトークン. インストールは Mail のユーザとして記録する.
 type InstallToken struct {
 	Token     string
@@ -74,7 +81,7 @@ func (s *Service) CreateInstallToken(ctx context.Context, p db.Package, mail str
 
 // InstallTokenByToken はインストールトークンを返す. 無いか期限切れなら ErrNotFound.
 func (s *Service) InstallTokenByToken(ctx context.Context, token string) (InstallToken, error) {
-	if token == "" {
+	if !validToken(token) {
 		return InstallToken{}, ErrNotFound
 	}
 	v, err := s.cache.Get(installTokenPrefix + token)
@@ -104,7 +111,7 @@ func (s *Service) CreatePlistToken(ctx context.Context, pkgID int64) (string, er
 
 // CheckPlistToken は token が pkgID のパッケージのものか確かめる.
 func (s *Service) CheckPlistToken(ctx context.Context, token string, pkgID int64) (bool, error) {
-	if token == "" {
+	if !validToken(token) {
 		return false, nil
 	}
 	v, err := s.cache.Get(plistTokenPrefix + token)

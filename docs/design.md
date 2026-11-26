@@ -94,7 +94,7 @@ JSON のキーは PHP 版と同じ. 数値フィールド（id, file_size など
 
 ## HTTP
 
-- URL は `X-Forwarded-Proto` / `X-Forwarded-Host` を見て組み立てる（`enable_https`, リダイレクト, itms-services の plist URL）.
+- URL は設定 `base_url` があればそれで, 無ければ `X-Forwarded-Proto` / `X-Forwarded-Host`（無ければ `Host`）を見て組み立てる（`enable_https`, リダイレクト, itms-services の plist URL）.
 - 大きなファイル（最大 7GB）のアップロードは, リクエストを一時ファイル（`TMPDIR`）に流し, S3 にはマルチパートアップロードで送る.
 - テンプレートと静的ファイルはバイナリに埋め込む. 更新は無停止の再起動で行う.
 
@@ -104,5 +104,7 @@ JSON のキーは PHP 版と同じ. 数値フィールド（id, file_size など
 
 - systemd では, 古いプロセスが処理中のリクエストを終えるまでは `MainPID` は古いプロセスのまま. 古いプロセスが終了した時点で PID ファイルから新しいプロセスに移る. その後に新しいプロセスが異常終了しても `Restart=always` で再起動される. `systemctl stop` / `start` も効く.
 - `systemctl reload` はシグナルを送った時点で成功を返す. 新しいプロセスの起動に失敗したかはログ（`upgrade failed`）で確認する.
-- 古いプロセスが処理中のリクエストを終えるまでは, 次の reload は拒否される（tableflip の仕様. ログに `parent hasn't exited`）.
+- 古いプロセスが処理中のリクエストを終えるまでは, 次の reload は何もしない（tableflip の仕様. ログに `upgrade failed err=already upgraded`）.
+- 古いプロセスが処理中のリクエストを終える前に新しいプロセスが異常終了すると, 古いプロセスが終了して systemd が再起動するまで待ち受けが無い（待ち受けを引き継ぐ方式の制約）.
+- `systemctl stop` では, 処理中のリクエストが起動した子プロセス（bundletool など）も止まる（`KillMode=control-group`）.
 - ユニットの `ExecReload` は `/bin/sh -c 'kill -HUP $MAINPID'` にしている（`/bin/kill` が無い環境があるため）.

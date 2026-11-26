@@ -21,9 +21,14 @@ import (
 // requireAPIKey は API キーのアプリを context に入れる. 無効なキーなら 400.
 func (s *Server) requireAPIKey(next http.Handler) http.Handler {
 	return s.api(func(w http.ResponseWriter, r *http.Request) error {
+		if _, ok := r.Context().Value(ctxApp{}).(db.Application); ok {
+			// checkBearerKey で確かめ済み
+			next.ServeHTTP(w, r)
+			return nil
+		}
 		key, ok := s.requestAPIKey(r)
 		if !ok && !s.cfg.APIKeyParamEnabled && formOf(r).has("api_key") {
-			return badRequest("api_key request parameter is disabled. Use the Authorization: Bearer header.")
+			return badRequest(apiKeyParamDisabled)
 		}
 		app, err := s.svc.GetAppByAPIKey(r.Context(), key)
 		if errors.Is(err, service.ErrNotFound) {
@@ -38,15 +43,73 @@ func (s *Server) requireAPIKey(next http.Handler) http.Handler {
 	})
 }
 
+// maxTokenHours はインストールトークンの有効期間の上限 (10 年).
+const maxTokenHours = 10 * 366 * 24
+
+const apiKeyParamDisabled = "api_key request parameter is disabled. Use the Authorization: Bearer header."
+
 var bearerRe = regexp.MustCompile(`(?i)^Bearer +(\S+) *$`)
 
-// requestAPIKey は API キー. Authorization: Bearer ヘッダを優先し, 無ければ
-// (api_key_param_enabled なら) リクエストパラメータ api_key を使う.
-func (s *Server) requestAPIKey(r *http.Request) (string, bool) {
+// bearerKey は Authorization: Bearer ヘッダの API キー.
+func bearerKey(r *http.Request) (string, bool) {
 	for _, v := range r.Header.Values("Authorization") {
 		if m := bearerRe.FindStringSubmatch(v); m != nil {
 			return m[1], true
 		}
+	}
+	return "", false
+}
+
+// checkBearerKey は Authorization: Bearer ヘッダの API キーを, 本文を読む前に確かめる.
+// 無効なキーのアップロードをディスクに書かないため. ヘッダが無ければ何もしない (requireAPIKey で確かめる).
+func (s *Server) checkBearerKey(next http.Handler) http.Handler {
+	return s.api(func(w http.ResponseWriter, r *http.Request) error {
+		key, ok := bearerKey(r)
+		if !ok {
+			next.ServeHTTP(w, r)
+			return nil
+		}
+		app, err := s.svc.GetAppByAPIKey(r.Context(), key)
+		if errors.Is(err, service.ErrNotFound) {
+			return badRequest("Invalid api_key")
+		}
+		if err != nil {
+			return err
+		}
+		logAttr(r, "app_id", app.ID)
+		next.ServeHTTP(w, r.WithContext(context.WithValue(r.Context(), ctxApp{}, app)))
+		return nil
+	})
+}
+
+// apiFileCheck は API キーが本文 (api_key) にある multipart のリクエストで, ファイルを一時ファイルに
+// 書く前に, それまでに読んだ api_key を確かめる. 無効なら読むのをやめる (応答は requireAPIKey と同じ).
+// api_key がファイルより後ろにあるときは確かめられないので, そのまま読む.
+func (s *Server) apiFileCheck(r *http.Request, value func(string) (string, bool)) error {
+	if _, ok := r.Context().Value(ctxApp{}).(db.Application); ok {
+		return nil
+	}
+	key, has := value("api_key")
+	if !s.cfg.APIKeyParamEnabled {
+		if has {
+			return badRequest(apiKeyParamDisabled)
+		}
+		return badRequest("Invalid api_key")
+	}
+	if !has {
+		return nil
+	}
+	if _, err := s.svc.GetAppByAPIKey(r.Context(), key); errors.Is(err, service.ErrNotFound) {
+		return badRequest("Invalid api_key")
+	}
+	return nil
+}
+
+// requestAPIKey は API キー. Authorization: Bearer ヘッダを優先し, 無ければ
+// (api_key_param_enabled なら) リクエストパラメータ api_key を使う.
+func (s *Server) requestAPIKey(r *http.Request) (string, bool) {
+	if key, ok := bearerKey(r); ok {
+		return key, true
 	}
 	if !s.cfg.APIKeyParamEnabled {
 		return "", false
@@ -294,7 +357,8 @@ func (s *Server) apiCreateToken(w http.ResponseWriter, r *http.Request) error {
 	}
 	hours := 1.0
 	if v := f.Get("expire_hour"); v != "" && v != "0" {
-		if hours, err = strconv.ParseFloat(v, 64); err != nil || hours <= 0 {
+		// NaN / Inf と極端に大きい値 (memcached の有効期限が溢れる) は受け付けない
+		if hours, err = strconv.ParseFloat(v, 64); err != nil || !(hours > 0 && hours <= maxTokenHours) {
 			return badRequest("Invalid expire_hour")
 		}
 	}

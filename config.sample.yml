@@ -5,6 +5,10 @@
 # ALB から 80 番で直接受けるなら ":80" (systemd のユニットに AmbientCapabilities=CAP_NET_BIND_SERVICE が必要. README 参照).
 listen: 127.0.0.1:8080
 
+# ブラウザから見たサイトの URL (スキームとホストだけ). メール, リダイレクト, API の応答などの URL をこれで作る.
+# 空なら X-Forwarded-Proto / X-Forwarded-Host (無ければ Host) から作る. Host はクライアントが決められるので設定を勧める.
+base_url: ""
+
 # DB の DATETIME を読み書きするときの TZ. 空なら実行環境の TZ (環境変数 TZ, /etc/localtime).
 # PHP 版の date.timezone と必ず同じにする (php -i | grep date.timezone で確認).
 timezone: Asia/Tokyo

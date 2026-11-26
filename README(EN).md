@@ -62,7 +62,10 @@ Example systemd unit:
 ```ini
 [Unit]
 Description=EMLauncher
-After=network.target
+Wants=network-online.target
+After=network-online.target
+# Keep retrying even if the DB is unreachable at boot
+StartLimitIntervalSec=0
 
 [Service]
 User=emlauncher
@@ -73,12 +76,15 @@ ExecReload=/bin/sh -c 'kill -HUP $MAINPID'
 # Wait for in-flight requests (large uploads) on stop. Match -drain-timeout of emlauncher (default 1h)
 TimeoutStopSec=1h
 Restart=always
+RestartSec=5s
 
 [Install]
 WantedBy=multi-user.target
 ```
 
-EMLauncher listens on `listen` (default `127.0.0.1:8080`). Put it behind a reverse proxy (Apache / nginx) or an ALB. URLs are built from `X-Forwarded-Proto` / `X-Forwarded-Host`. The health check path is `/health`.
+EMLauncher listens on `listen` (default `127.0.0.1:8080`). Put it behind a reverse proxy (Apache / nginx) or an ALB. The health check path is `/health`.
+
+Absolute URLs in mails, redirects and API responses are built from the config `base_url` (e.g. `https://emlauncher.example.com`) if set. Otherwise they are built from `X-Forwarded-Proto` / `X-Forwarded-Host` (or `Host`). Since clients can set these headers freely, setting `base_url` is recommended (an ALB does not add `X-Forwarded-Host`).
 
 To receive requests from an ALB directly on port 80 without a reverse proxy, set `listen: ":80"` and add the following line to `[Service]` of the unit (a non-root user cannot listen on ports below 1024). The zero-downtime restart hands the listening socket over to the new process, so it works as is.
 
@@ -88,7 +94,11 @@ AmbientCapabilities=CAP_NET_BIND_SERVICE
 
 #### Update (zero-downtime restart)
 
-Replace the binary or the config file and run `systemctl reload emlauncher`. A new process takes over the listening socket, and the old process exits after finishing in-flight requests (including long uploads). If the new process fails to start (e.g. a config error), the old process keeps running (`upgrade failed` in the log).
+Replace the binary or the config file and run `systemctl reload emlauncher`. A new process takes over the listening socket, and the old process exits after finishing in-flight requests (including long uploads). If the new process fails to start (e.g. a config error or an unreachable DB), the old process keeps running (`upgrade failed` in the log).
+
+- Another `reload` while the old process is still finishing in-flight requests does nothing (`upgrade failed err=already upgraded` in the log). Reload again after the old process exits.
+- If the new process dies before the old process finishes its in-flight requests, new requests cannot be accepted until the old process exits and systemd restarts the service (a limitation of handing over the listening socket).
+- `systemctl stop` also terminates child processes started by in-flight requests (e.g. bundletool converting an AAB).
 
 `systemctl restart` stops the service first, so it waits for in-flight uploads and the service is down meanwhile. Use `reload` to update.
 

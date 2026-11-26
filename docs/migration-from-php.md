@@ -47,6 +47,10 @@ php export_php_config.php /path/to/emlauncher <MFW_ENV> > /etc/emlauncher/config
 - `listen`: `":80"` にする（Apache の代わりに ALB から受ける. ターゲットグループのポートに合わせる）. 書き出した値は `127.0.0.1:8080`.
 - `session.secret`: 書き出すたびにランダムに作られる. **複数台構成では全台で同じ値にする**（違うとサーバをまたぐたびにログアウトされる）.
 - `local_file.serve`: `true` のままにする（Apache を使わないので, Go 版が `/files` を配信する）.
+- `base_url`: ブラウザから見たサイトの URL（例: `https://emlauncher.example.com`）を設定する（推奨. 未設定なら `Host` ヘッダから URL を作る）.
+- 書き出し時に警告が出たら対応する.
+  - PHP 版の設定に `http_proxy` がある: Go 版は外部（Google / AzureAD）への接続に環境変数 `HTTPS_PROXY` を使うので, ユニットに `Environment=HTTPS_PROXY=...` を足す.
+  - DB のホストが `localhost`（unix_socket の指定なし）: PHP 版（PDO）は Unix ソケットで繋いでいたが, Go 版は TCP（`localhost:3306`）で繋ぐ. MySQL が TCP を受け付けること, ユーザの権限（`'user'@'127.0.0.1'` など）が TCP の接続を許していることを確かめる.
 
 ## 2. 切替
 
@@ -65,7 +69,10 @@ Go 版は **Apache と同じユーザ**（例: `apache`, `www-data`）で動か�
 ```ini
 [Unit]
 Description=EMLauncher
-After=network.target
+Wants=network-online.target
+After=network-online.target
+# 起動時に DB に繋がらなくても, 諦めずに再起動し続ける
+StartLimitIntervalSec=0
 
 [Service]
 User=apache
@@ -78,6 +85,7 @@ AmbientCapabilities=CAP_NET_BIND_SERVICE
 # 停止時は処理中のリクエスト (大きなアップロード) を待つ. emlauncher の -drain-timeout (既定 1h) に合わせる
 TimeoutStopSec=1h
 Restart=always
+RestartSec=5s
 # timezone を空にした場合は, ここで TZ を指定してもよい
 # Environment=TZ=Asia/Tokyo
 
@@ -101,7 +109,7 @@ journalctl -u emlauncher | head        # 起動時に timezone / storage / cache
 ```
 
 - ALB, ターゲットグループ（80 番, ヘルスチェックは `/health`）は変えない.
-- ALB が付ける `X-Forwarded-Proto` / `X-Forwarded-Host` から URL を組み立てる.
+- URL は設定 `base_url`（例: `https://emlauncher.example.com`）で組み立てる. 未設定なら `X-Forwarded-Proto` と `Host`（`X-Forwarded-Host` があればそれ）から組み立てるが, ALB は `X-Forwarded-Host` を付けず, `Host` はクライアントが決められるので, `base_url` を設定することを勧める.
 - PHP 版の `DocumentRoot`（`web/`）, `.htaccess`, Apache の設定は使わなくなる. アクセスログは Apache ではなく Go 版のログ（journald）に出る.
 - 以後の更新（バイナリや設定の差し替え）は `systemctl reload emlauncher` で行う（無停止. README 参照）.
 
@@ -131,6 +139,16 @@ PHP 版の不具合を直したもの:
 - ダウンロード時のファイル名で, PHP 版は空白を `+` にしていた. Go 版は `%20` にする.
 - 30 日を超える有効期限のインストールトークンが, PHP 版では発行直後に失効していた.
 - 画面のアップロードで, PHP 版は一時ファイル名を検証しておらず, 任意のキーのファイルを移動できた. Go 版は一時ファイルとして作った名前だけを受け付ける.
+- 添付ファイルの追加（画面・API）で, PHP 版はパッケージをロックしておらず, 同時に削除されたパッケージに添付ファイルの行とファイルが残ることがあった. Go 版はパッケージをロックし直して確かめる.
+- 古いパッケージの削除バッチで, PHP 版は対象を選んだ後に保護されたパッケージも消していた. Go 版はロックを取った後に確かめ直し, 消さない（`skipped`）.
+- ログインしていない画面へのアップロードや, API キーが無効なアップロードも, PHP 版は一時ファイルに書いていた（PHP が本文を読んでから認証していた）. Go 版はログインと `Authorization: Bearer` の API キーを本文を読む前に確かめる. API キーを本文（`api_key`）で送る場合は, ファイルより前に送られたキーが無効なら, そこで読むのをやめる.
+- `login.enable_password: false` でも, PHP 版はパスワードリセット（メールの送信とパスワードの設定）ができた. Go 版は 404 を返す.
+- API `create_token` の `expire_hour` を PHP 版は検証しておらず, 数値でない値や極端に大きい値では有効期限がおかしくなった. Go 版は 10 年を上限とし, それを超える値や正の数でない値は 400 を返す.
+- 画面のアップロードで, 一時ファイルを正式なキーにコピーした後に一時ファイルを消せないと, PHP 版はアップロードを失敗にしてコピー先のファイルを残していた. Go 版は移動を成功として扱い, 消せなかった一時ファイルはログに出す.
+- AAB の変換（bundletool）とキーストアの表示（keytool）で, PHP 版はキーストアのパスワードをコマンドラインに出し, 時間の上限も無かった. Go 版はパスワードをファイル（0600）や環境変数で渡し, 時間の上限（bundletool 10 分, keytool 1 分）と同時に動かす数の上限（2）を設ける.
+- PHP 版はメールやリダイレクト, API の応答の URL を `Host` / `X-Forwarded-Host` ヘッダ（クライアントが決められる）から作っていた. Go 版は設定 `base_url` があればそれを使う.
+- オーナーの変更（`/app/preferences_update_owners`）を, PHP 版は GET でも受け付けていた（別のサイトのリンクで変えられた）. Go 版は POST の本文だけを受け付ける.
+- QR コード（`/qr/code`）の `q` に `@host` などを渡すと, PHP 版は別のサイトを指す QR コードを作っていた. Go 版はサイトの中のパス（`/` で始まるもの）だけを受け付け, それ以外は 400.
 
 その他:
 
@@ -147,7 +165,6 @@ PHP 版の不具合を直したもの:
 - パスワードログインの失敗は 401, パスワードリセットの無効なキー（`password_reset`, `password_commit`）は 400 を返す（PHP 版はどれも 200 のエラーページ）.
 - コメントは本文が空なら受け付けない（400）. 対象のパッケージ（`package_id`）が別のアプリのものなら NULL にする.
 - 画面のアップロード（`/app/upload_post`）のファイルサイズは, フォームの値ではなくストレージに置いた一時ファイルの実際の大きさにする. `platform` と添付ファイルの `type` も検証する.
-- API `create_token` の `expire_hour` が正の数でなければ 400 を返す.
 - API `package_list` の `limit` / `offset` が負の数なら 0 として扱う（PHP 版は SQL のエラーで 500）.
 - 古いパッケージ削除バッチは, 対象を選んだ後に他の処理で消された・保護されたパッケージを消さず, `skipped` と出力する.
 - DB への接続は 1 プロセスあたり最大 50.

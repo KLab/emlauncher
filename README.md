@@ -62,7 +62,10 @@ systemd のユニットの例:
 ```ini
 [Unit]
 Description=EMLauncher
-After=network.target
+Wants=network-online.target
+After=network-online.target
+# 起動時に DB に繋がらなくても, 諦めずに再起動し続ける
+StartLimitIntervalSec=0
 
 [Service]
 User=emlauncher
@@ -73,12 +76,15 @@ ExecReload=/bin/sh -c 'kill -HUP $MAINPID'
 # 停止時は処理中のリクエスト (大きなアップロード) を待つ. emlauncher の -drain-timeout (既定 1h) に合わせる
 TimeoutStopSec=1h
 Restart=always
+RestartSec=5s
 
 [Install]
 WantedBy=multi-user.target
 ```
 
-`listen`（既定 `127.0.0.1:8080`）で待ち受けます. Apache / nginx のリバースプロキシや ALB の裏に置いてください. `X-Forwarded-Proto` / `X-Forwarded-Host` を見て URL を組み立てます. ヘルスチェックは `/health` です.
+`listen`（既定 `127.0.0.1:8080`）で待ち受けます. Apache / nginx のリバースプロキシや ALB の裏に置いてください. ヘルスチェックは `/health` です.
+
+メールやリダイレクト, API の応答に書く URL は, 設定 `base_url`（例: `https://emlauncher.example.com`）があればそれで組み立てます. 未設定なら `X-Forwarded-Proto` / `X-Forwarded-Host`（無ければ `Host`）を見ます. `Host` などのヘッダはクライアントが自由に決められるので, `base_url` を設定することを勧めます（ALB は `X-Forwarded-Host` を付けません）.
 
 リバースプロキシを置かずに ALB から 80 番で直接受ける場合は, `listen: ":80"` にし, ユニットの `[Service]` に次の行を足します（root 以外のユーザは 1024 未満のポートで待ち受けられないため）. 無停止の再起動では待ち受けを新しいプロセスに引き継ぐので, そのままで動きます.
 
@@ -88,7 +94,11 @@ AmbientCapabilities=CAP_NET_BIND_SERVICE
 
 #### 更新（無停止の再起動）
 
-バイナリや設定ファイルを置き換えて `systemctl reload emlauncher` すると, 処理中のリクエストを止めずに切り替わります. 新しいプロセスが待ち受けソケットを引き継ぎ, 古いプロセスは処理中のリクエスト（長いアップロードを含む）を終えてから終了します. 新しいプロセスが起動できなかった場合（設定の誤りなど）は, 古いプロセスがそのまま動き続けます（ログに `upgrade failed` が出ます）.
+バイナリや設定ファイルを置き換えて `systemctl reload emlauncher` すると, 処理中のリクエストを止めずに切り替わります. 新しいプロセスが待ち受けソケットを引き継ぎ, 古いプロセスは処理中のリクエスト（長いアップロードを含む）を終えてから終了します. 新しいプロセスが起動できなかった場合（設定の誤り, DB に繋がらないなど）は, 古いプロセスがそのまま動き続けます（ログに `upgrade failed` が出ます）.
+
+- 古いプロセスが処理中のリクエストを終えるまでの間に, もう一度 `reload` しても何も起きません（ログに `upgrade failed err=already upgraded`）. 古いプロセスが終了してから `reload` してください.
+- 古いプロセスが処理中のリクエストを終える前に新しいプロセスが異常終了すると, 古いプロセスが終了して systemd が再起動するまでの間, 新しいリクエストを受けられません（待ち受けを引き継ぐ方式の制約）.
+- `systemctl stop` では, 処理中のリクエストが起動した子プロセス（AAB の変換の bundletool など）も止まります.
 
 `systemctl restart` は一度停止するので, 処理中のアップロードが終わるまで待ち, その間はサービスが止まります. 更新には `reload` を使ってください.
 

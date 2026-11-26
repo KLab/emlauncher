@@ -10,7 +10,11 @@ import (
 )
 
 // requestScheme はブラウザから見たスキーム. リバースプロキシ / ALB の X-Forwarded-Proto を優先する.
+// base_url を設定していれば, そのスキームとホストを使う.
 func requestScheme(r *http.Request) string {
+	if u, ok := r.Context().Value(ctxBaseURL).(*url.URL); ok {
+		return u.Scheme
+	}
 	if p := r.Header.Get("X-Forwarded-Proto"); p != "" {
 		p, _, _ = strings.Cut(p, ",")
 		return strings.ToLower(strings.TrimSpace(p))
@@ -23,6 +27,9 @@ func requestScheme(r *http.Request) string {
 
 // requestHost はブラウザから見たホスト. X-Forwarded-Host を優先する.
 func requestHost(r *http.Request) string {
+	if u, ok := r.Context().Value(ctxBaseURL).(*url.URL); ok {
+		return u.Host
+	}
 	if h := r.Header.Get("X-Forwarded-Host"); h != "" {
 		h, _, _ = strings.Cut(h, ",")
 		return strings.TrimSpace(h)
@@ -123,7 +130,23 @@ const (
 	ctxForm ctxKey = iota
 	ctxUser
 	ctxLog
+	ctxBaseURL
 )
+
+// withBaseURL は設定 base_url を context に入れる (requestScheme / requestHost がヘッダより優先する).
+// Host / X-Forwarded-Host はクライアントが決められるので, メールなどに書く URL を偽らせないため.
+func (s *Server) withBaseURL(next http.Handler) http.Handler {
+	if s.cfg.BaseURL == "" {
+		return next
+	}
+	u, err := url.Parse(s.cfg.BaseURL)
+	if err != nil {
+		panic("base_url: " + err.Error()) // config で検証済み
+	}
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		next.ServeHTTP(w, r.WithContext(context.WithValue(r.Context(), ctxBaseURL, u)))
+	})
+}
 
 // formOf はリクエストのパラメータ (withForm で読んだもの).
 func formOf(r *http.Request) *form {
@@ -135,10 +158,10 @@ func formOf(r *http.Request) *form {
 
 // withForm はリクエストのパラメータを読んで context に入れる. 処理が終わったら一時ファイルを消す.
 // 読めなければ onError (エラーページ / JSON) で応答する.
-func (s *Server) withForm(onError func(http.ResponseWriter, *http.Request, error)) func(http.Handler) http.Handler {
+func (s *Server) withForm(onError func(http.ResponseWriter, *http.Request, error), check fileCheck) func(http.Handler) http.Handler {
 	return func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			f, err := parseForm(w, r)
+			f, err := parseForm(w, r, check)
 			if err != nil {
 				onError(w, r, err)
 				return

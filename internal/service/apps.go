@@ -187,6 +187,10 @@ func (s *Service) SetOwners(ctx context.Context, appID int64, by string, owners 
 	want := []string{by}
 	for _, o := range owners {
 		o = strings.TrimSpace(o)
+		// オーナーにはコメントの通知メールを送るので, ヘッダを壊す制御文字 (改行など) は受け付けない
+		if strings.ContainsFunc(o, func(r rune) bool { return r < 0x20 || r == 0x7f }) {
+			return invalidf("invalid owner address %q", o)
+		}
 		if o != "" && !slices.Contains(want, o) {
 			want = append(want, o)
 		}

@@ -8,6 +8,7 @@ import (
 	"image/png"
 	"net/http"
 	"strconv"
+	"strings"
 
 	"github.com/go-chi/chi/v5"
 	"github.com/makiuchi-d/gozxing"
@@ -35,7 +36,13 @@ func (s *Server) qrCode(w http.ResponseWriter, r *http.Request) {
 		gozxing.EncodeHintType_ERROR_CORRECTION: "H",
 		gozxing.EncodeHintType_MARGIN:           0,
 	}
-	code, err := qrcode.NewQRCodeWriter().Encode(baseURL(r)+f.Get("q"), gozxing.BarcodeFormat_QR_CODE, size, size, hints)
+	q := f.Get("q")
+	if !sitePath(q) {
+		// サイトの外 ("//evil.example" や "@evil.example" で別のホストになる URL) を指す QR コードは作らない
+		http.Error(w, "q must be a path in this site", http.StatusBadRequest)
+		return
+	}
+	code, err := qrcode.NewQRCodeWriter().Encode(baseURL(r)+q, gozxing.BarcodeFormat_QR_CODE, size, size, hints)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
@@ -211,4 +218,13 @@ func (s *Server) guestpassList(w http.ResponseWriter, r *http.Request) error {
 		})
 	}
 	return s.renderOK(w, r, "guestpass/list", struct{ GuestPasses []item }{items})
+}
+
+// sitePath は p がこのサイトの中のパス ("/" 1 つで始まる) か. "//host", "/\host" はブラウザが
+// 別のホストとして扱うので受け付けない. 制御文字と "\" も受け付けない.
+func sitePath(p string) bool {
+	if !strings.HasPrefix(p, "/") || strings.HasPrefix(p, "//") {
+		return false
+	}
+	return !strings.ContainsFunc(p, func(r rune) bool { return r == '\\' || r < 0x20 || r == 0x7f })
 }
