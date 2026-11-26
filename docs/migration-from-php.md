@@ -133,7 +133,23 @@ PHP 版の不具合を直したもの:
 その他:
 
 - ファイル名・API キー・トークンのランダム文字列は, 形式は同じで, 暗号論的乱数で作るようにした.
-- 設定の正規表現（`login.allowed_mailaddr_pattern`）は, PHP 版と同じく preg 形式（`/pattern/flags`）のまま書ける.
+- 設定の正規表現（`login.allowed_mailaddr_pattern`）は, PHP 版と同じく preg 形式（`/pattern/flags`）のまま書ける. 起動時に検証し, 誤りや Go で使えないフラグ（`x` など）があれば起動しない.
+- 設定ファイルは知らないキーがあると起動しない. `session.secret`（16 文字以上）, `storage_class`（`S3` / `LocalFile`）と保存先（`aws.bucket_name` / `local_file.path`）, `database.user`（または authfile）が必須. 省略時の既定値は `listen: 127.0.0.1:8080`, `mail.sendmail: /usr/sbin/sendmail -t -i`, DB は `localhost:3306` の `emlauncher`, memcached は `localhost:11211`, `local_file.url_prefix: /files`.
+- `-config` の既定値は `/etc/emlauncher/config.yml`. ログ（アクセスログを含む）は標準エラー出力に slog のテキスト形式（`key=value`）で出る.
+- 画面の 400（タイトルが空など）は, PHP 版は本文が空だった. Go 版はエラーページにメッセージを出す.
+- 壊れたパッケージ（Info.plist や AndroidManifest.xml が読めない IPA / APK）のアップロードは, PHP 版は 500, Go 版は 400.
+- 無効なインストールトークンの応答（403）は, PHP 版はプレーンテキスト, Go 版はエラーページ（HTML）.
+- ログインのセッション（Cookie）は, ログインから 30 日で無効になる.
+- ログイン後の戻り先が別のホストの URL なら, トップ（`/`）に戻る.
+- 無効にしたログイン方法（パスワード, Google, AzureAD）の URL は 404 を返す.
+- パスワードログインの失敗は 401, パスワードリセットの無効なキー（`password_reset`, `password_commit`）は 400 を返す（PHP 版はどれも 200 のエラーページ）.
+- コメントは本文が空なら受け付けない（400）. 対象のパッケージ（`package_id`）が別のアプリのものなら NULL にする.
+- 画面のアップロード（`/app/upload_post`）のファイルサイズは, フォームの値ではなくストレージに置いた一時ファイルの実際の大きさにする. `platform` と添付ファイルの `type` も検証する.
+- API `create_token` の `expire_hour` が正の数でなければ 400 を返す.
+- API `package_list` の `limit` / `offset` が負の数なら 0 として扱う（PHP 版は SQL のエラーで 500）.
+- 古いパッケージ削除バッチは, 対象を選んだ後に他の処理で消された・保護されたパッケージを消さず, `skipped` と出力する.
+- DB への接続は 1 プロセスあたり最大 50.
+- S3 へのアップロードはマルチパートのパートを 64MB にする（PHP 版は aws-sdk-php の既定の 5MB）. 5GB を超えるオブジェクトの移動（一時ファイルから正式なキーへ）は 512MB ずつのコピーで行う.
 
 ### Go 版で確認できていないこと
 
