@@ -10,10 +10,10 @@ import (
 	"text/template"
 	"time"
 
-	"emlauncher/internal/db"
-	"emlauncher/internal/pkgfile"
-	"emlauncher/internal/randstr"
-	"emlauncher/internal/service"
+	"github.com/KLab/emlauncher-go/internal/db"
+	"github.com/KLab/emlauncher-go/internal/pkgfile"
+	"github.com/KLab/emlauncher-go/internal/randstr"
+	"github.com/KLab/emlauncher-go/internal/service"
 )
 
 type ctxPackage struct{}

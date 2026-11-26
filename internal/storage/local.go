@@ -13,7 +13,7 @@ import (
 	"strings"
 	"time"
 
-	"emlauncher/internal/randstr"
+	"github.com/KLab/emlauncher-go/internal/randstr"
 )
 
 // Local はローカルディスクの保存先 (設定 storage_class: LocalFile).

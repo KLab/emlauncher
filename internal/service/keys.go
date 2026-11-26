@@ -5,9 +5,9 @@ import (
 	"regexp"
 	"strings"
 
-	"emlauncher/internal/db"
-	"emlauncher/internal/pkgfile"
-	"emlauncher/internal/randstr"
+	"github.com/KLab/emlauncher-go/internal/db"
+	"github.com/KLab/emlauncher-go/internal/pkgfile"
+	"github.com/KLab/emlauncher-go/internal/randstr"
 )
 
 // ストレージのキーの構成 (PHP 版と同じ).

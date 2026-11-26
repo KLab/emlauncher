@@ -8,9 +8,9 @@ import (
 	"strconv"
 	"time"
 
-	"emlauncher/internal/cache"
-	"emlauncher/internal/db"
-	"emlauncher/internal/randstr"
+	"github.com/KLab/emlauncher-go/internal/cache"
+	"github.com/KLab/emlauncher-go/internal/db"
+	"github.com/KLab/emlauncher-go/internal/randstr"
 )
 
 // memcached のキー (cache_prefix の後ろ).

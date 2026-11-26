@@ -5,7 +5,7 @@ import (
 	"net/http"
 	"strings"
 
-	"emlauncher/internal/service"
+	"github.com/KLab/emlauncher-go/internal/service"
 )
 
 // requireLogin はログインしていなければログイン画面にリダイレクトする.

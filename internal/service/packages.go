@@ -6,8 +6,8 @@ import (
 	"errors"
 	"time"
 
-	"emlauncher/internal/db"
-	"emlauncher/internal/pkgfile"
+	"github.com/KLab/emlauncher-go/internal/db"
+	"github.com/KLab/emlauncher-go/internal/pkgfile"
 )
 
 // GetPackage はパッケージを返す. 無ければ ErrNotFound.

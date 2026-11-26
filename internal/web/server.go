@@ -16,10 +16,10 @@ import (
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
 
-	"emlauncher/internal/config"
-	"emlauncher/internal/pkgfile"
-	"emlauncher/internal/service"
-	"emlauncher/internal/storage"
+	"github.com/KLab/emlauncher-go/internal/config"
+	"github.com/KLab/emlauncher-go/internal/pkgfile"
+	"github.com/KLab/emlauncher-go/internal/service"
+	"github.com/KLab/emlauncher-go/internal/storage"
 )
 
 type Server struct {

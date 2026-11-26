@@ -14,7 +14,7 @@ import (
 	"testing"
 	"time"
 
-	"emlauncher/internal/randstr"
+	"github.com/KLab/emlauncher-go/internal/randstr"
 )
 
 func TestRFC5987(t *testing.T) {

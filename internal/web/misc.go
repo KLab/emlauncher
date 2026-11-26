@@ -13,7 +13,7 @@ import (
 	"github.com/makiuchi-d/gozxing"
 	"github.com/makiuchi-d/gozxing/qrcode"
 
-	"emlauncher/internal/db"
+	"github.com/KLab/emlauncher-go/internal/db"
 )
 
 const (

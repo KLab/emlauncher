@@ -17,19 +17,19 @@ e2e/
 
 ### PHP 版のソース
 
-PHP 版はリポジトリから削除したので, `e2e/env/up.sh` が `e2e/env/php-src.sh` で過去のコミットからソースを取り出して `e2e/.work/php-src/` に置く（`git archive`, mfw は当時の submodule のコミットを clone, composer の依存はコンテナで install）。既定は PHP 版の最終版（`4124ca6`）。別のコミットを使うときは `E2E_PHP_REF=<commit>` を指定する。
+PHP 版（[KLab/emlauncher](https://github.com/KLab/emlauncher)）のソースは, `e2e/env/up.sh` が `e2e/env/php-src.sh` で取り出して `e2e/.work/php-src/` に置く（このリポジトリの履歴にそのコミットが無ければ KLab/emlauncher から取得して `git archive`, mfw は当時の submodule のコミットを clone, composer の依存はコンテナで install）。既定は PHP 版の基準の版（`26ea3e5`）。別のコミットを使うときは `E2E_PHP_REF=<commit>`, 別のリポジトリから取るときは `E2E_PHP_REPO=<url>` を指定する。
 
 ## 必要なもの
 
 - Docker（WSL の Ubuntu 上の Docker で動作確認済み。Docker Desktop は使わない）
-- Go 1.23 以上
+- Go 1.26 以上
 - git と, インターネットへの接続（PHP 版の mfw と composer の依存の取得. 初回のみ）
 
 WSL の Go が古い場合は、公式の方法でホーム以下に追加できる。
 
 ```sh
-go install golang.org/dl/go1.23.4@latest && ~/go/bin/go1.23.4 download
-export PATH=$HOME/sdk/go1.23.4/bin:$PATH
+go install golang.org/dl/go1.26.11@latest && ~/go/bin/go1.26.11 download
+export PATH=$HOME/sdk/go1.26.11/bin:$PATH
 ```
 
 ## シナリオテスト

@@ -22,9 +22,9 @@ import (
 
 	"github.com/cloudflare/tableflip"
 
-	"emlauncher/internal/bootstrap"
-	"emlauncher/internal/config"
-	"emlauncher/internal/web"
+	"github.com/KLab/emlauncher-go/internal/bootstrap"
+	"github.com/KLab/emlauncher-go/internal/config"
+	"github.com/KLab/emlauncher-go/internal/web"
 )
 
 func main() {

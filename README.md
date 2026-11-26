@@ -3,7 +3,7 @@ EMLauncher
 
 社内向けのアプリ配布サービスです. iOS (ipa) / Android (apk, aab) のパッケージをアップロードし, 端末からインストールできます.
 
-Go で実装しています. PHP 版はリポジトリから削除しました（最終版はコミット `4124ca6`）. PHP 版からの移行手順は [docs/migration-from-php.md](docs/migration-from-php.md) を参照してください.
+[KLab/emlauncher](https://github.com/KLab/emlauncher)（PHP 版）を Go で作り直したものです. DB スキーマ, ストレージの構成, URL は PHP 版と同じで, 初期バージョンは PHP 版からの移行をサポートします（PHP 版の DB とストレージをそのまま使い, PHP 版に切り戻すこともできます）. 移行手順は [docs/migration-from-php.md](docs/migration-from-php.md) を参照してください.
 
 ## 必要なもの
 
@@ -12,7 +12,7 @@ Go で実装しています. PHP 版はリポジトリから削除しました�
 - 保存先: Amazon S3（または S3 互換ストレージ）, もしくはローカルディスク
 - Java（Android App Bundle (aab) から apk を作る bundletool と keytool に使う）
 - sendmail 互換のコマンド（更新通知やパスワードリセットのメール）
-- ビルドに Go 1.23 以降
+- ビルドに Go 1.26 以降
 
 ## Setup
 

@@ -13,8 +13,8 @@ import (
 	"time"
 	"unicode/utf8"
 
-	"emlauncher/internal/db"
-	"emlauncher/internal/service"
+	"github.com/KLab/emlauncher-go/internal/db"
+	"github.com/KLab/emlauncher-go/internal/service"
 )
 
 // 画面に渡すデータ (テンプレートから参照する名前で持つ).

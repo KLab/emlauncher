@@ -11,9 +11,9 @@ import (
 	"strconv"
 	"strings"
 
-	"emlauncher/internal/db"
-	"emlauncher/internal/pkgfile"
-	"emlauncher/internal/service"
+	"github.com/KLab/emlauncher-go/internal/db"
+	"github.com/KLab/emlauncher-go/internal/pkgfile"
+	"github.com/KLab/emlauncher-go/internal/service"
 )
 
 type ctxApp struct{}

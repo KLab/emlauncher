@@ -11,10 +11,10 @@ import (
 	"fmt"
 	"time"
 
-	"emlauncher/internal/cache"
-	"emlauncher/internal/db"
-	"emlauncher/internal/mailer"
-	"emlauncher/internal/passhash"
+	"github.com/KLab/emlauncher-go/internal/cache"
+	"github.com/KLab/emlauncher-go/internal/db"
+	"github.com/KLab/emlauncher-go/internal/mailer"
+	"github.com/KLab/emlauncher-go/internal/passhash"
 )
 
 // passwordResetTTL はパスワードリセットの URL の有効期間.

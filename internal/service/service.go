@@ -15,12 +15,12 @@ import (
 	"log/slog"
 	"time"
 
-	"emlauncher/internal/cache"
-	"emlauncher/internal/config"
-	"emlauncher/internal/db"
-	"emlauncher/internal/mailer"
-	"emlauncher/internal/pkgfile"
-	"emlauncher/internal/storage"
+	"github.com/KLab/emlauncher-go/internal/cache"
+	"github.com/KLab/emlauncher-go/internal/config"
+	"github.com/KLab/emlauncher-go/internal/db"
+	"github.com/KLab/emlauncher-go/internal/mailer"
+	"github.com/KLab/emlauncher-go/internal/pkgfile"
+	"github.com/KLab/emlauncher-go/internal/storage"
 )
 
 // 処理の結果を表すエラー. 呼び出し側 (HTTP) はこれを見てステータスを決める.

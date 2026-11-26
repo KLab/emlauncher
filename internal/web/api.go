@@ -10,8 +10,8 @@ import (
 	"strings"
 	"time"
 
-	"emlauncher/internal/db"
-	"emlauncher/internal/service"
+	"github.com/KLab/emlauncher-go/internal/db"
+	"github.com/KLab/emlauncher-go/internal/service"
 )
 
 // API (/api/...) は api_key でアプリを特定する. 応答は JSON. JSON のキーは PHP 版と同じで,

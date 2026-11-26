@@ -5,7 +5,7 @@ import (
 	"net/http"
 	"strconv"
 
-	"emlauncher/internal/service"
+	"github.com/KLab/emlauncher-go/internal/service"
 )
 
 // ajaxNotificationSetting はインストール済みのアプリの更新通知を切り替える (value: 1 / 0).

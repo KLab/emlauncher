@@ -1,5 +1,5 @@
 # E2E テスト用の Go 版イメージ. ビルドコンテキストはリポジトリ直下.
-FROM golang:1.23.4-bookworm AS build
+FROM golang:1.26.11-bookworm AS build
 WORKDIR /src
 COPY go.mod go.sum ./
 RUN go mod download

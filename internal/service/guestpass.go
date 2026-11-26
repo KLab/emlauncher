@@ -4,8 +4,8 @@ import (
 	"context"
 	"time"
 
-	"emlauncher/internal/db"
-	"emlauncher/internal/randstr"
+	"github.com/KLab/emlauncher-go/internal/db"
+	"github.com/KLab/emlauncher-go/internal/randstr"
 )
 
 // GuestPassTTL はゲストパスの有効期間.

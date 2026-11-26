@@ -4,7 +4,7 @@ import (
 	"context"
 	"time"
 
-	"emlauncher/internal/db"
+	"github.com/KLab/emlauncher-go/internal/db"
 )
 
 // RecordInstall はインストール履歴を記録し, アプリをインストール済みにする (更新通知の対象になる).

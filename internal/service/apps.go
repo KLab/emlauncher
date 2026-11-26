@@ -8,9 +8,9 @@ import (
 	"strings"
 	"time"
 
-	"emlauncher/internal/db"
-	"emlauncher/internal/icon"
-	"emlauncher/internal/randstr"
+	"github.com/KLab/emlauncher-go/internal/db"
+	"github.com/KLab/emlauncher-go/internal/icon"
+	"github.com/KLab/emlauncher-go/internal/randstr"
 )
 
 // GetApp はアプリを返す. 無ければ ErrNotFound.

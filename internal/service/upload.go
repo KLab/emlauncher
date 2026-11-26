@@ -9,9 +9,9 @@ import (
 	"slices"
 	"strings"
 
-	"emlauncher/internal/db"
-	"emlauncher/internal/pkgfile"
-	"emlauncher/internal/storage"
+	"github.com/KLab/emlauncher-go/internal/db"
+	"github.com/KLab/emlauncher-go/internal/pkgfile"
+	"github.com/KLab/emlauncher-go/internal/storage"
 )
 
 // アップロードは 2 段階で行う.

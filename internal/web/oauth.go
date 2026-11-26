@@ -11,8 +11,8 @@ import (
 	"strings"
 	"time"
 
-	"emlauncher/internal/config"
-	"emlauncher/internal/randstr"
+	"github.com/KLab/emlauncher-go/internal/config"
+	"github.com/KLab/emlauncher-go/internal/randstr"
 )
 
 // oauthProvider は Google / AzureAD の OAuth 2.0 (認可コード) でのログイン.

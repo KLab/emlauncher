@@ -6,8 +6,8 @@ import (
 	"fmt"
 	"text/template"
 
-	"emlauncher/internal/db"
-	"emlauncher/internal/mailer"
+	"github.com/KLab/emlauncher-go/internal/db"
+	"github.com/KLab/emlauncher-go/internal/mailer"
 )
 
 var uploadMail = template.Must(template.New("upload").Parse(

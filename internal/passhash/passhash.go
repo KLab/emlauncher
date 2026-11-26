@@ -14,7 +14,7 @@ import (
 	"strconv"
 	"strings"
 
-	"emlauncher/internal/randstr"
+	"github.com/KLab/emlauncher-go/internal/randstr"
 )
 
 const (

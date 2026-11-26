@@ -12,12 +12,12 @@ import (
 
 	"github.com/go-sql-driver/mysql"
 
-	"emlauncher/internal/cache"
-	"emlauncher/internal/config"
-	"emlauncher/internal/mailer"
-	"emlauncher/internal/pkgfile"
-	"emlauncher/internal/service"
-	"emlauncher/internal/storage"
+	"github.com/KLab/emlauncher-go/internal/cache"
+	"github.com/KLab/emlauncher-go/internal/config"
+	"github.com/KLab/emlauncher-go/internal/mailer"
+	"github.com/KLab/emlauncher-go/internal/pkgfile"
+	"github.com/KLab/emlauncher-go/internal/service"
+	"github.com/KLab/emlauncher-go/internal/storage"
 )
 
 // App は用意したもの. 使い終わったら Close する.

@@ -3,7 +3,7 @@ EMLauncher
 
 An in-house app distribution service. Upload iOS (ipa) / Android (apk, aab) packages and install them on devices.
 
-EMLauncher is implemented in Go. The PHP version has been removed from this repository (the last PHP version is commit `4124ca6`). To migrate from the PHP version, see [docs/migration-from-php.md](docs/migration-from-php.md) (in Japanese).
+This is a Go rewrite of [KLab/emlauncher](https://github.com/KLab/emlauncher) (the PHP version). The DB schema, storage layout and URLs are the same as the PHP version, and the initial version supports migrating from the PHP version (it uses the PHP version's DB and storage as they are, and you can roll back to the PHP version). See [docs/migration-from-php.md](docs/migration-from-php.md) (in Japanese) for the migration procedure.
 
 ## Requirements
 
@@ -12,7 +12,7 @@ EMLauncher is implemented in Go. The PHP version has been removed from this repo
 - Storage: Amazon S3 (or S3 compatible storage), or local disk
 - Java (for bundletool and keytool, to build apk from Android App Bundle (aab))
 - A sendmail compatible command (notification and password reset mails)
-- Go 1.23+ to build
+- Go 1.26+ to build
 
 ## Setup
 

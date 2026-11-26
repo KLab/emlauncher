@@ -8,6 +8,8 @@ EC2 + Apache + ALB の構成で, PHP 版を Go 版に切り替える手順. DB �
 
 ## 0. 準備（ビルド）
 
+この手順と移行リハーサルは, PHP 版の [KLab/emlauncher](https://github.com/KLab/emlauncher) の `26ea3e5` を基準にしている. `4124ca6`（2023 年の master）以降の版は DB のスキーマが同じなので, そのまま移行できる. それより古い PHP 版の DB は, `sql/alter_*.sql` のうち未適用のものを日付順に流してスキーマを最新にする.
+
 ```sh
 GOOS=linux GOARCH=amd64 CGO_ENABLED=0 go build -o dist/ ./cmd/emlauncher ./cmd/delete-old-packages
 ```

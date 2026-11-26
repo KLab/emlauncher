@@ -14,8 +14,8 @@ import (
 	"syscall"
 	_ "time/tzdata" // TZ のデータが無い環境でも timezone を読めるように
 
-	"emlauncher/internal/bootstrap"
-	"emlauncher/internal/config"
+	"github.com/KLab/emlauncher-go/internal/bootstrap"
+	"github.com/KLab/emlauncher-go/internal/config"
 )
 
 func main() {

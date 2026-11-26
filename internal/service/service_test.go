@@ -16,12 +16,12 @@ import (
 	"testing"
 	"time"
 
-	"emlauncher/internal/cache"
-	"emlauncher/internal/config"
-	"emlauncher/internal/db"
-	"emlauncher/internal/mailer"
-	"emlauncher/internal/randstr"
-	"emlauncher/internal/storage"
+	"github.com/KLab/emlauncher-go/internal/cache"
+	"github.com/KLab/emlauncher-go/internal/config"
+	"github.com/KLab/emlauncher-go/internal/db"
+	"github.com/KLab/emlauncher-go/internal/mailer"
+	"github.com/KLab/emlauncher-go/internal/randstr"
+	"github.com/KLab/emlauncher-go/internal/storage"
 
 	"github.com/go-sql-driver/mysql"
 )

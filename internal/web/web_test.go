@@ -14,7 +14,7 @@ import (
 	"testing"
 	"time"
 
-	"emlauncher/internal/config"
+	"github.com/KLab/emlauncher-go/internal/config"
 )
 
 func TestFormatSize(t *testing.T) {

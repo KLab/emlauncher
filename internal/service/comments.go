@@ -4,7 +4,7 @@ import (
 	"context"
 	"database/sql"
 
-	"emlauncher/internal/db"
+	"github.com/KLab/emlauncher-go/internal/db"
 )
 
 // PostComment はアプリにコメントする. pkgID は対象のパッケージ (0 なら無し).

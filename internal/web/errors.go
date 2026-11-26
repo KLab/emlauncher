@@ -5,7 +5,7 @@ import (
 	"errors"
 	"net/http"
 
-	"emlauncher/internal/service"
+	"github.com/KLab/emlauncher-go/internal/service"
 )
 
 // httpError はステータスと, 利用者に見せるメッセージを持つエラー.

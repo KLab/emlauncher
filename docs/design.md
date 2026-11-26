@@ -7,7 +7,7 @@
 - **DB スキーマとストレージの構成（キー, S3 の ACL と ContentType）は PHP 版から変えない.** Go 版はマイグレーションを持たず, 既存のスキーマ（`sql/tables.sql`）に合わせた手書きの SQL で読み書きする. PHP 版と同じ DB・ストレージを共有でき, 切り戻しもできる.
 - **URL とリクエストパラメータ名は PHP 版と同じ**（`/{module}/{action}?...`）. API は CI などの外部から使われるため. 画面の form のパラメータ名も, E2E テストを PHP 版と共用するため変えない.
 - **OAuth のコールバック URL**（`/login/google_callback`, `/login/azuread_callback`）は変えない.
-- PHP 版との互換は 1 年程度（2027 年 11 月ごろまで）保つ想定. それまでは上記を変えない. PHP 版の最終版はコミット `4124ca6`.
+- 初期バージョンは PHP 版（[KLab/emlauncher](https://github.com/KLab/emlauncher) の `26ea3e5`）からの移行をサポートし, 上記を変えない. 互換を外す変更は, 移行と切り戻しの期間を終えた後のバージョンで行う.
 
 ## ディレクトリ構成
 
@@ -40,7 +40,7 @@ e2e/                         E2E テストと移行リハーサル. テスト専
 docs/                        設計メモ, PHP 版からの移行手順
 ```
 
-モジュール名は `emlauncher`. リポジトリには github.com 以外のミラーもあるので, モジュール名にホスト名は含めない.
+モジュール名は `github.com/KLab/emlauncher-go`.
 
 ## DB
 

@@ -123,9 +123,6 @@ func TestAPIUploadAABAndDSYM(t *testing.T) {
 // AAB と一緒に APK を送ると, AAB から生成せずにその APK を添付する.
 func TestAPIUploadAABWithAPK(t *testing.T) {
 	e := e2e.New(t)
-	if e.Config.Target == "php" {
-		t.Skip("PHP 版 (4124ca6) には無い機能")
-	}
 	owner := e.NewUser("owner")
 	app := e.CreateApp(owner, e2e.Unique("app"))
 
@@ -350,9 +347,6 @@ func TestAPIAttachDetach(t *testing.T) {
 
 func TestAPIAttachDownload(t *testing.T) {
 	e := e2e.New(t)
-	if e.Config.Target == "php" {
-		t.Skip("PHP 版 (4124ca6) には無い機能")
-	}
 	owner := e.NewUser("owner")
 	app := e.CreateApp(owner, e2e.Unique("app"))
 	id := e.MustAPIUpload(app.APIKey, "p", "a.apk", e2e.APK("com.example.a"), nil)
@@ -504,3 +498,4 @@ func sortedTagNames(e *e2e.Env, pkgID int64) []string {
 	}
 	return names
 }
+
